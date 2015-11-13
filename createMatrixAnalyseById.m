@@ -1,3 +1,5 @@
+% create a 360° matrix for one scan 
+% work the same as createMatrixTraining
 function [] = createMatrixAnalyseById(Id)
 nbMesurementByTrain=getNbStepsRotation();
 strdeb='ToAnalyse\';
@@ -22,9 +24,9 @@ i=1;
 					angleNext=scanToAnalyse(j+1,1);
 					interval=1;
 						while (k < angleNext )
-							pixelBF(1,k+2)=scanToAnalyse(j,2)+(scanToAnalyse(j+1,2)-scanToAnalyse(j,2))/(angleNext-angle)*interval; % +1 VS valeur angle
+							pixelBF(1,k+2)=scanToAnalyse(j,2)+(scanToAnalyse(j+1,2)-scanToAnalyse(j,2))/(angleNext-angle)*interval; 
 							pixelBF(2,k+2)=scanToAnalyse(j,3)+(scanToAnalyse(j+1,3)-scanToAnalyse(j,3))/(angleNext-angle)*interval;
-							if (scanToAnalyse(j,2)==0 || scanToAnalyse(j+1,2)==0)  % pas d extrapolation si 0
+							if (scanToAnalyse(j,2)==0 || scanToAnalyse(j+1,2)==0)  
 								pixelBF(1,k+2)=0;
 							end
 							if (scanToAnalyse(j,3)==0 || scanToAnalyse(j+1,3)==0)
