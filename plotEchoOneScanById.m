@@ -1,13 +1,18 @@
-function [] = plotEchoOneScanById(Id)
-createMatrixAnalyseById(Id) % creat matrix
+function [] = plotEchoOneScanById(Id,plotOn)
+% Id to analyse graph if plotOn=1
+createMatrixAnalyseById(Id); % creat matrix
 load ('analyseMat.mat'); % load the created matrix
 % rec correspond a la combinaison case angle
 
- angle=linspace(1,181,181); % 
- col=['r','g','b','m','c']; % graph color 
-figure();
-title (Id);
-hold on;
+
+	angle=linspace(1,181,181); % 
+if (plotOn==1)
+	col=['r','g','b','m','c']; % graph color 
+ 
+	figure();
+	title (Id);
+	hold on;
+endif
 
  Z=reshape(analyseMat(1,:),2,181);  % reshape matrix (1 362) > (2 181)
 	dX=Z(1,:);
@@ -15,10 +20,15 @@ hold on;
 	angleR=angle*pi()/180;
 	X=dX.*cos(angleR);
 	Y=dX.*sin(angleR);
-	plot (X,Y,col(3));
-
+	if (plotOn==1)
+		plot (X,Y,col(3));
+	endif
 	X=-dY.*cos(angleR);
 	Y=-dY.*sin(angleR);
-	plot (X,Y,col(3));
+	if (plotOn==1)
+		plot (X,Y,col(3));
+	endif
 
-hold off;
+if (plotOn==1)
+	hold off;
+endif

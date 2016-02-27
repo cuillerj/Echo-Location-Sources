@@ -1,0 +1,6 @@
+function [predLocMatrix] = InitLocMatrix(all_theta)
+nbPossibility=size(all_theta,1);
+predLocMatrix=zeros(nbPossibility,1);
+for i=1:nbPossibility;
+	predLocMatrix(i)=1/nbPossibility;
+endfor;

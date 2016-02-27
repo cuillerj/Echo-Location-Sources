@@ -5,10 +5,10 @@ nbMesurementByTrain=getNbStepsRotation();
 strdeb='ToAnalyse\';
 strfin='.txt';
 str=strcat(strdeb,Id,strfin);
-str
-copyfile (str, 'scanToAnalyse.txt','f')
+%str
+copyfile (str, 'scanToAnalyse.txt','f');
 load ('scanToAnalyse.txt');
-nbRec=size(scanToAnalyse,1)
+nbRec=size(scanToAnalyse,1);
 analyseMat=zeros(1,362);
 j=1;
 i=1;
@@ -36,12 +36,12 @@ i=1;
 							interval=interval+1;
 						end
 				end
-				j=j+1  ;
+				j=j+1;
 
 		pixelBF;
 
 		analyseMat(1,:)=reshape (pixelBF,1,[]);
 
 end
-size(analyseMat)
+size(analyseMat);
 save  ("-mat4-binary","analyseMat.mat","analyseMat")

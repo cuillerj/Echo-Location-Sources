@@ -1,0 +1,4 @@
+function [carto] = MapLocalize(posX,posY,cartoID)
+load "cartoCuisine.txt";
+carto=cartoCuisine(abs(posY/10),abs(posX/10))
+endfunction
