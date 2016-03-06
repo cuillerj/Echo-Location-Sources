@@ -19,14 +19,14 @@ i=1;
 predMat = predictxVsAll(all_theta, analyseMat,nbPred) % predict loaclization value zone/angle
 load 'extScanResult.mat' % load the training matrix
 while (i<=nbPred)
-		predLoc=predMat(i,1)
-		c = floor((predLoc-1)/(2*nbPasRotation-2))
-		Maille=c+1 % predicted zone 
-		zonesXY(Maille,:)
+		predLoc=predMat(i,1);
+		c = floor((predLoc-1)/(2*nbPasRotation-2));
+		Maille=c+1; % predicted zone 
+		zonesXY(Maille,:);
 		locX(i)=zonesXY(Maille,1);
 		locY(i)=zonesXY(Maille,2);
 		reste=predLoc-c*(2*nbPasRotation-2);
-		Angle=mod(360-(reste-1)*valAngle,360) % predicted angle
+		Angle=mod(360-(reste-1)*valAngle,360); % predicted angle
 		locAngle(i)=Angle;
 		locCost(i)=predMat(i,2);
 		[x,y]=find(extScanResult(:,5)==predLoc);

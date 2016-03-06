@@ -31,7 +31,8 @@ X = [ones(m, 1) X];
 %       for each row.
 %       
 mat=X*all_theta';
-%save  ("-mat4-binary","mat.mat","mat")
+% supprimer le save pour ameliorer perf
+save  ("-mat4-binary","mat.mat","mat")
 [w j]=min(mat,[],2);
 n=1;
 while (n<=x)

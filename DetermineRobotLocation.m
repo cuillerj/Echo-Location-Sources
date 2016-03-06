@@ -1,16 +1,16 @@
-function [detX,detY,detAngle,detProb,predLocMatrix] = DetermineRobotLocation(robot,posX,posY,posAngle,echoX,echoY,echoAngle,echoProb,predLocMatrix)
-shiftNorthXOrientation=91; % shift between north and X direction in degres
-northOrientation=robot.GetNorthOrientation
-northAjdustOrientation=mod((northOrientation+360-shiftNorthXOrientation),360);
-currentLocProb=robot.GetCurrentLocProb
+function [detX,detY,detAngle,detProb,predLocMatrix] = DetermineRobotLocation(robot,posX,posY,posAngle,echoX,echoY,echoAngle,echoProb,predLocMatrix,shiftNorthXOrientation)
+%shiftNorthXOrientation=290; % shift between north and X direction in degres
+northOrientation=robot.GetNorthOrientation;
+northAjdustOrientation=mod((shiftNorthXOrientation-northOrientation+360),360);
+currentLocProb=robot.GetCurrentLocProb;
 %if (robot.GetHardJustReboot==true || currentLocProb==0) %% robot never located since reboot
 if ( currentLocProb==0) %% robot never located since reboot
 	deltaAngle=zeros(size(echoAngle,2),1);
 	for i=1:size(echoAngle,2)
-		deltaAngle(i)=mod(northAjdustOrientation+360-echoAngle(i),360)
+		deltaAngle(i)=mod(northAjdustOrientation+360-echoAngle(i),360);
 	endfor
 	for i=1:size(echoAngle,2)
-		if (deltaAngle(i) >=345 || deltaAngle(i) <=15)
+		if (deltaAngle(i) >=330 || deltaAngle(i) <=30)
 			detX=echoX(i);
 			detY=echoY(i);
 			detAngle=echoAngle(i);
