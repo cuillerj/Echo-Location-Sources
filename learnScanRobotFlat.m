@@ -1,5 +1,5 @@
 % lambda and maxIter wiil be used by oneVsAll()
-function [] = learnScanRobot(lambdamin,lambdamax,maxIter)
+function [] = learnScanRobotFlat(lambdamin,lambdamax,maxIter)
 %% Initialization
 %% Setup the parameters 
 input_layer_size  = 360;  % 
@@ -14,7 +14,7 @@ load ('trainResultFlat.mat');
 Yv4=trainResultFlat;
 sY=size(Yv4)
 lambda=lambdamin;
-
+testFlatResult=[];
 
 %% ============ Part 2: Vectorize Logistic Regression ============
 %  use regularized logistic regression (implementation is vectorized).
@@ -28,6 +28,7 @@ while (lambda<=lambdamax)
 	[all_thetaFlat] = oneVsAll(trainMatFlat, Yv4, num_labels, lambda,maxIter);
 	fname=strcat("all_thetaFlat",mat2str(i),".mat");
 	save  ("-mat4-binary",fname,"all_thetaFlat")
+	save  ("-mat4-binary","all_thetaFlat.mat","all_thetaFlat")
 	%% ================ Part 3: Predict for One-Vs-All ================
 	% calculate the accuaracy of the prediction with the training data
 	load('trainMatFlat.mat'); % training data stored in arrays X, y
@@ -38,6 +39,11 @@ while (lambda<=lambdamax)
 	save  ("-mat4-binary","accuracyFlat.mat","accuracyFlat")
 	ctime (time ())
 	fprintf('\nTraining Set accuracyFlat: %f\n', mean(double(predTrain == Yv4)) * 100);
+	% test
+	[coeff,foundFirst,notFound,nbrec] = evaluateLearningResultsFlat()
+	testFlatResult=[testFlatResult;[lambda,accuracyFlat(i,2),coeff,foundFirst,notFound,nbrec]];
+	save  ("-mat4-binary","testFlatResult.mat","testFlatResult")
+	%
 	lambda=lambda+delta/20;
 	i=i+1;
 end

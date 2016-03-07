@@ -4,7 +4,6 @@ northOrientation=robot.GetNorthOrientation;
 northAjdustOrientation=mod((shiftNorthXOrientation-northOrientation+360),360);
 currentLocProb=robot.GetCurrentLocProb;
 %if (robot.GetHardJustReboot==true || currentLocProb==0) %% robot never located since reboot
-if ( currentLocProb==0) %% robot never located since reboot
 	deltaAngle=zeros(size(echoAngle,2),1);
 	for i=1:size(echoAngle,2)
 		deltaAngle(i)=mod(northAjdustOrientation+360-echoAngle(i),360);
@@ -37,9 +36,9 @@ if ( currentLocProb==0) %% robot never located since reboot
 		endif
 	endfor	
 		robot.SetCurrentLocProb(detProb);
+if ( currentLocProb==0) %% robot never located since reboot
 	return
 else
-
 	return
 endif
 
