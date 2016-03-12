@@ -42,9 +42,9 @@ i=1;
 
 		end
 		pixelBF;
-		save  ("-mat4-binary","pixelBF.mat","pixelBF");
-		analyseMat(1,:)=reshape (pixelBF,1,[]);
-		save  ("-mat4-binary","analyseMat.mat","analyseMat");
+%		save  ("-mat4-binary","pixelBF.mat","pixelBF");
+%		analyseMat(1,:)=reshape (pixelBF,1,[]);
+%		save  ("-mat4-binary","analyseMat.mat","analyseMat");
 		pixelBFTr=pixelBF';
 for i=(1:rotation)
 	pixelBFTr=circshift(pixelBFTr,1);

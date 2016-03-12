@@ -2,13 +2,15 @@ function [rotationToDo,lenToDo] = ComputeMoveToDo(currentX,currentY,currentOrien
 deltaX=nextX-currentX;
 deltaY=nextY-currentY;
 deltaAlpha=atan(deltaY/deltaX)*180/pi;
-rotationToDo=deltaAlpha-currentOrientation;
+rotationToDo=deltaAlpha-currentOrientation
 if (deltaX<0)
 	rotationToDo=180+rotationToDo;
 endif
 if (rotationToDo>180);
 	rotationToDo=rotationToDo-360;
 endif
+if (rotationToDo<-180);
+	rotationToDo=360+rotationToDo;
+endif
 lenToDo=sqrt(deltaX^2+deltaY^2);
-
 endfunction

@@ -5,7 +5,7 @@ javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar'
 shiftNorthXOrientation=268; % shift between north and X direction in degres
 setupPath;
 robot=robotJava;
-methods=javamethods(robot);
+%methods=javamethods(robot);
 robot.SetTraceFileOn(1);    % route console to trace file
 robot.LaunchBatch();          % call java method to start batch
 load "cartoCuisine.txt";
@@ -19,7 +19,7 @@ targetReached=false;
 ready=false;
 nbPred=5;
 while (ready==false)
-	ready=yes_or_no(" robot ready to go ?")
+	ready=yes_or_no(" robot ready to go ?");
 end
 % compute target location
 [targetX,targetY,targetAngle]=ComputeTargetLocation(robot);
@@ -27,23 +27,24 @@ printf("robot target is X:%d Y:%d orientation: %d. \n",targetX,targetY,targetAng
 sleep(1);
 % loop till target reached
 	% localize robot
-robot.NorthAlignRobot(shiftNorthXOrientation);
+robot.NorthAlign(shiftNorthXOrientation);
 count=0;
 printf("north aligning \n")
 aligned=false;
-while (aligned==false)
-	status=robot.GetOctaveRequestPending();
-	if (status==false)
-		aligned=true;
-	endif
-	if (mod(count,10)==0)
-		printf("robot status: %d. \n",status);
-	endif
-	count =count+1;
+issue=false;
+retCode=9;
+while (retCode==9)
+	retCode=robot.GetRetcode(6,1,2);
+	printf("robot retcode: %d. \n",retCode);
 	sleep(1)
 end
+	if (retCode==0)
+		aligned=true
+		else
+		issue=true
+	endif
 
-while (issue==0 && targetReached==false)
+while (issue==false && targetReached==false)
 printf("echo loc \n")
 %	[echoX,echoY,echoAngle,echoProb]=EchoLocalizeRobot(robot,nbLocPossibility,nbPred);
 	orientation=mod(robot.GetNorthOrientation+360-shiftNorthXOrientation,360)
@@ -57,10 +58,22 @@ printf("echo loc \n")
 	robot.SetAlpha(newAngle);
 	robot.SetCurrentLocProb(newProb);
 	robot.UpdateHardRobotLocation();
+	retCode=9;
+hardRobotUpToDate=false;
+while (retCode==9)
+	retCode=robot.GetRetcode(8,1,2);
+	printf("robot retcode: %d. \n",retCode);
+	sleep(1)
+end
+	if (retCode==0)
+		hardRobotUpToDate=true
+		else
+		issue=true
+	endif
 	printf("determined location is X:%d Y:%d orientation:%d with %d%% probability. \n",newX,newY,newAngle,newProb)
-	sleep(2);
+%	sleep(3);
 	if (robot.GetHardPosX==newX && robot.GetHardPosY==newY && robot.GetHardAngle==floor(newAngle))
-			if (abs(targetX-robot.GetHardPosX)<=20 && abs(targetY-robot.GetHardPosY)<=20)
+			if (abs(targetX-robot.GetHardPosX)<=10 && abs(targetY-robot.GetHardPosY)<=10)
 				targetReached=true;
 				% check target reached
 			else 
