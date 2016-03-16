@@ -18,6 +18,7 @@ issue=0;
 targetReached=false;
 ready=false;
 nbPred=5;
+CreateParticles(1000,1);
 while (ready==false)
 	ready=yes_or_no(" robot ready to go ?");
 end
@@ -53,6 +54,7 @@ printf("echo loc \n")
 		printf("robot echo location is X:%d Y:%d orientation:%d with %d%% probability. \n",echoX(i),echoY(i),echoAngle(i),echoProb(i))
 	endfor
 	[newX,newY,newAngle,newProb,predLocMatrix]=DetermineRobotLocation(robot,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardAngle,echoX,echoY,echoAngle,echoProb,predLocMatrix,shiftNorthXOrientation);
+	DetermineRobotLocationWithParticles(newX,newY,newAngle,newProb);
 	robot.SetPosX(newX);
 	robot.SetPosY(newY);
 	robot.SetAlpha(newAngle);
@@ -87,6 +89,7 @@ while (ready==false)
 end 
 				[rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardAngle,nextX,nextY);
 				robot.Move(rotationToDo,lenToDo*10);  % len sent in mm
+				MoveParticles(rotationToDo,lenToDo*10);
 				while (robot.GetRunningStatus()!=105)
 				sleep(1);
 				end
