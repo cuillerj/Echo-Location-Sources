@@ -6,28 +6,17 @@ function [] = DetermineRobotLocationWithParticlesGaussian(echoX,echoY,echoProb,p
 	z=size(echoX,2);
 	for i=1:x
 		weight=[];
-%		W=[particles(i,1:2),[180]];
-				W=[particles(i,1:2)];
+		W=[particles(i,1:2)];       % get(x,y) of particles
 		for j=1:z
-%			[a,b]=max(echoAngle(j),particles(i,3:3)];
-%%			p2=particles(i,3:3);
-%			if (p1-p2<0)
-%				p2=echoAngle(j);
-%				p1=particles(i,3:3);
-%			endif
-%			diffAngle=min(p1-p2,p1-p2+360);
-%			X=[echoX(j),echoY(j),mod((echoAngle(j)+180-particles(i,3:3)+360),360)];
-			X=[echoX(j),echoY(j)];
-			weight=[weight;[normpdf(X,W,sigma)]];           % gaussian normal
-
+			X=[echoX(j),echoY(j)]; % get measurment (x,y)
+			weight=[weight;[normpdf(X,W,sigma)]];           % compute gaussian normal
 		endfor
-%		weight(:,3)=weight(:,3).*2;
-		Z=max(sum(weight,2));
+
+		Z=max(sum(weight,2));     % sum the weight for each measurment and keep the highest value corresponding to the better choice 
 		[k,l]=max(Z);
-		particles(i,4)=k*(101-echoProb(l));
-%		particles(i,4)=k;
+		particles(i,4)=k*(101-echoProb(l)); % update particle weight taking into account the measurment probability
 	endfor
-	particles(:,4)=particles(:,4)/sum(particles(:,4));  % normalyze
+	particles(:,4)=particles(:,4)/sum(particles(:,4));  % normalyze the weight to get probability
 	save ("-mat4-binary","particles.mat","particles")
 %	particles 
 endfunction
