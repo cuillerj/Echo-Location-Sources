@@ -44,7 +44,7 @@ while (lambda<=lambdamax)
 	testFlatResult=[testFlatResult;[lambda,accuracyFlat(i,2),coeff,foundFirst,notFound,nbrec]];
 	save  ("-mat4-binary","testFlatResult.mat","testFlatResult")
 	%
-	lambda=lambda+delta/20;
+	lambda=lambda+delta/10;
 	i=i+1;
 end
 

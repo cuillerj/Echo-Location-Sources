@@ -18,7 +18,7 @@ issue=0;
 targetReached=false;
 ready=false;
 nbPred=5;
-CreateParticles(1000,1);
+CreateParticles(1000,1,1);
 while (ready==false)
 	ready=yes_or_no(" robot ready to go ?");
 end

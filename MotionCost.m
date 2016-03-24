@@ -1,11 +1,14 @@
-function [cost] = MotionCost(rotation,distance)
+function [cost] = MotionCost(rotation,distance,currentX,currentY,currentHeading,plotOn)
 % tenir compte du nb entier de trous encodeurs dans rotation cost
+cartoId=1;
 miniRotationCost=500;
 supplementaryCost=200;
 [angleHole,distancOneHole]=StepEncoderByHole()
 miniRotationAbility=2*angleHole
 miniMoveAbility=2*distancOneHole
 costD=0;
+cosH=cos((currentHeading+rotation)*pi/180);
+sinH=sin((currentHeading+rotation)*pi/180);
 %rotation/angleHole;
 %abs(rotation/angleHole-floor(rotation/angleHole));
 %abs(rotation/angleHole-ceil(rotation/angleHole));
@@ -35,5 +38,15 @@ if (distance!=0)
 		endif
 else
 endif
-cost=cost+costD;
+dx=10;
+dy=10;
+cartoWeight=0;
+while (sqrt(dx^2+dy^2)<(distance))
+	cartoWeight=cartoWeight+QueryCartoWeight(mod(rotation+currentHeading,360),currentX+dx,currentY+dy,cartoId,plotOn);
+	dx=dx+10*cosH;
+	dy=dy+10*sinH;
+	sqrt(dx^2+dy^2)
+end
+cartoWeight
+cost=cost+costD+cartoWeight;
 endfunction
