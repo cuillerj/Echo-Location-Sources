@@ -12,5 +12,5 @@ endif
 if (rotationToDo<-180);
 	rotationToDo=360+rotationToDo;
 endif
-lenToDo=sqrt(deltaX^2+deltaY^2);
+lenToDo=sqrt(deltaX^2+deltaY^2)
 endfunction

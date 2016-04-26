@@ -1,6 +1,6 @@
-function [] = plotEchoLastScanRotation(robot,plotOn,rotation)
-createMatrixLastScanWithRotation(robot,rotation) % creat matrix
-load ('analyseMatRotated.mat'); % load the created matrix
+function [analyseMatRotated] = plotEchoLastScanRotation(robot,plotOn,rotation)
+analyseMatRotated=createMatrixLastScanWithRotation(robot,rotation); % creat matrix
+%load ('analyseMatRotated.mat'); % load the created matrix
 % rec correspond a la combinaison case angle
 
  angle=linspace(1,181,181); % 

@@ -1,7 +1,0 @@
-function [angleHole] = angleEncoderByHole(rotation,distance)
-% tenir compte du nb entier de trous encodeurs dans rotation cost
-RobotWidth = 45.5; 
-WheelDiameter = 6.4;
-WheelEncoderHoles=8;
-angleHole=(((pi*WheelDiameter)/WheelEncoderHoles)/(pi*RobotWidth))*360
-endfunction

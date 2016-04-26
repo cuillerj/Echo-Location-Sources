@@ -17,6 +17,6 @@ while (i<=nbPred)
 	[x,y]=find(scanResult(:,5)==predLoc);
 	scanResult(x:x+14,:);
 	plotEchoTraining(predLoc) % plot training data that fit with the prediction
-	i=i+1
+	i=i+1;
 end
 save  ("-mat4-binary","predMat.mat","predMat")

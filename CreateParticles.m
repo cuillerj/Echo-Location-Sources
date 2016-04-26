@@ -1,4 +1,4 @@
-function [] = CreateParticles(particlesNumber,cartoId,plotOn)
+function [particles] = CreateParticles(particlesNumber,cartoId,plotOn)
 % cortoId to be developped
 load carto1;
 pw=0;
@@ -17,11 +17,12 @@ end
 save ("-mat4-binary","particles.mat","particles")
 if (plotOn)
 	figure();
-	title ("particles");
+	title ("created particles");
 	hold on;
 	for i=1:particlesNumber
 		plot(particles(i,1),particles(i,2))
 	end
 	hold off;
 endif
+return
 endfunction

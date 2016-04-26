@@ -1,5 +1,5 @@
 % create a matrix for one scan rotated by "rotation" degres
-function [] = createMatrixLastScanWithRotation(robot,rotation)
+function [analyseMatRotated] = createMatrixLastScanWithRotation(robot,rotation)
 nbMesurementByTrain=getNbStepsRotation();
 %load ('scanToAnalyse.txt');
 scanToAnalyse=zeros(nbMesurementByTrain,3);
@@ -58,4 +58,4 @@ endfor
 	pixelBF=pixelBFTr';
 analyseMatRotated(1,:)=reshape (pixelBF,1,[]);
 size(analyseMatRotated);
-save  ("-mat4-binary","analyseMatRotated.mat","analyseMatRotated")
+%save  ("-mat4-binary","analyseMatRotated.mat","analyseMatRotated")

@@ -1,7 +1,7 @@
-function p = analyseOneScanFlatById(Id,rotation)
+function p = analyseOneScanFlatRotationById(Id,rotation)
 %createMatrixAnalyseById(Id)
 load ("zonesXY.txt");
-plotEchoLastScanRotation(Id,1,rotation) % plot data to be analysed and create matrix analyseMat
+plotEchoLastScanRotation(Id,1,rotation) % create matrix analyseMat and plot data to be analysed 
 nbPasRotation=getNbStepsRotation(); % get the number of steps for a 360° rotation
 %valAngle=180/(nbPasRotation-1); % value of the angle of a step 
 load all_thetaFlat % load matrix learnt during the traing phase

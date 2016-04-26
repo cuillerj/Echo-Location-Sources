@@ -1,5 +1,5 @@
-function [] = MoveParticles(rotation,distance,plotOn)
-load particles
+function [particles] = MoveParticles(rotation,distance,plotOn,particles)
+%load particles
 noiseX=2;               % noise on x move
 noiseY=noiseX; 			% noise on y move
 noiseO=1;               % noise on rotation move
@@ -11,10 +11,10 @@ for i=1:x
 	particles(i,3)=mod(angle*180/pi,360)+(randi(noiseO)-noiseO/2);
 endfor
 
-save ("-mat4-binary","particles.mat","particles")
+%save ("-mat4-binary","particles.mat","particles")
 if (plotOn)
 	figure();
-	title ("particles");
+	title ("particles moved");
 	hold on;
 	for i=1:x
 		plot(particles(i,1),particles(i,2))

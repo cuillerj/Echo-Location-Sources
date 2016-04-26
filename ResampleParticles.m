@@ -1,5 +1,5 @@
-function [] = ResampleParticles(plotOn)
-load particles;
+function [particles] = ResampleParticles(plotOn,particles)
+%load particles
 [nbPart,y]=size(particles);
 omegaMax=max(particles(:,4));
 %idx=[1:nbPart];
@@ -24,6 +24,7 @@ particles=[newParticles,z];
 save ("-mat4-binary","particles.mat","particles");
 if (plotOn)
 	figure()
+	title ("particles resampeled");
 	hold on;
 	for i=1:nbPart
 		plot(particles(i,1),particles(i,2),'m');

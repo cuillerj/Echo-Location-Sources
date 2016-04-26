@@ -1,4 +1,4 @@
-function [locX,locY,locAngle,locCost] = analyseLastScanRotation(robot,plotOn,nbPred,rotation)
+function [locX,locY,locAngle,locCost] = analyseLastScanRotation(robot,plotOn,nbPred,rotation,analyseMatRotated)
 %createMatrixAnalyseById(Id)
 %javamethods(robot)
 %robot.GetLastScanID()
@@ -8,13 +8,12 @@ locCost=0;
 locAngle=0;
 load ("zonesXY.txt");
 
-plotEchoLastScanRotation(robot,plotOn,rotation) % plot data to be analysed and create matùrix analyseMat
+analyseMatRotated=plotEchoLastScanRotation(robot,plotOn,rotation); %  create matrix analyseMat and plot data to be analysed 
 nbPasRotation=getNbStepsRotation(); % get the number of steps for a 360° rotation
 %valAngle=180/(nbPasRotation-1); % value of the angle of a step 
 load all_thetaFlat % load matrix learnt during the traing phase
-load analyseMatRotated.mat % load data to be analysed
+%load analyseMatRotated.mat % load data to be analysed
 i=1;
-
 %predLoc = predictOneVsAll(all_theta, analyseMat) % predict loaclization value zone/angle
 predMat = predictxVsAll(all_thetaFlat, analyseMatRotated,nbPred) % predict loaclization value zone/angle
 load 'scanResult.txt' % load the training matrix
