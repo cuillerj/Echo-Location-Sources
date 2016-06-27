@@ -1,11 +1,27 @@
-function [nextX,nextY] = ComputeNextStepToTarget(currentX,currentY,targetX,targetY,plotOn)
-% to be developp to find path
-[AStarPath,AStarStep,cost] = AStarSearch(RoundTo(currentX,5),RoundTo(currentY,5),RoundTo(targetX,5),RoundTo(targetY,5),plotOn)
+function [nextX,nextY,rotation,distance,direct,startHeading,forward] = ComputeNextStepToTarget(currentX,currentY,currentHeading,targetX,targetY,plotOn)
+% first try direct acces
+nextX=0;
+nextY=0;
+rotation=0;
+startHeading=-1;
+forward=1;
+[rotation,distance,possible] = CheckStraightMovePossibility(currentX,currentY,currentHeading,targetX,targetY)
+if (possible==true)
+	direct=true;
+	return
+endif
+% in case direct acces not possible determine path
+[AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(RoundTo(currentX,5),RoundTo(currentY,5),currentHeading,RoundTo(targetX,5),RoundTo(targetY,5),0,plotOn);
+if (cost<0)   % no path found
+	forward=0;
+	return
+endif
 [a,b]=size(AStarStep)
 i=1;
 prevPath=0;
 nextPath=prevPath;
 endPath=false;
+direct=false;
 while (prevPath==nextPath && endPath==false)
 	prevPath=AStarPath(i);
 	nextX=AStarStep(a-i,1);

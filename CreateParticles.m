@@ -8,8 +8,7 @@ while (i<=particlesNumber)
 	px=randi(x);
 	py=randi(y);
 	po=randi(361)-1;
-
-		if (QueryCartoAvailability(px,py,po,cartoId)==1)
+		if (QueryCartoAvailability(px,py,po,cartoId,0)==1)
 			i=i+1;
 		particles=[particles;[px,py,po,pw]];
 		endif

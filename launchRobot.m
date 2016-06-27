@@ -275,15 +275,20 @@ while (issue==false && targetReached==false)
 				endif
 			endif
 				if (robot.GetHardPosX==newX && robot.GetHardPosY==newY && robot.GetHardAngle==floor(newAngle))
-						if (QueryCartoAvailability(newX,newY,cartoId)==false)
+						if (QueryCartoAvailability(newX,newY,newAngle,cartoId,true)==false)
 							currentPositionIssue=true;
 						endif
-						if (abs(targetX-robot.GetHardPosX)<=10 && abs(targetY-robot.GetHardPosY)<=10)
+						if ((targetX-robot.GetHardPosX)^2 + (targetY-robot.GetHardPosY)^2 <=225)
 							targetReached=true;
 							% check target reached
 						else 
 							% compute trajectory step
-							[nextX,nextY] = ComputeNextStepToTarget(robot.GetHardPosX,robot.GetHardPosY,targetX,targetY,plotOn);
+							[nextX,nextY,rotationToDo,lenToDo,direct,startHeading,forward] = ComputeNextStepToTarget(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardAngle,targetX,targetY,plotOn);
+							if (forward==0)
+								printf("no path found. \n")
+								issue=true
+								return
+							endif
 							% move
 %							ready=false;
 %						while (ready==false && issue==false)
@@ -294,7 +299,9 @@ while (issue==false && targetReached==false)
 							if (inp==0)
 								return
 							endif
-							[rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardAngle,nextX,nextY)
+							if (direct==false)
+								[rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardAngle,nextX,nextY)
+							endif
 							%{
 							if (rotationToDo!=0)
 								printf("align robot:%d  \n",robot.GetNorthOrientation()-rotationToDo)
@@ -311,7 +318,7 @@ while (issue==false && targetReached==false)
 								endif
 							endif
 							%}
-							robot.Move(rotationToDo,lenToDo) 		 % len sent in cm
+							robot.Move(rotationToDo,lenToDo*forward) 		 % len sent in cm
 %							particles=ResampleParticles(plotOn,particles);
 							particles=MoveParticles(rotationToDo,lenToDo,plotOn,particles);
 							WaitForRobot(robot,WaitMove);

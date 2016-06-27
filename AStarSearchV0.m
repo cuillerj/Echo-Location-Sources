@@ -1,4 +1,4 @@
-function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn)
+function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearchV0(currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn)
 %{ 
  AStarPath will return the ordered list of actions to go from current to target position
  AStarStep will return the list of positions touched to go from current to target position(ordered from target position to  current)
@@ -6,8 +6,6 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(currentX,
  cost will return cost to go from current to target position
   %}
  % printf("astar search\n")
- print=false;       % set true for debug
- debug=false;
  currentHeading=mod(currentHeading+360,360);
  startHeading=-1;
  forward=0;
@@ -37,7 +35,7 @@ actions=[
 		[stepSize,stepSize]; [stepSize,-stepSize];  % actions list (deltaX,deltaY)
 		[-stepSize,stepSize];[-stepSize,-stepSize];
 		];
-actionsRotation=[0,pi(),pi()/2,3*pi()/2,pi()/4,7*pi()/4,pi()*3/4,pi()*5/4];
+actionsRotation=[0,-pi(),pi()/2,-pi()/2,pi()/4,-pi()/4,pi()*3/4,-pi()*3/4];
 AStarHeading=currentHeadingGrad;
 nbActions=size(actions,1);
 currentAction=[0,0];
@@ -45,30 +43,39 @@ g=0;
 currentCost=0;
 %{ openList contains (X,Y) points that are to be developped
 %}
-openList=[g,pos(1),pos(2),currentAction,currentCost+AStarHeuristic(currentX,currentY,targetX,targetY),currentCost,0];
+openList=[g,pos(1),pos(2),currentAction,currentCost+AStarHeuristic(currentX,currentY,targetX,targetY),currentCost,AStarHeading];
 AStarPath=[];         
 AStarStep=[];
         
-%actionSteps=zeros(a,b);  % will keep for each cartography point the last action to go there
-[c,deltaHeading]=size(actionsRotation);
-closed=zeros(a,b,deltaHeading);       % will contains cartography points status
-expandList=ones(a,b,deltaHeading).*-1; % will contains cartography points status
-actionSteps=zeros(a,b,deltaHeading);  % will keep for each cartography point the last action to go there
+actionSteps=zeros(a,b);  % will keep for each cartography point the last action to go there
+closed=zeros(a,b);       % will contains cartography points status
+expandList=ones(a,b).*-1; % will contains cartography points status
 found=false;
 resign=false;
 origin=false;
 %if (carto(targetX,targetY)>maxCartoWeight || carto(currentX,currentY)>maxCartoWeight )  % origine or target not reachable
-if (QueryCartoAvailability(currentX,currentY,currentHeadingGrad,cartoId,0) == 0 || QueryCartoAvailability(targetX,targetY,targetHeadingGrad,cartoId,0) == 0 )  % origine or target not reachable
+if (QueryCartoAvailability(currentX,currentY,currentHeadingGrad,cartoId,1) == 0 || QueryCartoAvailability(targetX,targetY,targetHeadingGrad,cartoId,1) == 0 )  % origine or target not reachable
 	cost=-1
 	resign=true
 	return
 endif
 
 	if (currentHeading<=90)
+	%{
+		if ((QueryCartoAvailability(currentX,currentY,floor(currentHeading/2),cartoId,1)) == 1 && (QueryCartoAvailability(currentX,currentY,0,cartoId,1) == 1))
+			startHeading=0;
+		endif
+	%}
 		startHeading=0;
 		forward=1;
 	endif
 	if (currentHeading>=270)
+		%{
+		if ((QueryCartoAvailability(currentX,currentY,floor(currentHeading +(360-currentHeading)/2),cartoId,1)) == 1 && (QueryCartoAvailability(currentX,currentY,0,cartoId,1) == 1))
+			startHeading=0;
+
+		endif
+			%}
 		startHeading=0;
 		forward=1;
 	endif
@@ -93,9 +100,7 @@ if (targetX==currentX && targetY==currentY)       % target already reached
 	cost=0;
 	return
 endif
-AStarHeading=0;
 while (found == false && resign == false)
-						%printf("debug 10.\n")
 	if (size(openList,1)==0)         % not more path to expand
 		resign=true;
 		cost=-2;
@@ -103,14 +108,14 @@ while (found == false && resign == false)
 		path=[];
 		return
 	else
+%		openList
 		[minV,idx]=min(openList(:,6));  % look for the lowest value of (cost+heuristic)
 		g=openList(idx,1)+1;            % get the step number
 		prevX=openList(idx,2);
 		prevY=openList(idx,3);
 		prevCost=openList(idx,7);
 		prevAction=openList(idx,4:5);
-		prevI=openList(idx,8);
-%		printf("minV:%d step number:%d min X:%d min Y:%d prevCost:%d prevAction:( %d %d ) prevHeading:%f prevI:%d .\n",minV,g,prevX,prevY,prevCost,prevAction(1) ,prevAction(2),prevHeading,prevI)
+%		printf("minV:%d step number:%d min X:%d min Y:%d prevCost:%d prevAction:( %d %d ). .\n",minV,g,prevX,prevY,prevCost,prevAction(1) ,prevAction(2))
 		for i=1:nbActions
 			if (prevX==targetX && prevY==targetY)
 				found=true;
@@ -118,63 +123,60 @@ while (found == false && resign == false)
 				a=targetX;
 				b=targetY;
 				AStarStep=[a,b];
-				c=prevI;
-				AStarPath=[c];
-				if (debug==true)
-					printf("found prevI %d .\n",c)
-					save ("actionSteps.mat","actionSteps")
-					save ("openList.mat","openList")
-					save ("expandList.mat","expandList")
-					save ("closed.mat","closed")
-				endif
-				while (origin==false)		
-					a1=a-actions(c,1);
-					b1=b-actions(c,2);
-					c=actionSteps(a,b,c);
-					if (c==0)
-						AStarStep=[AStarStep;[a,b]];
-						AStarStep=[AStarStep;[initPos(1:2)]]
-						AStarPath=fliplr(AStarPath);
+				ss=actions==prevAction;
+				actionSteps(a,b)=find(ss(:,1).*ss(:,2));
+				while (origin==false)
+					AStarPath=[AStarPath,[(actionSteps(a,b))]];
+					as=a;
+%					actionSteps(a,b);
+					a=a-actions(actionSteps(a,b),1);
+					b=b-actions(actionSteps(as,b),2);
+					AStarStep=[AStarStep;[a,b]];
+					if ([a,b]==initPos(1:2))
 						origin=true;
-					else
-						AStarStep=[AStarStep;[a,b]];
-						AStarPath=[AStarPath,[c]];
-						a=a1;
-						b=b1;				
-						endif
+						AStarPath=fliplr(AStarPath);
+					endif
 				end
 				if (plotOn)
 					AStarShowStep(AStarStep);
-					hold off
 				endif
 				return
 			else
-				AStarHeading = actionsRotation(i);
+				AStarHeading = mod(AStarHeading + actionsRotation(i),2*pi());
+%				newX=floor(prevX+actions(i,1)+stepSize*cos(AStarHeading));
+%				newY=floor(prevY+actions(i,2)+stepSize*sin(AStarHeading));
 				newX=floor(prevX+actions(i,1));
 				newY=floor(prevY+actions(i,2));
-				if (newX >=1 && newY >=1 && newX <=size(carto,1) && newY <=size(carto,2) && QueryCartoAvailability(newX,newY,AStarHeading,cartoId,0)==1)
+				if (newX >=1 && newY >=1 && newX <=size(carto,1) && newY <=size(carto,2))
 					cartoWeight=carto(newX,newY);
-					
+
 % check space available for the entire robot taking into account the orientation
-						if (expandList(newX,newY,i)==-1 && closed(newX,newY,i)==0)
+%					if (QueryCartoAvailability(newX,newY,mod(360+AStarHeading*180/pi(),360),cartoId,0)==1)
+					if (QueryCartoAvailability(newX,newY,AStarHeading,cartoId,0)==1)
+%					if (QueryCartoAvailability(newX,newY,5,cartoId,0)==1)
+%					if (carto1(newX,newY)<=20)
+						if (expandList(newX,newY)==-1 && closed(newX,newY)==0)
+%							printf("new X:%d new Y:%d . \n",newX,newY)
 							newCost=prevCost+AStarActionCost(prevAction,actions(i,:),stepSize)+weightCarto*cartoWeight;
-							openList=[openList;[g,newX,newY,[actions(i,:)],newCost+AStarHeuristic(newX,newY,targetX,targetY)],newCost,i]; 
-							actionSteps(newX,newY,i)=prevI;								
-							expandList(newX,newY,i)=0;
+							openList=[openList;[g,newX,newY,[actions(i,:)],newCost+AStarHeuristic(newX,newY,targetX,targetY)],newCost,AStarHeading]; 
+%							ss=actions==actions(i,:);
+%							actionSteps(newX,newY)=find(ss(:,1).*ss(:,2));	
+							actionSteps(newX,newY)=i;						
+							closed(newX,newY)=1;
 						endif
 					else
-						closed(newX,newY,i)=1;
+%						QueryCartoAvailability(newX,newY,AStarHeading,cartoId,1);
+						expandList(newX,newY)=0;
+						AStarHeading=currentHeadingGrad;
+					endif
 				endif
 			endif
 		endfor
-		if (print==true)
-			print=yes_or_no(" print ?"); % wait for end user to start
-			printf("newW: %d newY:%d newH:%d prevH:%d AStarHeading:%f actionSteps:%d i:%d .\n",newX,newY,newH,prevH,AStarHeading,actionSteps(newX,newY),i)
-			openList
-		endif
-		expandList(newX,newY,[])=0;
+		expandList(openList(idx,2),openList(idx,3))=openList(idx,1);
+		closed(openList(idx,2),openList(idx,3))=1;
 		currentCost=g;
 		openList(idx,:)=[];
 	endif
 end
+
 endfunction
