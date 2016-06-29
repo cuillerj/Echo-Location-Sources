@@ -133,7 +133,7 @@ while (found == false && resign == false)
 					c=actionSteps(a,b,c);
 					if (c==0)
 						AStarStep=[AStarStep;[a,b]];
-						AStarStep=[AStarStep;[initPos(1:2)]]
+						AStarStep=[AStarStep;[initPos(1:2)]];
 						AStarPath=fliplr(AStarPath);
 						origin=true;
 					else

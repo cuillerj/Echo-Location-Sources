@@ -4,8 +4,8 @@ defineList= {
 	"iRightWheelDiameter",
 	"iRobotWidth",
 	"iRobotFrontWidth",
-	"leftWheelEncoderHoles"
-	"rightWheelEncoderHoles"
+	"leftWheelEncoderHoles",
+	"rightWheelEncoderHoles",
 	"shiftEchoVsRotationCenter",
 	"frontLenght",
 	"backLenght",
@@ -30,7 +30,8 @@ defineList= {
 	"diagMotorPbSynchro",
 	"diagMotorPbEncoder",
 	"diagRobotPause",
-	"diagRobotObstacle"};
+	"diagRobotObstacle",
+	"stepSize"};
 	
 defineValue=[
 	6.4; 
@@ -63,7 +64,9 @@ defineValue=[
 	2;
 	3;
 	0;
-	1];
+	1;
+	10
+	];
 %strDefineList=cellstr(defineList);
 %sizeof(strDefineList)
 loopexit=false;
