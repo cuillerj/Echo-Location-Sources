@@ -4,8 +4,10 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(currentX,
  AStarStep will return the list of positions touched to go from current to target position(ordered from target position to  current)
 		step will be ploted if plotOn is true
  cost will return cost to go from current to target position
-  %}
- % printf("astar search\n")
+
+  printf("astar search\n")
+ %}
+ cpu1=cputime();
  iterCount=0;
  print=false;       % set true for debug
  debug=false;
@@ -148,6 +150,7 @@ while (found == false && resign == false)
 					AStarShowStep(AStarStep);
 					hold off
 				endif
+				printf("cpu:%f .\n",cputime()-cpu1);
 				return
 			else
 				AStarHeading = actionsRotation(i);
