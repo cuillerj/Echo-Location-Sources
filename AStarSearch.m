@@ -6,6 +6,7 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(currentX,
  cost will return cost to go from current to target position
   %}
  % printf("astar search\n")
+ iterCount=0;
  print=false;       % set true for debug
  debug=false;
  currentHeading=mod(currentHeading+360,360);
@@ -29,7 +30,7 @@ initPos=[currentX,currentY];
 pos=initPos;
 targetPos=[targetX,targetY];
 %maxCartoWeight=20; % threshold over that means space (x,y) is not available
-weightCarto=5;     % weight used to balance way depending on cartography weight and action cost
+weightCarto=10;     % weight used to balance way depending on cartography weight and action cost
 
 actions=[
 		[stepSize,0];[-stepSize,0];
@@ -48,7 +49,6 @@ currentCost=0;
 openList=[g,pos(1),pos(2),currentAction,currentCost+AStarHeuristic(currentX,currentY,targetX,targetY),currentCost,0];
 AStarPath=[];         
 AStarStep=[];
-        
 %actionSteps=zeros(a,b);  % will keep for each cartography point the last action to go there
 [c,deltaHeading]=size(actionsRotation);
 closed=zeros(a,b,deltaHeading);       % will contains cartography points status
@@ -95,7 +95,6 @@ if (targetX==currentX && targetY==currentY)       % target already reached
 endif
 AStarHeading=0;
 while (found == false && resign == false)
-						%printf("debug 10.\n")
 	if (size(openList,1)==0)         % not more path to expand
 		resign=true;
 		cost=-2;
@@ -112,7 +111,9 @@ while (found == false && resign == false)
 		prevI=openList(idx,8);
 %		printf("minV:%d step number:%d min X:%d min Y:%d prevCost:%d prevAction:( %d %d ) prevHeading:%f prevI:%d .\n",minV,g,prevX,prevY,prevCost,prevAction(1) ,prevAction(2),prevHeading,prevI)
 		for i=1:nbActions
+			iterCount++;
 			if (prevX==targetX && prevY==targetY)
+				iterCount
 				found=true;
 				cost=openList(idx,7);
 				a=targetX;
@@ -153,9 +154,7 @@ while (found == false && resign == false)
 				newX=floor(prevX+actions(i,1));
 				newY=floor(prevY+actions(i,2));
 				if (newX >=1 && newY >=1 && newX <=size(carto,1) && newY <=size(carto,2) && QueryCartoAvailability(newX,newY,AStarHeading,cartoId,0)==1)
-					cartoWeight=carto(newX,newY);
-					
-% check space available for the entire robot taking into account the orientation
+					cartoWeight=carto(newX,newY);				
 						if (expandList(newX,newY,i)==-1 && closed(newX,newY,i)==0)
 							newCost=prevCost+AStarActionCost(prevAction,actions(i,:),stepSize)+weightCarto*cartoWeight;
 							openList=[openList;[g,newX,newY,[actions(i,:)],newCost+AStarHeuristic(newX,newY,targetX,targetY)],newCost,i]; 
@@ -167,11 +166,6 @@ while (found == false && resign == false)
 				endif
 			endif
 		endfor
-		if (print==true)
-			print=yes_or_no(" print ?"); % wait for end user to start
-			printf("newW: %d newY:%d newH:%d prevH:%d AStarHeading:%f actionSteps:%d i:%d .\n",newX,newY,newH,prevH,AStarHeading,actionSteps(newX,newY),i)
-			openList
-		endif
 		expandList(newX,newY,[])=0;
 		currentCost=g;
 		openList(idx,:)=[];
