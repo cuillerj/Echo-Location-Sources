@@ -28,8 +28,9 @@ WaitNorthAlign=6;
 WaitUpdate=8;
 WaitFor=0;
 callFrom=1;          % to identify the main function
-cartoId=1;
+%cartoId=1;
 headingIssue=false;
+load carto1
 while (ready==false)
 	ready=yes_or_no(" robot ready to go ?"); % wait for end user to start
 end
@@ -275,7 +276,7 @@ while (issue==false && targetReached==false)
 				endif
 			endif
 				if (robot.GetHardPosX==newX && robot.GetHardPosY==newY && robot.GetHardAngle==floor(newAngle))
-						if (QueryCartoAvailability(newX,newY,newAngle,cartoId,true)==false)
+						if (QueryCartoAvailability(newX,newY,newAngle,carto1,true)==false)
 							currentPositionIssue=true;
 						endif
 						if ((targetX-robot.GetHardPosX)^2 + (targetY-robot.GetHardPosY)^2 <=225)

@@ -1,4 +1,4 @@
-function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn)
+function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn)
 %{ 
  AStarPath will return the ordered list of actions to go from current to target position
  AStarStep will return the list of positions touched to go from current to target position(ordered from target position to  current)
@@ -24,10 +24,15 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(currentX,
   targetX=stepSize*(floor(targetX/stepSize))+floor(stepSize/2);
   targetY=stepSize*(floor(targetY/stepSize))+floor(stepSize/2);
 [angleOneHole,distanceOneHole] = StepEncoderByHole();
-cartoId=1;        %  multiple cartography to be supported later
-load carto1;       % cartographie matrix (1x1 cm)
+%cartoId=1;        %  multiple cartography to be supported later
+%load carto1;       % cartographie matrix (1x1 cm)
+%carto=carto1;
+if (exist("carto1")==false)
+	load carto1;
+	printf("load carto\n")
+endif
 carto=carto1;
-[a,b]=size(carto); % a nb of X positions b nb of Y poistions
+[a,b]=size(carto) % a nb of X positions b nb of Y poistions
 initPos=[currentX,currentY];
 pos=initPos;
 targetPos=[targetX,targetY];
@@ -60,7 +65,7 @@ found=false;
 resign=false;
 origin=false;
 %if (carto(targetX,targetY)>maxCartoWeight || carto(currentX,currentY)>maxCartoWeight )  % origine or target not reachable
-if (QueryCartoAvailability(currentX,currentY,currentHeadingGrad,cartoId,0) == 0 || QueryCartoAvailability(targetX,targetY,targetHeadingGrad,cartoId,0) == 0 )  % origine or target not reachable
+if (QueryCartoAvailability(carto,currentX,currentY,currentHeadingGrad,0) == 0 || QueryCartoAvailability(carto,targetX,targetY,targetHeadingGrad,0) == 0 )  % origine or target not reachable
 	cost=-1
 	resign=true
 	return
@@ -156,7 +161,7 @@ while (found == false && resign == false)
 				AStarHeading = actionsRotation(i);
 				newX=floor(prevX+actions(i,1));
 				newY=floor(prevY+actions(i,2));
-				if (newX >=1 && newY >=1 && newX <=size(carto,1) && newY <=size(carto,2) && QueryCartoAvailability(newX,newY,AStarHeading,cartoId,0)==1)
+				if (newX >=1 && newY >=1 && newX <=size(carto,1) && newY <=size(carto,2) && QueryCartoAvailability(carto,newX,newY,AStarHeading,0)==1)
 					cartoWeight=carto(newX,newY);				
 						if (expandList(newX,newY,i)==-1 && closed(newX,newY,i)==0)
 							newCost=prevCost+AStarActionCost(prevAction,actions(i,:),stepSize)+weightCarto*cartoWeight;

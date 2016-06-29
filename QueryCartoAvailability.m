@@ -1,4 +1,4 @@
-function [available] = QueryCartoAvailability(xIn,yIn,heading,cartoId,debugOn)
+function [available] = QueryCartoAvailability(carto1,xIn,yIn,heading,debugOn)
 % multiple cartoId to be developped
 % take into account the robot physical characteristics (by checking 10 points) to determine if it can be at a place
 %{  
@@ -52,11 +52,13 @@ endif
 if (Found==true)
 	backLenght= Value;
 endif
+%{
 if (cartoId==1)
 	load carto1;
 else
 	load carto0;
-endif 
+endif
+%}
 [cartoX,cartoY]=size(carto1);
 available=true;
 x=xIn;
