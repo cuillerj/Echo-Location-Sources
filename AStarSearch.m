@@ -32,7 +32,7 @@ if (exist("carto1")==false)
 	printf("load carto\n")
 endif
 carto=carto1;
-[a,b]=size(carto) % a nb of X positions b nb of Y poistions
+[a,b]=size(carto); % a nb of X positions b nb of Y poistions
 initPos=[currentX,currentY];
 pos=initPos;
 targetPos=[targetX,targetY];
@@ -155,7 +155,7 @@ while (found == false && resign == false)
 					AStarShowStep(AStarStep);
 					hold off
 				endif
-				printf("cpu:%f .\n",cputime()-cpu1);
+				printf("cpu search:%f .\n",cputime()-cpu1);
 				return
 			else
 				AStarHeading = actionsRotation(i);
