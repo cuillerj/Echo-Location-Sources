@@ -1,5 +1,5 @@
 function [available] = QueryCartoAvailability(carto1,xIn,yIn,heading,debugOn)
-% multiple cartoId to be developped
+% heading in grad
 % take into account the robot physical characteristics (by checking 10 points) to determine if it can be at a place
 %{  
 	8___6
@@ -88,21 +88,21 @@ for i=0:floor(frontLenght/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(0-x) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available center(0-x) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (0-x) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available center (0-x) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(0-x) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available center(0-x) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -142,21 +142,21 @@ for i=0:floor(RobotFrontWidth/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(0-1) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available front(0-1) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (0-1) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available front (0-1) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(0-1) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available front(0-1) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -169,21 +169,21 @@ for i=0:floor(RobotFrontWidth/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(0-3) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available front(0-3) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (0-3) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available front(0-3) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(0-3) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available front(0-3) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -196,21 +196,21 @@ for i=0:floor(frontLenght/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(1-2) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available right side (1-2) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (1-2) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available right side (1-2) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(1-2) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available right side(1-2) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -223,21 +223,21 @@ for i=0:floor(frontLenght/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(3-4) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available left side(3-4) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (3-4) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available left side (3-4) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(3-4) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available left side(3-4) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -250,21 +250,21 @@ for i=0:floor(backLenght/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(5-7) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back right side(5-7) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (5-7) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back right side(5-7) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(5-7) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back right side(5-7) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -277,21 +277,21 @@ for i=0:floor(backLenght/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(6-8) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back left side(6-8) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (6-8) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back left side(6-8) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(6-8) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back left side (6-8) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -306,7 +306,7 @@ for i=0:floor(RobotBackWidth/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(7-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back right(7-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -314,14 +314,14 @@ for i=0:floor(RobotBackWidth/gapSize)
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (7-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back right(7-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(7-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back right(7-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -334,7 +334,7 @@ for i=0:floor(RobotBackWidth/gapSize)
 	if (x <= 0 || x > cartoX)
 		available=false;
 		if(debugOn)
-			printf("carto not available back(8-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back left(8-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
@@ -342,14 +342,14 @@ for i=0:floor(RobotBackWidth/gapSize)
 	if (y <= 0 || y > cartoY)
 		available=false;
 		if(debugOn)
-			printf("carto not available back (8-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back left(8-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif
 	if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
 		if(debugOn)
-			printf("carto not available back(8-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
+			printf("carto not available back left(8-9) X:%d Y:%d orientation: %f .\n",x,y,heading)
 		endif
 		return
 	endif

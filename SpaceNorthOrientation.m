@@ -1,5 +1,5 @@
-function [NorthOrientation] = SpaceNorthOrientation(X,Y)
-load "zonesXY.txt";
+function [NorthOrientation] = SpaceNorthOrientation(zonesXY,X,Y)
+%load "zonesXY.txt";
 tmp=(zonesXY(:,1)-X).^2+(zonesXY(:,2)-Y).^2;  % look for the closest x y coordinates
 [a,b]=min(tmp);                               % b get the closest index
 Xa=zonesXY(b,1);                              % find corresponding X

@@ -21,7 +21,7 @@ for i=1:nbPart
 endfor
 z=zeros(nbPart,1);
 particles=[newParticles,z];
-save ("-mat4-binary","particles.mat","particles");
+%save ("-mat4-binary","particles.mat","particles");
 if (plotOn)
 	figure()
 	title ("particles resampeled");

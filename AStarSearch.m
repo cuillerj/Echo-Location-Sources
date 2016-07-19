@@ -26,18 +26,17 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,cur
 [angleOneHole,distanceOneHole] = StepEncoderByHole();
 %cartoId=1;        %  multiple cartography to be supported later
 %load carto1;       % cartographie matrix (1x1 cm)
-%carto=carto1;
-if (exist("carto1")==false)
+if (exist("carto")==false)
 	load carto1;
 	printf("load carto\n")
+	carto=carto1;
 endif
-carto=carto1;
 [a,b]=size(carto); % a nb of X positions b nb of Y poistions
 initPos=[currentX,currentY];
 pos=initPos;
 targetPos=[targetX,targetY];
 %maxCartoWeight=20; % threshold over that means space (x,y) is not available
-weightCarto=10;     % weight used to balance way depending on cartography weight and action cost
+weightCarto=20;     % weight used to balance way depending on cartography weight and action cost
 
 actions=[
 		[stepSize,0];[-stepSize,0];

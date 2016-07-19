@@ -2,13 +2,16 @@ cd ..
 javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
 % create and start robot
 % load matrix
+load carto1;
+carto=carto1;
+load "zonesXY.txt"
 shiftNorthXOrientation=267; % shift between north and X direction in degres - that is the average mesurment
 setupPath;					% define paths
 robot=robotJava;            % create the java object
 robot.SetTraceFileOn(1);    % route console to trace file
 robot.LaunchBatch();        % call java method to start batch
 load all_theta;             % load the trained logistic regression matrix
-nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning pahse
+nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);
 % load "zonesXY.txt"
 j=1;
@@ -19,30 +22,58 @@ nbPred=5;                    % define the number of predictions that will be com
 plotOn=true;                 % if true graphics will be provided (reduces performance)
 plotOff=false;               % non graphic
 printf("create particles. \n")
-particles=CreateParticles(1000,1,plotOff); % creation for particles filter
+particlesNumber=1000;
+%particles=CreateParticles(carto,particlesNumber,plotOff); % creation for particles filter
 %load particles;
 WaitInfo=1;                 
-WaitScan360=2;
-WaitMove=4;
-WaitNorthAlign=6;
+WaitScan360=robot.scanEnd;
+WaitMove=robot.moveEnd;
+WaitNorthAlign=robot.alignEnd;
+WaitServoAlign=robot.servoAlignEnd;
 WaitUpdate=8;
 WaitFor=0;
 callFrom=1;          % to identify the main function
 %cartoId=1;
 headingIssue=false;
-load carto1
+shiftNO=0;
 while (ready==false)
 	ready=yes_or_no(" robot ready to go ?"); % wait for end user to start
+	if (ready==false)
+		exit
+	endif
 end
-[posX,posY,heading,locProb] = InitCurrentLocation(robot)  % manualy init position if prob >0
-
+[posX,posY,heading,locProb] = InitCurrentLocation(carto,robot)  % manualy init position if prob >0
+newX=posX;
+newY=posY;
+newH=heading;
+newProb=locProb;
+particles = CreateLocatedParticles(carto,posX,posY,heading,locProb,particlesNumber,plotOn);
+spaceNO=SpaceNorthOrientation(zonesXY,posX,posX);
+retCode=9;
+NO=robot.GetNorthOrientation;          %  request info
+WaitFor=WaitInfo;
+retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
+if (retCode!=0)
+	[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+	if action=="stop"
+		return
+	endif
+	if action=="break"
+		break
+	endif
+	if action=="resume"
+		resume
+	endif
+endif
+NO=robot.GetNorthOrientation;           % get the up to date info
+shiftNO=NO-spaceNO
 %{
 		compute target location
 %}
-[targetX,targetY,targetAngle]=ComputeTargetLocation(robot);
+[targetX,targetY,targetAngle]=ComputeTargetLocation(carto,robot);
 printf("robot target is X:%d Y:%d orientation: %d. \n",targetX,targetY,targetAngle)
 %
-
+%{
 if (locProb>0 && locProb <100)
 		[detX,detY,detH,particles]=DetermineRobotLocationWithParticlesGaussian(posX,posY,locProb,plotOff,particles);
 		printf("step 0 particles det location is X:%d Y:%d heading:%d  \n",detX,detY,detH)
@@ -56,11 +87,13 @@ else
 		newY=posY;
 		newAngle=heading;
 		newProb=locProb;
+
 endif
-robot.SetPosX(newX);
-robot.SetPosY(newY);
-robot.SetAlpha(newAngle);
-robot.SetCurrentLocProb(newProb);
+%}
+robot.SetPosX(posX);
+robot.SetPosY(posY);
+robot.SetHeading(heading);
+robot.SetCurrentLocProb(locProb);
 printf("update hard robot. \n")
 robot.UpdateHardRobotLocation();	
 WaitFor=WaitUpdate;
@@ -97,7 +130,7 @@ if locProb <95
 		aligned=true;
 		else
 		[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
-		if action=="stop"
+		if action=="stop.."
 			return
 		endif
 	endif
@@ -134,13 +167,21 @@ while (issue==false && targetReached==false)
 		firstStep=false;
 		retry=0;
 		while (firstStep==false && issue==false)
-			[echoX,echoY,echoAngle,echoProb,retCode]=EchoLocalizeRobotWithRotation(robot,nbLocPossibility,nbPred,orientation);
+			[echoX,echoY,echoH,echoProb,retCode]=EchoLocalizeRobotWithRotation(robot,nbPred,orientation);
+			for i=1:nbPred
+				printf("echo localize X:%d Y:%d heading:%d prob:%d . \n",echoX(i),echoY(i),echoH(i),echoProb(i))
+			endfor
 %			analyseRetcode(retCode,WaitScan360)
 			if (retCode!=0)
 				issue=true;
 			endif
-			deltaNO=mod(360+SpaceNorthOrientation(echoX(1),echoY(1))-NO,360)   % compute the difference between current orientation and orientation during the learning phase
+			deltaNO=mod(360+SpaceNorthOrientation(zonesXY,echoX(1),echoY(1))-NO,360)   % compute the difference between current orientation and orientation during the learning phase
 %			deltaNO=mod(NO+360-SpaceNorthOrientation(echoX(1),echoY(1)),360);
+			prob = TestLocationEchoConsistancy(robot,carto,echoX(1),echoY(1),echoH(1))
+			if (prob>=85)
+				echoH(1)=prob;
+				firstStep=true;			
+			endif
 			prev=[echoX(1),echoY(1)]				% keep coordinates before next echoloc
 			if (abs(deltaNO)<=3 || abs(deltaNO)>= 358)     % if closed to
 				if (retry==0)           					%  best prediction is good enough
@@ -152,7 +193,7 @@ while (issue==false && targetReached==false)
 				endif
 			else
 				retry++;
-				robot.NorthAlign(SpaceNorthOrientation(prev(1),prev(2)));  % align according to the trainning for this location
+				robot.NorthAlign(SpaceNorthOrientation(zonesXY,prev(1),prev(2)));  % align according to the trainning for this location
 				WaitFor=WaitNorthAlign;
 				retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
 				if (retCode!=0)
@@ -184,7 +225,7 @@ while (issue==false && targetReached==false)
 				endif
 				NO=robot.GetNorthOrientation;           		% get the up to date info
 			endif
-			if (retry>=5)
+			if (retry>=3)
 				firstStep=true;
 				retry=-1;
 			endif
@@ -195,7 +236,7 @@ while (issue==false && targetReached==false)
 		else
 			robot.SetPosX(echoX(1));
 			robot.SetPosY(echoY(1));
-			robot.SetAlpha(echoAngle(1));
+			robot.SetHeading(echoH(1));
 			robot.SetCurrentLocProb(echoProb(1));
 			printf("update hard robot. \n")
 			robot.UpdateHardRobotLocation();
@@ -215,17 +256,17 @@ while (issue==false && targetReached==false)
 			endif
 		endif
 		for i=1:nbPred
-			printf("robot echo location is X:%d Y:%d orientation:%d with %d%% probability. \n",echoX(i),echoY(i),echoAngle(i),echoProb(i))
+			printf("robot echo location is X:%d Y:%d orientation:%d with %d%% probability. \n",echoX(i),echoY(i),echoH(i),echoProb(i))
 		endfor
 		printf("find robot location. \n")
-		[newX,newY,newAngle,newProb,predLocMatrix]=DetermineRobotLocation(robot,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardAngle,echoX,echoY,echoAngle,echoProb,predLocMatrix,shiftNorthXOrientation);
+		[newX,newY,newAngle,newProb,predLocMatrix]=DetermineRobotLocation(robot,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardAngle,echoX,echoY,echoH,echoProb,predLocMatrix,shiftNorthXOrientation);
 		printf("step 1 particles det location is X:%d Y:%d heading:%d  prob:%d \n",newX,newY,newAngle,newProb)
 		[detX,detY,detH,particles]=DetermineRobotLocationWithParticlesGaussian(newX,newY,newProb,plotOff,particles);
 		printf("step 2 particles det location is X:%d Y:%d heading:%d  \n",detX,detY,detH)
 		particles=ResampleParticles(plotOn,particles);
 		locProb=newProb
 
-		if (newProb>=95 && issue==false)
+		if (newProb>=85 && issue==false)
 			printf("determined location is X:%d Y:%d orientation:%d with %d%% probability. \n",newX,newY,newAngle,newProb)
 			break
 			else
@@ -239,25 +280,25 @@ while (issue==false && targetReached==false)
 				rotation=mod(rotation+90,360)
 				if (retCode!=0)
 					[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
-					if action=="stop"
+					if action=="stop.."
 						return
 					endif
-					if action=="break"
+					if action=="break."
 						break
 					endif
 					if action=="resume"
-						resume
+						pause
 					endif
 				endif
 		endif	
 	end
 	%{
 	robot location is good enough to start moving toward target
-	localization loop untill probalility is good enough
+	localization loop as long as probalility is good enough
 	%}
 			robot.SetPosX(newX);
 			robot.SetPosY(newY);
-			robot.SetAlpha(newAngle);
+			robot.SetHeading(newH);
 			robot.SetCurrentLocProb(newProb);
 			printf("update hard robot. \n")
 			robot.UpdateHardRobotLocation();
@@ -265,18 +306,18 @@ while (issue==false && targetReached==false)
 			retCode=WaitForRobot(robot,WaitFor);
 			if (retCode!=0)
 				[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
-				if action=="stop"
+				if action=="stop.."
 					return
 				endif
-				if action=="break"
+				if action=="break."
 					break
 				endif
 				if action=="resume"
 					resume
 				endif
 			endif
-				if (robot.GetHardPosX==newX && robot.GetHardPosY==newY && robot.GetHardAngle==floor(newAngle))
-						if (QueryCartoAvailability(newX,newY,newAngle,carto1,true)==false)
+				if (robot.GetHardPosX==newX && robot.GetHardPosY==newY && robot.GetHardAngle==floor(newH))
+						if (QueryCartoAvailability(carto,newX,newY,newH*pi()/180,true)==false)
 							currentPositionIssue=true;
 						endif
 						if ((targetX-robot.GetHardPosX)^2 + (targetY-robot.GetHardPosY)^2 <=225)
@@ -284,26 +325,30 @@ while (issue==false && targetReached==false)
 							% check target reached
 						else 
 							% compute trajectory step
-							[nextX,nextY,rotationToDo,lenToDo,direct,startHeading,forward] = ComputeNextStepToTarget(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardAngle,targetX,targetY,plotOn);
+							[nextX,nextY,rotationToDo,lenToDo,direct,startHeading,forward] = ComputeNextStepToTarget(carto,robot.GetHardPosX,robot.GetHardPosY,robot.GetHardAngle,targetX,targetY,plotOn);
 							if (forward==0)
 								printf("no path found. \n")
-								issue=true
+								issue=true;
+								pause
 								return
 							endif
+							printf("Next X:%d Y:%d . \n",nextX,nextY)
 							% move
 %							ready=false;
 %						while (ready==false && issue==false)
 %							printf("robot goto X:%d Y:%d . \n",nextX,nextY)
 %							ready=yes_or_no(" ok ?")
 %						end 
+%{
 							inp=eval(input("enter 0 to stop, 1 to resume ","i"));
 							if (inp==0)
 								return
 							endif
+%}
 							if (direct==false)
 								[rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardAngle,nextX,nextY)
 							endif
-							%{
+%{
 							if (rotationToDo!=0)
 								printf("align robot:%d  \n",robot.GetNorthOrientation()-rotationToDo)
 								robot.NorthAlign(robot.GetNorthOrientation()-rotationToDo);    % align robot such that it will be in the same orientation as for learning phase
@@ -318,7 +363,7 @@ while (issue==false && targetReached==false)
 									endif
 								endif
 							endif
-							%}
+%}			
 							robot.Move(rotationToDo,lenToDo*forward) 		 % len sent in cm
 %							particles=ResampleParticles(plotOn,particles);
 							particles=MoveParticles(rotationToDo,lenToDo,plotOn,particles);
@@ -347,11 +392,38 @@ while (issue==false && targetReached==false)
 							robot.ValidHardPosition();
 							newX=robot.GetHardPosX();
 							newY=robot.GetHardPosY();
-							newAngle=robot.GetHardAngle();
+							newH=robot.GetHardAngle();
 							newProb=robot.GetCurrentLocProb();
-							if ((mod(newAngle+robot.GetNorthOrientation(),360)/shiftNorthXOrientation)>1.2)  % to much difference between robot calculation and NO
-								printf("heading inconsitancy :%d NO:%d . \n",newAngle,robot.NorthOrientation())
-								headingIssue=true
+							prob = TestLocationEchoConsistancy(robot,carto,newX,newY,newH);
+							printf("test consistancy prob: %d \n",prob)
+							[detX,detY,detH,particles]=DetermineRobotLocationWithParticlesGaussian(newX,newY,prob,plotOn,particles);
+							printf("detX: %d \n",detX)
+							printf("detY: %d \n",detY)
+							printf("detH: %d \n",detH)
+							robot.SetPosX(detX);
+							robot.SetPosY(detY);
+							robot.SetHeading(detH);
+							robot.SetCurrentLocProb(prob);
+							printf("update hard robot. \n")
+							robot.UpdateHardRobotLocation();	
+							WaitFor=WaitUpdate;
+							retCode=WaitForRobot(robot,WaitFor);
+							if (retCode!=0)
+								[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+								if action=="stop"
+									return
+								endif
+								if action=="break"
+									break
+								endif
+								if action=="resume"
+									resume
+								endif
+							endif							
+							particles=ResampleParticles(plotOn,particles);
+							if ((mod(newH+robot.GetNorthOrientation(),360)/shiftNorthXOrientation)>1.2)  % to much difference between robot calculation and NO
+								printf("heading inconsitancy :%d NO:%d . \n",newH,robot.GetNorthOrientation())
+%								headingIssue=true
 							endif
 %							robot.SetAlpha(robot.GetHardAngle())								
 						endif
@@ -359,4 +431,5 @@ while (issue==false && targetReached==false)
 					printf("robot location inconsistency X:%d expected:%d Y:%d expected:%d orientation:%d expected:%d. \n",robot.GetHardPosX,newX,robot.GetHardPosY,newY,robot.GetHardAngle,newAngle)
 					issue=1;
 				endif
+
 	end

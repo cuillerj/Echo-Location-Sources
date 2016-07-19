@@ -1,4 +1,4 @@
-function [posX,posY,posAngle,posProb,retCode] = EchoLocalizeRobotWithRotation(robot,nbLocPossibility,nbPred,orientation)
+function [posX,posY,posAngle,posProb,retCode] = EchoLocalizeRobotWithRotation(robot,nbPred,orientation)
 % probability defined according to 28 tests
 % first is right: =60% (17/28)
 % second is right: =18% 5/28
@@ -6,7 +6,7 @@ function [posX,posY,posAngle,posProb,retCode] = EchoLocalizeRobotWithRotation(ro
 % fourth is right: = 8% 2/28
 % fifth is right: =8% 2/28
 % not found in first five =4% 1/28
-
+heading=orientation
 probRef=[60,18,06,06,06,04];
 retCode=9;
 robot.Scan360();
@@ -27,7 +27,7 @@ end
 if (retCode==0)
 	printf("scan ended\n")
 	robot.SetRunningStatus(0);
-	[X,Y,Angle,Cost]=analyseLastScanRotation(robot,false,nbPred,orientation);
+	[X,Y,Angle,Cost]=analyseLastScanRotation(robot,false,nbPred,heading);
 	posX=X;
 	posY=Y;
 	posAngle=Angle;

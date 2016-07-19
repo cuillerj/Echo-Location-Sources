@@ -12,63 +12,24 @@ defineList= {
 	"securityLenght",
 	"minDistToBeDone",
 	"minRotToBeDone",
-	"scanning",
-	"scanEnded",
-	"moving",
-	"moveEnded",
-	"aligning",
-	"alignEnded",
-	"moveRetcodeEncoderLeftLowLevel",
-	"moveRetcodeEncoderRightLowLevel",
-	"moveRetcodeEncoderLeftHighLevel",
-	"moveRetcodeEncoderRightHighLevel",
-	"moveUnderLimitation",
-	"moveKoDueToSpeedInconsistancy",
-	"moveKoDueToObstacle",
-	"diagMotorPbLeft",
-	"diagMotorPbRight",
-	"diagMotorPbSynchro",
-	"diagMotorPbEncoder",
-	"diagRobotPause",
-	"diagRobotObstacle",
 	"stepSize"};
 	
 defineValue=[
-	6.4; 
-	6.4; 
-	46.5;         %46.5
+	6.3; 
+	6.3; 
+	40;         %40
 	30;         %33
     8;
     8;
-	10; 
+	11; 
 	35;          %35
 	12;          %12
-	0;
+	20;
 	3;
 	5;
-	102; 
-	103;
-	104;
-	105;
-	106;
-	107;
-	1;
-	2;
-	3;
-	4;
-	5;
-	6;
-	7;
-	0;
-	1;
-	2;
-	3;
-	0;
-	1;
 	10
 	];
-%strDefineList=cellstr(defineList);
-%sizeof(strDefineList)
+
 loopexit=false;
 found=false;
 param="";

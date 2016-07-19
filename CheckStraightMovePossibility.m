@@ -1,5 +1,4 @@
-function [rotation,distance,possible] = CheckStraightMovePossibility(currentX,currentY,currentHeading,targetX,targetY)
-cartoId=1;
+function [rotation,distance,possible] = CheckStraightMovePossibility(carto,currentX,currentY,currentHeading,targetX,targetY)
 deltaX=targetX-currentX
 deltaY=targetY-currentY
 possible=true;
@@ -29,7 +28,7 @@ delta=10;
 while (delta<distance && possible==true)
 	x=floor(currentX+delta*cosA);
 	y=floor(currentY+delta*sinA);
-	if (QueryCartoAvailability(floor(currentX+delta*cosA),floor(currentY+delta*sinA),newAngle,cartoId,1)==false)
+	if (QueryCartoAvailability(carto,floor(currentX+delta*cosA),floor(currentY+delta*sinA),newAngle*pi()/180,0)==false)
 		possible=false;
 	endif
 	delta=delta+10;

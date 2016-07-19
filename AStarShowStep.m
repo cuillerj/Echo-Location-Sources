@@ -3,7 +3,7 @@ step;
 figure()
 hold on;
 load carto1img
-imshow(carto1img)
+imshow(carto1img,[])
 [a,b]=size(carto1img);
 for i=1:size(step,1)
 %	x=x+step(i,1);

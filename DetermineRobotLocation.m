@@ -1,5 +1,5 @@
 function [detX,detY,detAngle,detProb,predLocMatrix] = DetermineRobotLocation(robot,posX,posY,posAngle,echoX,echoY,echoAngle,echoProb,predLocMatrix,shiftNorthXOrientation)
-%shiftNorthXOrientation=290; % shift between north and X direction in degres
+
 northOrientation=robot.GetNorthOrientation;
 northAjdustOrientation=mod((shiftNorthXOrientation-northOrientation+360),360);
 currentLocProb=robot.GetCurrentLocProb;
