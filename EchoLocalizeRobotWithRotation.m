@@ -15,15 +15,31 @@ posX=0;
 posY=0;
 posAngle=0;
 idx=1;
+WaitFor=robot.scanEnd;
+retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
+	if (retCode!=0)
+		[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+		if action=="stop"
+			return
+		endif
+		if action=="break"
+			break
+		endif
+		if action=="resume"
+			resume
+		endif
+	endif
+	%{
 while (retCode==9)
 	retCode=robot.GetRetcode(2,1,2);
 	if (mod(idx,10)==0)
-		printf("robot retcode: %d. \n",retCode);
+		printf("robot retcode: %d. ",retCode);
+		printf(ctime(time()))
 		idx++;
 	endif
 	sleep(1);
 end
-
+%}
 if (retCode==0)
 	printf("scan ended\n")
 	robot.SetRunningStatus(0);

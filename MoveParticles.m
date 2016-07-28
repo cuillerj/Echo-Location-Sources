@@ -3,12 +3,18 @@ function [particles] = MoveParticles(rotation,distance,plotOn,particles)
 noiseX=2;               % noise on x move
 noiseY=noiseX; 			% noise on y move
 noiseO=1;               % noise on rotation move
+noiseDist=150;
+noiseRot=300;
+%distance=distance+distance*(randi(noiseDist)-noiseDist/2)/1000 % add noise
+%rotation=rotation+rotation*(randi(noiseRot)-noiseRot/2)/1000;
 [x,y]=size(particles);
 for i=1:x
-	angle=(particles(i,3)+rotation)*pi/180;
-	particles(i,1)=particles(i,1)+distance*cos(angle)+randi(noiseX)-noiseX/2;  % add noise
-	particles(i,2)=particles(i,2)+distance*sin(angle)+randi(noiseY)-noiseY/2;
-	particles(i,3)=mod(angle*180/pi,360)+(randi(noiseO)-noiseO/2);
+	dist=distance+distance*(randi(noiseDist)-noiseDist/2)/1000; % add noise
+	rot=rotation+rotation*(randi(noiseRot)-noiseRot/2)/1000;
+	angle=(particles(i,3)+rot)*pi/180;
+	particles(i,1)=particles(i,1)+dist*cos(angle);  
+	particles(i,2)=particles(i,2)+dist*sin(angle);
+	particles(i,3)=mod(angle*180/pi,360);
 endfor
 
 %save ("-mat4-binary","particles.mat","particles")

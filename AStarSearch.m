@@ -31,7 +31,7 @@ if (exist("carto")==false)
 	printf("load carto\n")
 	carto=carto1;
 endif
-[a,b]=size(carto); % a nb of X positions b nb of Y poistions
+[nbX,nbY]=size(carto); % a nb of X positions b nb of Y positions
 initPos=[currentX,currentY];
 pos=initPos;
 targetPos=[targetX,targetY];
@@ -55,11 +55,11 @@ currentCost=0;
 openList=[g,pos(1),pos(2),currentAction,currentCost+AStarHeuristic(currentX,currentY,targetX,targetY),currentCost,0];
 AStarPath=[];         
 AStarStep=[];
-%actionSteps=zeros(a,b);  % will keep for each cartography point the last action to go there
+%actionSteps=zeros(nbX,nbY);  % will keep for each cartography point the last action to go there
 [c,deltaHeading]=size(actionsRotation);
-closed=zeros(a,b,deltaHeading);       % will contains cartography points status
-expandList=ones(a,b,deltaHeading).*-1; % will contains cartography points status
-actionSteps=zeros(a,b,deltaHeading);  % will keep for each cartography point the last action to go there
+closed=zeros(nbX,nbY,deltaHeading);       % will contains cartography points status
+expandList=ones(nbX,nbY,deltaHeading).*-1; % will contains cartography points status
+actionSteps=zeros(nbX,nbY,deltaHeading);  % will keep for each cartography point the last action to go there
 found=false;
 resign=false;
 origin=false;
@@ -154,7 +154,8 @@ while (found == false && resign == false)
 					AStarShowStep(AStarStep);
 					hold off
 				endif
-				printf("cpu search:%f .\n",cputime()-cpu1);
+				printf("cpu search:%f . ",cputime()-cpu1);
+				printf(ctime(time()))
 				return
 			else
 				AStarHeading = actionsRotation(i);

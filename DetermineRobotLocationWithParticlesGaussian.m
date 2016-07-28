@@ -1,6 +1,6 @@
 function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussian(inX,inY,inProb,plotOn,particles)
 %	sigma=[5,5,10];     % sigma for X, Y, angle
-	sigma=[12,12];   
+	sigma=[1,1]*sqrt(inX^2+inY^2);   
 %	load particles
 	[x,y]=size(particles);
 	z=size(inX,2);
@@ -29,9 +29,9 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 		for i=1:x
 			plot(particles(i,1),particles(i,2))
 		end
-			plot(detX,detY,"r")
+			plot(detX,detY,"color","r","+","markersize",15)
 		for j=1:z
-			plot(inX(j),inY(j),"g")
+			plot(inX(j),inY(j),"color","k","s","markersize",15)
 		endfor
 		hold off;
 	endif

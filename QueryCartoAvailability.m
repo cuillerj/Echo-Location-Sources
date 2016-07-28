@@ -16,7 +16,7 @@ function [available] = QueryCartoAvailability(carto1,xIn,yIn,heading,debugOn)
 	iRobotWidth is the distance between 7 and 8
 	iRobotFrontWidth is the distance between 1 and 3
 	cosH = cos(heading)
-	sinH=sin(heading)
+	sinH = sin(heading)
 	(x0,y0) = (x + F*cosH , y + F*sinH)
 	(x1,y1) = (x + F*cosH + (iRobotFrontWidth/2)*sinH , y + F*sinH - (iRobotFrontWidth/2)*cosH)
 	(x3,y3) = (x + F*cosH - (iRobotFrontWidth/2)*sinH , y + F*sinH + (iRobotFrontWidth/2)*cosH)
@@ -33,6 +33,8 @@ cartoMaxAvailableValue=20;
 [Param,Value,Found] = ApeRobotCommonDefine("iRobotWidth"); 
 cosH=cos(heading);
 sinH=sin(heading);
+xIn=floor(xIn);
+yIn=floor(yIn);
 if (Found==true)
 	RobotBackWidth = Value/2;
 endif
@@ -65,18 +67,22 @@ x=xIn;
 y=yIn;
 if (x <= 0 || x > cartoX)
 	available=false;
-	printf("carto not available (1) X:%d Y:%d orientation: %f .\n",x,y,heading)
+	printf("carto not available (1) X:%d Y:%d orientation: %f . ",x,y,heading)
+	printf(ctime(time()))
 	return
 endif
 if (y <= 0 || y > cartoY)
 	available=false;
-	printf("carto not available (1) X:%d Y:%d orientation: %f .\n",x,y,heading)
+	printf("carto not available (1) X:%d Y:%d orientation: %f . ",x,y,heading)
+	printf(ctime(time()))
 	return
 endif
+
 if (carto1(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 	available=false;
 	if(debugOn)
-	printf("carto not available (1) X:%d Y:%d orientation: %f .\n",x,y,heading)
+	printf("carto not available (1) X:%d Y:%d orientation: %f . ",x,y,heading)
+	printf(ctime(time()))
 	endif
 	return
 endif
