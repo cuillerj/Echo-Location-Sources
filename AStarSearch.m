@@ -9,7 +9,7 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,cur
  %}
  cpu1=cputime();
  iterCount=0;
- print=false;       % set true for debug
+ print=false;   % set true for debug
  debug=false;
  currentHeading=mod(currentHeading+360,360);
  startHeading=-1;
@@ -28,7 +28,8 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,cur
 %load carto1;       % cartographie matrix (1x1 cm)
 if (exist("carto")==false)
 	load carto1;
-	printf("load carto\n")
+	printf("load carto *** ")
+	printf(ctime(time()))
 	carto=carto1;
 endif
 [nbX,nbY]=size(carto); % a nb of X positions b nb of Y positions
@@ -64,7 +65,7 @@ found=false;
 resign=false;
 origin=false;
 %if (carto(targetX,targetY)>maxCartoWeight || carto(currentX,currentY)>maxCartoWeight )  % origine or target not reachable
-if (QueryCartoAvailability(carto,currentX,currentY,currentHeadingGrad,0) == 0 || QueryCartoAvailability(carto,targetX,targetY,targetHeadingGrad,0) == 0 )  % origine or target not reachable
+if (QueryCartoAvailability(carto,currentX,currentY,currentHeadingGrad,debug) == 0 || QueryCartoAvailability(carto,targetX,targetY,targetHeadingGrad,debug) == 0 )  % origine or target not reachable
 	cost=-1
 	resign=true
 	return
@@ -119,7 +120,8 @@ while (found == false && resign == false)
 		for i=1:nbActions
 			iterCount++;
 			if (prevX==targetX && prevY==targetY)
-				iterCount
+				printf("iteration count:%d *** ",iterCount);
+				printf(ctime(time()));
 				found=true;
 				cost=openList(idx,7);
 				a=targetX;
@@ -128,7 +130,8 @@ while (found == false && resign == false)
 				c=prevI;
 				AStarPath=[c];
 				if (debug==true)
-					printf("found prevI %d .\n",c)
+					printf("found prevI %d . *** ",c)
+					printf(ctime(time()))
 					save ("actionSteps.mat","actionSteps")
 					save ("openList.mat","openList")
 					save ("expandList.mat","expandList")

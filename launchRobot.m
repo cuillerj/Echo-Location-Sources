@@ -1,19 +1,7 @@
-cd ..
-javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
-% create and start robot
-% load matrix
-load carto1;
-carto=carto1;
-load "zonesXY.txt"
-shiftNorthXOrientation=267; % shift between north and X direction in degres - that is the average mesurment
-setupPath;					% define paths
-robot=robotJava;            % create the java object
-robot.SetTraceFileOn(1);    % route console to trace file
+[robot,carto,shiftNorthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
 robot.LaunchBatch();        % call java method to start batch
-load all_theta;             % load the trained logistic regression matrix
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);
-% load "zonesXY.txt"
 j=1;
 issue=0;                    % flag used to identify any issues
 targetReached=false;        
@@ -21,13 +9,8 @@ ready=false;
 nbPred=5;                    % define the number of predictions that will be compute for each 360° scan
 plotOn=true;                 % if true graphics will be provided (reduces performance)
 plotOff=false;               % non graphic
-simulation=eval(input("enter 0 normal 1 simulation: ","i"));
-robot.SetSimulationMode(simulation);
-%printf("create particles. ")
 printf(ctime(time()))
 particlesNumber=1000;
-%particles=CreateParticles(carto,particlesNumber,plotOff); % creation for particles filter
-%load particles;
 WaitInfo=robot.robotInfoUpdated;                 
 WaitScan360=robot.scanEnd;
 WaitMove=robot.moveEnd;
@@ -35,16 +18,12 @@ WaitNorthAlign=robot.northAlignEnd;
 WaitServoAlign=robot.servoAlignEnd;
 WaitRobotUpdate=robot.robotUpdatedEnd;
 WaitFor=0;
-callFrom=1;          % to identify the main function
+callFrom=10;          % to identify the main octave function
 %cartoId=1;
 headingIssue=false;
 shiftNO=0;
-while (ready==false)
-	ready=yes_or_no(" robot ready to go ?"); % wait for end user to start
-	if (ready==false)
-		exit
-	endif
-end
+simulation=eval(input("enter 0 normal 1 simulation: ","i"));
+robot.SetSimulationMode(simulation);
 [posX,posY,heading,locProb] = InitCurrentLocation(carto,robot)  % manualy init position if prob >0
 newX=posX;
 newY=posY;
@@ -57,7 +36,7 @@ NO=robot.GetNorthOrientation;          %  request info
 WaitFor=WaitInfo;
 retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
 if (retCode!=0)
-	[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 	if action=="stop.."
 		return
 	endif
@@ -104,7 +83,7 @@ robot.UpdateHardRobotLocation();
 WaitFor=WaitRobotUpdate;
 retCode=WaitForRobot(robot,WaitFor);
 if (retCode!=0)
-	[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 	if action=="stop"
 		return
 	endif
@@ -135,7 +114,7 @@ if locProb <95
 	if (retCode==0)
 		aligned=true;
 		else
-		[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+		[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 		if action=="stop.."
 			return
 		endif
@@ -156,7 +135,7 @@ while (issue==false && targetReached==false)
 		WaitFor=WaitInfo;
 		retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
 		if (retCode!=0)
-			[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+			[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 			if action=="stop"
 				return
 			endif
@@ -179,7 +158,7 @@ while (issue==false && targetReached==false)
 				printf("echo localize X:%d Y:%d heading:%d prob:%d . ",echoX(i),echoY(i),echoH(i),echoProb(i))
 				printf(ctime(time()))
 			endfor
-%			analyseRetcode(retCode,WaitScan360)
+%			analyseRetcode(robot,retCode,WaitScan360)
 			if (retCode!=0)
 				issue=true;
 			endif
@@ -205,7 +184,7 @@ while (issue==false && targetReached==false)
 				WaitFor=WaitNorthAlign;
 				retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
 				if (retCode!=0)
-					[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+					[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 					if action=="stop"
 						return
 					endif
@@ -215,12 +194,13 @@ while (issue==false && targetReached==false)
 					if action=="resume"
 						resume
 					endif
+
 				endif
 				NO=robot.GetNorthOrientation;          			% request info
 				WaitFor=WaitInfo;
 				retCode=WaitForRobot(robot,WaitFor); 			% wait for up to date
 				if (retCode!=0)
-					[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+					[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 					if action=="stop"
 						return
 					endif
@@ -229,6 +209,12 @@ while (issue==false && targetReached==false)
 					endif
 					if action=="resume"
 						resume
+					endif
+					if (action=="noMove." )
+						printf (action);
+					endif
+					if (action=="inMove" || action=="osbta")
+						printf (action);
 					endif
 				endif
 				NO=robot.GetNorthOrientation;           		% get the up to date info
@@ -252,7 +238,7 @@ while (issue==false && targetReached==false)
 			WaitFor=WaitInfo;
 			WaitForRobot(robot,WaitFor);
 			if (retCode!=0)
-				[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+				[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 				if action=="stop"
 					return
 				endif
@@ -293,7 +279,7 @@ while (issue==false && targetReached==false)
 				retCode=WaitForRobot(robot,WaitFor)
 				rotation=mod(rotation+90,360)
 				if (retCode!=0)
-					[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+					[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 					if action=="stop.."
 						return
 					endif
@@ -320,7 +306,7 @@ while (issue==false && targetReached==false)
 			WaitFor=WaitRobotUpdate;
 			retCode=WaitForRobot(robot,WaitFor);
 			if (retCode!=0)
-				[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+				[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 				if action=="stop.."
 					return
 				endif
@@ -376,7 +362,7 @@ while (issue==false && targetReached==false)
 								if (retCode==0)
 									aligned=true;
 									else
-									[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+									[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 									if action=="stop"
 										return
 									endif
@@ -391,7 +377,7 @@ while (issue==false && targetReached==false)
 	%						WaitFor=WaitInfo;
 	%						retCode=WaitForRobot(robot,WaitFor);
 							if (retCode>=9)  
-								[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+								[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 								if action=="stop"
 									return
 								endif
@@ -436,7 +422,7 @@ while (issue==false && targetReached==false)
 							WaitFor=WaitRobotUpdate;
 							retCode=WaitForRobot(robot,WaitFor);
 							if (retCode!=0)
-								[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+								[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 								if action=="stop"
 									return
 								endif
