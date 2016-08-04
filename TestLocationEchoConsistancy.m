@@ -1,23 +1,36 @@
 function [weight] = TestLocationEchoConsistancy(robot,carto,posX,posY,heading)
-% en cours de ddev a partir de la v0 sous forme matricielle pour ne pas rescanner
-[nbLine,nbCol]=size(posX);
-WaitServoAlign=robot.servoAlignEnd;          % set servo motor in 
-WaitPingFB=robot.pingFBEnd;
-callFrom=1;          % to identify the main function
-coefWeight=1;
-%simuParam1=30;
-simuParam3=10;
-simulationMode=90;        % retCode in simulation mode
-%simuParam2=1;
-%posX=[55,115,180,200]
-%posY=[55,55,120,120]
-%echo=[190,50,10,10]
+%{
+This function does 4 echos measurments based on the (X,Y) cartography referential
+Parameters are:
+	robot: the java object that is used to drive the physical robot
+	carto: the cartography matrix
+	posX: a vector containing a list of position regarding X axis
+	posY: a vector containing a list of position regarding Y axis (the number of values posY must be the same as posX)
+	heading: is the robot orientation
+	
+The aim of this function is to provide a weight for each position (x,y)
+Compare echos with theoretical distances to determine the weight
+In simulation mode the echoes are simulated based on theoritical distances and noised added
+The higher is the weight the most likely is the position
+	Query the cartography obstacle distances (QueryCartoEchosProjection) 
+	Align the servo motor with th X axis 
+	Ping front and back to get distances
+	Align the servo motor with th Y axis 
+	Ping front and back to get distances
+	Compute and return the weight
+%}
+[nbLine,nbCol]=size(posX);                  % get the vector size
+WaitServoAlign=robot.servoAlignEnd;          % define the wait for servo motor aligment value
+WaitPingFB=robot.pingFBEnd;                  % define the wait for ping code value
+callFrom=1;          % define the main function for the waitFor function
+coefWeight=1;        % reserved to adjust weight if necessary
+simuParam1=10;       % coefficient used to determine the noise in simulation mode - Increasing the value will increase the noise
+simulationMode=90;    % used to identify the simulation mode  (retCode of waitFor function)
 echo=[];
-[nbLine,nbCol]=size(posX);
 pts=[posX;posY]';   % create matric of points  (x,y)
-printf ("EchoConsistancy for points:");
+printf ("Check echoConsistancy for points:");
 for i=1:nbCol
-	printf(" (%d,%d)",pts(i,1),pts(i,2));
+	printf(" (%d,%d)",pts(i,1),pts(i,2)); % print the points list
 endfor
 pts=repmat(pts,1,2);   % create matric of points (2,nbCol) (x,y)
 printf (" *** ");
@@ -27,18 +40,18 @@ weight=[];
 % create matrix to project obstacle on (X,Y) absolute referential
 projection=[];
 for i=1:nbCol         
-	[p0,p1,p2,p3] = QueryCartoEchosProjection(carto,posX(i),posY(i));
-	projection = [projection;[p0,p1,p2,p3]]; 
+	[p0,p1,p2,p3] = QueryCartoEchosProjection(carto,posX(i),posY(i));  % get the theorical points from the cartography
+	projection = [projection;[p0,p1,p2,p3]];                           % create a matrix - one line for each points
 endfor
-projection=[projection(:,1),projection(:,4),projection(:,5),projection(:,8)];  % keep the 4 significative rows
+projection=[projection(:,1),projection(:,4),projection(:,5),projection(:,8)];  % keep the significative values following (+X,+Y,-X,-Y)
 nnzProj=projection==0;
-nnzProj=nnzProj==0;
+nnzProj=nnzProj==0;                    % a matrix that contain 1 for each non zero of projection
 nbnnz=(sum((projection==0)==0,2))';    % get a vector containing the number of non zero in each line
 % ping echo
-robot.RobotAlignServo(floor(90-heading));
-WaitFor=WaitServoAlign;
-retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
-if (retCode!=0)
+robot.RobotAlignServo(floor(90-heading));     % ask the robot to align with X axis taking into account the current heading
+WaitFor=WaitServoAlign;                       % define the waiting for value for the wairFor function
+retCode=WaitForRobot(robot,WaitFor);			% wait for robot feedback
+if (retCode!=0)                                % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
 	if action=="stop.."
 		return
@@ -49,10 +62,10 @@ if (retCode!=0)
 	if action=="resume"
 	endif
 endif
-robot.PingEchoFrontBack();
-WaitFor=WaitPingFB;
-retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
-if (retCode!=0)
+robot.PingEchoFrontBack();             %  ask the robot to ping echo front and back
+WaitFor=WaitPingFB;                        % define the waiting for value for the wairFor function
+retCode=WaitForRobot(robot,WaitFor);			% wait fo robot feedback
+if (retCode!=0)                           % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
 	if action=="stop.."
 		return
@@ -63,21 +76,17 @@ if (retCode!=0)
 	if action=="resume"
 	endif
 endif
-if retCode==simulationMode         % simulation mode
-% simuation mode
-%	simuParam2=floor(rand*nbCol+1)  % to choose wich value will be the simulation reference
-%	echo=[projection(simuParam2,1)-posX(simuParam2),projection(simuParam2,2)-posY(simuParam2),projection(simuParam2,3)-posX(simuParam2),projection(simuParam2,4)-posY(simuParam2)]
-%	echo=normrnd(echo,abs(echo)/simuParam3)
+if retCode==simulationMode         % test if we are in simulation mode
 
 else
-	echo0=robot.GetScanDistFront(0);
-	echo2=robot.GetScanDistBack(0);
+	echo0=robot.GetScanDistFront(0);   % if normal mode get the robot echoes
+	echo2=robot.GetScanDistBack(0);    % if normal mode get the robot echoes
 endif
 
-robot.RobotAlignServo(floor(180-heading));
-WaitFor=WaitServoAlign;
+robot.RobotAlignServo(floor(180-heading)); % ask the robot to align with Y axis taking into account the current heading
+WaitFor=WaitServoAlign;                       % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
-if (retCode!=0)
+if (retCode!=0)                     % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
 	if action=="stop.."
 		return
@@ -88,10 +97,10 @@ if (retCode!=0)
 	if action=="resume"
 	endif
 endif
-robot.PingEchoFrontBack();
-WaitFor=WaitPingFB;
+robot.PingEchoFrontBack();                 %  ask the robot to ping echo front and back
+WaitFor=WaitPingFB;                         % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
-if (retCode!=0)
+if (retCode!=0)                              % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
 	if action=="stop.."
 		return
@@ -102,25 +111,27 @@ if (retCode!=0)
 	if action=="resume"
 		endif
 endif
-if retCode==simulationMode
+if retCode==simulationMode                 % test if we are in simulation mode
 	simuParam2=floor(rand*nbCol+1);  % to choose wich value will be the simulation reference
 	printf ("simulator choice for echo simulation is the %d position *** ",simuParam2);
 	printf(ctime(time()));
+	% compute the 4 theoretical distances with the obstacles
 	echo=[projection(simuParam2,1)-posX(simuParam2),projection(simuParam2,2)-posY(simuParam2),projection(simuParam2,3)-posX(simuParam2),projection(simuParam2,4)-posY(simuParam2)];
-	echo=normrnd(echo,abs(echo)/simuParam3);
+	echo=normrnd(echo,abs(echo)/simuParam1);  % add some noise to the theoretical values
 	printf("simulation echo +X:%d +Y:%d -X:%d -Y:%d *** ",echo(1),echo(2),echo(3),echo(4));
 	printf(ctime(time()));
 	% mode simulation
 else
-	echo1=robot.GetScanDistFront(0);
-	echo3=robot.GetScanDistBack(0);
+	echo1=robot.GetScanDistFront(0);   % if normal mode get the robot echoes
+	echo3=robot.GetScanDistBack(0);    % if normal mode get the robot echoes
 	echo=[echo0,echo1,echo2,echo3];
 	printf("real echo +X:%d +Y:%d -X:%d -Y:%d *** ",echo(1),echo(2),echo(3),echo(4));
 	printf(ctime(time()));
 endif
 % then compute distances for each positions
-echo=repmat(echo,nbCol,1);
-
+echo=repmat(echo,nbCol,1);            % create matrix by duplicating echo vector
+% compute the weight taking into account the number of "references" (non zero projections)
+% the higher is the nb references the higher is the weight
 weight=max(1,100-((sqrt(sum((abs(projection-echo-pts).*nnzProj).^2,2))')./(nbnnz))*coefWeight);
 
 

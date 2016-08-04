@@ -1,6 +1,11 @@
+ function [] = TestTrajectoryControl(simulationMode)
  cpu1=cputime();
- simulationMode=0;  % to set simulation on off
-[robot,carto,shiftNorthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
+   if (exist("simulationMode"))
+  else
+    simulationMode=1;
+  endif
+ %simulationMode=1;  % to set simulation 1 on 0 off
+[robot,carto,headingNOrthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
 robot.LaunchBatch();        % call java method to start batch
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);
@@ -23,7 +28,7 @@ WaitFor=0;
 callFrom=10;          % to identify the main octave function
 %cartoId=1;
 headingIssue=false;
-shiftNO=0;
+headingNO=0; 		 % heading regarding magneto mesurment and value for echo scan reference
 spaceNO=0;
 robot.SetSimulationMode(simulationMode);  % 0 normal 1 siimulation mode
 %[posX,posY,heading,locProb] = InitCurrentLocation(carto,robot)  % manualy init position if prob >0
@@ -39,7 +44,7 @@ particles = CreateLocatedParticles(carto,newX,newY,newH,newProb,particlesNumber,
 spaceNO=SpaceNorthOrientation(zonesXY,newX,newY);  % 
 if (simulationMode!=0)
 	NO=normrnd(spaceNO,10);  % simulate noise NO
-	shiftNO=spaceNO-NO;   % determine actual shift regarding magneto mesurment and value for echo scan reference
+	headingNO=mod(360+spaceNO-NO,360);   % determine heading regarding magneto mesurment and value for echo scan reference
 else
 	NO=robot.GetNorthOrientation;          %  request NO info
 	WaitFor=WaitInfo;
@@ -56,7 +61,7 @@ else
 			resume
 		endif
 	NO=robot.GetNorthOrientation;           % get the up to date info
-	shiftNO=spaceNO-NO;                    
+	headingNO=mod(360+spaceNO-NO,360);                    
 	endif
 endif
 
@@ -67,7 +72,7 @@ heading=newH;
 retCode=99;
 robot.northOrientation=NO;  
 
-printf("robot shiftNorth Orientation:%d *** ",shiftNO);
+printf("robot headingNOrth Orientation:%d *** ",headingNO);
 printf(ctime(time()));
 %{
 		compute target location
@@ -173,7 +178,7 @@ while (issue==false && targetReached==false)
 									endif
 								endif
 							endif
-							robot.SetHeading(robot.GetHardHeading());
+							robot.SetHeading(mod(360+robot.GetHardHeading(),360));
 							robot.Move(0,lenToDo*forward); 		 % len sent in cm
 							lastParticles=particles;          % to be able to recover in case of move failure
 							particles=MoveParticles(rotationToDo,lenToDo,plotOff,particles);
@@ -213,19 +218,34 @@ while (issue==false && targetReached==false)
 							robot.ValidHardPosition();
 							newX=[nextX,robot.GetHardPosX()];
 							newY=[nextY,robot.GetHardPosY()];
-							newH=[robot.GetHardHeading()];
+							newH=[mod(360+robot.GetHardHeading(),360)];
 							newProb=[probExpectedMoveOk,probHardMoveOk];
 							if (probExpectedMoveOk >= probHardMoveOk)
 								spaceNO=SpaceNorthOrientation(zonesXY,newX(1),newY(1));  
 							else
 								spaceNO=SpaceNorthOrientation(zonesXY,newX(2),newY(2));
 							endif
-							shiftNO=spaceNO-robot.GetNorthOrientation(); 
+							headingNO=mod(360+spaceNO-robot.GetNorthOrientation(),360); 
 %							prob=newProb;
 							[line,col]=size(newX);
 							weightEcho=[];
-							averageH=floor(mod((360+(newH+shiftNO+saveTargetHeading)/3),360));
-							printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%d SpaceNO:%d *** ",newH,shiftNO,saveTargetHeading,averageH,spaceNO);
+							if (newH>=0 && newH<=180)
+								alpha1=newH+360
+							else 
+								alpha1=newH
+							endif
+							if (headingNO>=0 && headingNO<=180)
+								alpha2=headingNO+360
+							else 
+								alpha2=headingNO
+							endif
+							if (saveTargetHeading>=0 && saveTargetHeading<=180)
+								alpha3=saveTargetHeading+360
+							else 
+								alpha3=saveTargetHeading
+							endif
+							averageH=floor(mod((360+(alpha1+alpha2+alpha3)/3),360));
+							printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%d SpaceNO:%d NO:%d *** ",newH,headingNO,saveTargetHeading,averageH,spaceNO,robot.GetNorthOrientation());
 							printf(ctime(time()))
 							weightEcho = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH);
 							printf("echo consistancy prob:");
@@ -265,8 +285,8 @@ while (issue==false && targetReached==false)
 								endif
 							endif							
 							particles=ResampleParticles(plotOff,particles);
-							if (abs(newH-shiftNO)>15)  % to much difference between robot calculation and NO
-								printf("inconsitancy heading:%d NO:%d . *** ",newH,robot.GetNorthOrientation())
+							if (mod(360+newH,360)-mod(360+headingNO,360)>15)  % to much difference between robot calculation and NO
+								printf("inconsitancy heading:%d headingNO:%d NO:%d SpaceNO:%d *** ",newH,headingNO,robot.GetNorthOrientation(),spaceNO)
 								printf(ctime(time()))
 %								headingIssue=true
 							endif
