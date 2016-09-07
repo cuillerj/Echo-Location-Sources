@@ -1,4 +1,4 @@
-[robot,carto,shiftNorthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
+[robot,carto,headingNOrthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
 robot.LaunchBatch();        % call java method to start batch
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);
@@ -21,7 +21,7 @@ WaitFor=0;
 callFrom=10;          % to identify the main octave function
 %cartoId=1;
 headingIssue=false;
-shiftNO=0;
+headingNO=0;
 simulation=eval(input("enter 0 normal 1 simulation: ","i"));
 robot.SetSimulationMode(simulation);
 [posX,posY,heading,locProb] = InitCurrentLocation(carto,robot)  % manualy init position if prob >0
@@ -48,7 +48,7 @@ if (retCode!=0)
 	endif
 endif
 NO=robot.GetNorthOrientation;           % get the up to date info
-shiftNO=NO-spaceNO
+headingNO=NO-spaceNO
 %{
 		compute target location
 %}
@@ -103,9 +103,9 @@ endif
 		first step is to north align robot according to the echo learning pahse
 %}
 if locProb <95
-	printf("align robot:%d  ",shiftNorthXOrientation)
+	printf("align robot:%d  ",headingNOrthXOrientation)
 	printf(ctime(time()))
-	robot.NorthAlign(shiftNorthXOrientation);    % align robot such that it will be in the same orientation as for learning phase
+	robot.NorthAlign(headingNOrthXOrientation);    % align robot such that it will be in the same orientation as for learning phase
 	count=0;
 	aligned=false;
 	issue=false;
@@ -147,7 +147,7 @@ while (issue==false && targetReached==false)
 			endif
 		endif
 		NO=robot.GetNorthOrientation;           % get the up to date info
-		orientation=mod(NO+360-shiftNorthXOrientation,360);
+		orientation=mod(NO+360-headingNOrthXOrientation,360);
 		printf("robot localize orientation:%d . ",orientation)
 		printf(ctime(time()))
 		firstStep=false;
@@ -255,7 +255,7 @@ while (issue==false && targetReached==false)
 			printf(ctime(time()))
 		endfor
 		printf("find robot location. \n")
-		[newX,newY,newAngle,newProb,predLocMatrix]=DetermineRobotLocation(robot,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardAngle,echoX,echoY,echoH,echoProb,predLocMatrix,shiftNorthXOrientation);
+		[newX,newY,newAngle,newProb,predLocMatrix]=DetermineRobotLocation(robot,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardAngle,echoX,echoY,echoH,echoProb,predLocMatrix,headingNOrthXOrientation);
 		printf("step 1 particles det location is X:%d Y:%d heading:%d  prob:%d ",newX,newY,newAngle,newProb)
 		printf(ctime(time()))
 		[detX,detY,detH,particles]=DetermineRobotLocationWithParticlesGaussian(newX,newY,newProb,plotOff,particles);
@@ -434,7 +434,7 @@ while (issue==false && targetReached==false)
 								endif
 							endif							
 							particles=ResampleParticles(plotOff,particles);
-							if ((mod(newH+robot.GetNorthOrientation(),360)/shiftNorthXOrientation)>1.2)  % to much difference between robot calculation and NO
+							if ((mod(newH+robot.GetNorthOrientation(),360)/headingNOrthXOrientation)>1.2)  % to much difference between robot calculation and NO
 								printf("heading inconsitancy :%d NO:%d . ",newH,robot.GetNorthOrientation())
 								printf(ctime(time()))
 %								headingIssue=true
