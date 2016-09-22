@@ -22,7 +22,7 @@ if (cost<0)   % no path found
 	return
 endif
 [nbSteps,dimMatx]=size(AStarStep);
-[dimMatx,nbPaths]=size(AStarPath);
+[nbPaths,dimMatx]=size(AStarPath);
 i=1;
 prevPath=0;
 nextPath=prevPath;
@@ -30,8 +30,8 @@ endPath=false;
 direct=false;
 while (prevPath==nextPath && endPath==false)
 	prevPath=AStarPath(i);
-	nextX=AStarStep(nbSteps-i,1);
-	nextY=AStarStep(nbSteps-i,2);
+	nextX=AStarStep(i+1,1);
+	nextY=AStarStep(i+1,2);
 	if (i>=nbPaths-1)
 		endPath=true;
 	else

@@ -14,7 +14,9 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,cur
  currentHeading=mod(currentHeading+360,360);
  startHeading=-1;
  forward=0;
- currentHeadingGrad=currentHeading*pi()/180;
+
+ weightCarto=2;     % weight used to balance way depending on cartography weight and action cost
+
  targetHeadingGrad=targetHeading*pi()/180;
   AStarPath=[];
   AStarStep=[];
@@ -37,7 +39,7 @@ initPos=[currentX,currentY];
 pos=initPos;
 targetPos=[targetX,targetY];
 %maxCartoWeight=20; % threshold over that means space (x,y) is not available
-weightCarto=20;     % weight used to balance way depending on cartography weight and action cost
+%weightCarto=20;     % weight used to balance way depending on cartography weight and action cost
 
 actions=[
 		[stepSize,0];[-stepSize,0];
@@ -45,141 +47,118 @@ actions=[
 		[stepSize,stepSize]; [stepSize,-stepSize];  % actions list (deltaX,deltaY)
 		[-stepSize,stepSize];[-stepSize,-stepSize];
 		];
-actionsRotation=[0,pi(),pi()/2,3*pi()/2,pi()/4,7*pi()/4,pi()*3/4,pi()*5/4];
-AStarHeading=currentHeadingGrad;
+
+shiftRotation=[0,4,2,6,1,7,3,5].*(pi()/4);     
+  
+%AStarHeading=currentHeadingGrad
+
 nbActions=size(actions,1);
+ mailleRotation=nbActions;
+deltaMailleRotation=360/mailleRotation;
+currentHeadingMaille=floor(currentHeading/deltaMailleRotation)
+currentHeadingGrad= currentHeadingMaille*2*pi()/mailleRotation
+currentH=currentHeadingGrad;
+actionsRotation=mod((shiftRotation).-currentHeadingGrad,2*pi());   
 currentAction=[0,0];
-g=0;
 currentCost=0;
 %{ openList contains (X,Y) points that are to be developped
 %}
-openList=[g,pos(1),pos(2),currentAction,currentCost+AStarHeuristic(currentX,currentY,targetX,targetY),currentCost,0];
 AStarPath=[];         
 AStarStep=[];
-%actionSteps=zeros(nbX,nbY);  % will keep for each cartography point the last action to go there
-[c,deltaHeading]=size(actionsRotation);
-closed=zeros(nbX,nbY,deltaHeading);       % will contains cartography points status
-expandList=ones(nbX,nbY,deltaHeading).*-1; % will contains cartography points status
-actionSteps=zeros(nbX,nbY,deltaHeading);  % will keep for each cartography point the last action to go there
+cost=0;
+closeSet=[];
+openSet=[pos(1),pos(2),currentHeadingMaille+1];
+cameFrom=zeros(nbX,nbY,mailleRotation);
+cameWith=zeros(nbX,nbY,mailleRotation);
+gScore=ones(nbX,nbY,mailleRotation).*Inf;
+gScore(pos(1),pos(2),currentHeadingMaille+1)=0;
+fScore=ones(nbX,nbY,mailleRotation).*Inf;
+fScore(pos(1),pos(2),currentHeadingMaille+1)=AStarHeuristic(pos(1),pos(2),targetX,targetY);
 found=false;
-resign=false;
-origin=false;
-%if (carto(targetX,targetY)>maxCartoWeight || carto(currentX,currentY)>maxCartoWeight )  % origine or target not reachable
-if (QueryCartoAvailability(carto,currentX,currentY,currentHeadingGrad,debug) == 0 || QueryCartoAvailability(carto,targetX,targetY,targetHeadingGrad,debug) == 0 )  % origine or target not reachable
-	cost=-1
-	resign=true
-	return
-endif
-
-	if (currentHeading<=90)
-		startHeading=0;
-		forward=1;
-	endif
-	if (currentHeading>=270)
-		startHeading=0;
-		forward=1;
-	endif
-	if (currentHeading>90 && currentHeading<=270)
-		%{
-		if ((QueryCartoAvailability(currentX,currentY,floor(currentHeading+(180-currentHeading)/2),cartoId,1)) == 1 && (QueryCartoAvailability(currentX,currentY,180,cartoId,1) == 1))
-			startHeading=180;
-
+current=[pos(1),pos(2),currentHeadingMaille+1]
+while (size(openSet,1)!=0 || found==true)
+	[valueMin,idxMin]=min(fScore(:));
+	[currentX,currentY,currentH]=ind2sub(size(fScore),idxMin);
+	if ([currentX,currentY]==[targetX,targetY])
+		found=true
+%		save  ("cameFrom.mat","cameFrom")
+		cost=fScore(currentX,currentY,currentH)
+		AStarStep=[AStarPath;[currentX,currentY]];
+		a=targetX;
+		b=targetY;
+	%		AStarStep=[AStarStep;[currentH]];
+		backEnd=false;
+%		currentH=mod(-shiftRotation(i)+(currentH-1)*2*pi()/mailleRotation,2*pi());
+%		currentHeadingMaille=floor(currentH*180/pi()/deltaMailleRotation)
+%		backHeadingMaille=currentHeadingMaille+1
+%		cost=valueMin;
+		while (backEnd!=true)
+			actionBack=cameFrom(currentX,currentY,currentH);
+			backX=currentX-actions(actionBack,1);
+			backY=currentY-actions(actionBack,2);
+%			backH=mod(shiftRotation(actionBack)+(currentH-1)*2*pi()/mailleRotation,2*pi())
+%			backHeadingMaille=floor(backH*180/pi()/deltaMailleRotation)
+%			backHeadingMaille=mod(floor((currentH-1-shiftRotation(actionBack))*180/pi()/deltaMailleRotation),mailleRotation)
+%			backH=mod(backHeadingMaille-shiftRotation(actionBack),2*pi())
+			AStarStep=[AStarStep;[backX,backY]];         
+			AStarPath=[AStarPath;[actionBack]];
+			if (backX == pos(1) && backY == pos(2))
+				backEnd=true
+			else
+				currentH=cameWith(currentX,currentY,currentH);
+				currentX=backX;
+				currentY=backY;
+%				currentH=backHeadingMaille+1;
+%				backHeadingMaille=floor((backH-1)*180/pi()/deltaMailleRotation)+1
+			endif
+		end
+		AStarPath=flipud(AStarPath);
+		AStarStep=flipud(AStarStep);
+		if (plotOn)
+			AStarShowStep(AStarStep);
+			hold off
 		endif
-			%}
-		startHeading=180;
-		forward=-1;
-	endif
-if (startHeading==-1)
-	cost=-3;
-	return
-else
-%	AStartHeading=currentHeadingGrad;
-endif
-%}
-if (targetX==currentX && targetY==currentY)       % target already reached
-	cost=0;
-	return
-endif
-AStarHeading=0;
-while (found == false && resign == false)
-	if (size(openList,1)==0)         % not more path to expand
-		resign=true;
-		cost=-2;
-		idx=-1;
-		path=[];
+		forward=1;
+		printf("cpu search:%f . ",cputime()-cpu1);
+		printf(ctime(time()))
 		return
 	else
-		[minV,idx]=min(openList(:,6));  % look for the lowest value of (cost+heuristic)
-		g=openList(idx,1)+1;            % get the step number
-		prevX=openList(idx,2);
-		prevY=openList(idx,3);
-		prevCost=openList(idx,7);
-		prevAction=openList(idx,4:5);
-		prevI=openList(idx,8);
-%		printf("minV:%d step number:%d min X:%d min Y:%d prevCost:%d prevAction:( %d %d ) prevHeading:%f prevI:%d .\n",minV,g,prevX,prevY,prevCost,prevAction(1) ,prevAction(2),prevHeading,prevI)
+		closeSet=[[closeSet];[currentX,currentY,currentH]];
+		idxOpenSet=find(ismember(openSet,[currentX,currentY,currentH],'rows'));
+		openSet(idxOpenSet,:)=[];
+		fScore(currentX,currentY,currentH)=[Inf];
 		for i=1:nbActions
-			iterCount++;
-			if (prevX==targetX && prevY==targetY)
-				printf("iteration count:%d *** ",iterCount);
-				printf(ctime(time()));
-				found=true;
-				cost=openList(idx,7);
-				a=targetX;
-				b=targetY;
-				AStarStep=[a,b];
-				c=prevI;
-				AStarPath=[c];
-				if (debug==true)
-					printf("found prevI %d . *** ",c)
-					printf(ctime(time()))
-					save ("actionSteps.mat","actionSteps")
-					save ("openList.mat","openList")
-					save ("expandList.mat","expandList")
-					save ("closed.mat","closed")
-				endif
-				while (origin==false)		
-					a1=a-actions(c,1);
-					b1=b-actions(c,2);
-					c=actionSteps(a,b,c);
-					if (c==0)
-						AStarStep=[AStarStep;[a,b]];
-						AStarStep=[AStarStep;[initPos(1:2)]];
-						AStarPath=fliplr(AStarPath);
-						origin=true;
-					else
-						AStarStep=[AStarStep;[a,b]];
-						AStarPath=[AStarPath,[c]];
-						a=a1;
-						b=b1;				
+				neighborX=floor(currentX+actions(i,1));
+				neighborY=floor(currentY+actions(i,2));
+%				neighborH=mod(shiftRotation(i)-shiftRotation(currentH),2*pi());
+				neighborH=mod(shiftRotation(i)-(currentH-1)*2*pi()/mailleRotation,2*pi());
+				neighborHeadingMaille=floor(neighborH*180/pi()/deltaMailleRotation);
+				neighbor=[neighborX,neighborY,neighborHeadingMaille+1];
+				if (neighborX >=1 && neighborY>=1 && neighborX <=size(carto,1) && neighborY <=size(carto,2) && QueryCartoAvailability(carto,neighborX,neighborY,neighborH,0)==1)
+					if (sum(ismember(closeSet,neighbor,'rows'))==0)
+%						tentative_gScore = gScore(currentX,currentY,currentH) + sqrt(actions(i,1)^2+actions(i,2)^2);
+						if (cameFrom(currentX,currentY,currentH)!=0)
+%actions(cameFrom(currentX,currentY,currentH),:)
+%actions(i,:)
+							neibghboorCost=AStarActionCost(actions(cameFrom(currentX,currentY,currentH),:),actions(i,:),stepSize);
+						else
+							neibghboorCost=sqrt(actions(i,1)^2+actions(i,2)^2);
 						endif
-				end
-				if (plotOn)
-					AStarShowStep(AStarStep);
-					hold off
-				endif
-				printf("cpu search:%f . ",cputime()-cpu1);
-				printf(ctime(time()))
-				return
-			else
-				AStarHeading = actionsRotation(i);
-				newX=floor(prevX+actions(i,1));
-				newY=floor(prevY+actions(i,2));
-				if (newX >=1 && newY >=1 && newX <=size(carto,1) && newY <=size(carto,2) && QueryCartoAvailability(carto,newX,newY,AStarHeading,0)==1)
-					cartoWeight=carto(newX,newY);				
-						if (expandList(newX,newY,i)==-1 && closed(newX,newY,i)==0)
-							newCost=prevCost+AStarActionCost(prevAction,actions(i,:),stepSize)+weightCarto*cartoWeight;
-							openList=[openList;[g,newX,newY,[actions(i,:)],newCost+AStarHeuristic(newX,newY,targetX,targetY)],newCost,i]; 
-							actionSteps(newX,newY,i)=prevI;								
-							expandList(newX,newY,i)=0;
+						tentative_gScore = gScore(currentX,currentY,currentH) + neibghboorCost;
+						if (sum(ismember(openSet,neighbor,'rows'))==0)
+							openSet=[[openSet];[neighbor]];
+							if (tentative_gScore < gScore(neighborX,neighborY,neighborHeadingMaille+1))
+								cameFrom(neighborX,neighborY,neighborHeadingMaille+1) = i;
+								cameWith(neighborX,neighborY,neighborHeadingMaille+1) = currentH;
+								gScore(neighborX,neighborY,neighborHeadingMaille+1) = tentative_gScore;
+								cartoWeight=weightCarto*carto(neighborX,neighborY);
+								fScore(neighborX,neighborY,neighborHeadingMaille+1) = gScore(neighborX,neighborY,neighborHeadingMaille+1) + AStarHeuristic(neighbor(1),neighbor(2),targetX,targetY)+cartoWeight;
+							endif
 						endif
-					else
-						closed(newX,newY,i)=1;
+					endif
 				endif
-			endif
 		endfor
-		expandList(newX,newY,[])=0;
-		currentCost=g;
-		openList(idx,:)=[];
 	endif
+		current=[currentX,currentY,currentH];
 end
 endfunction

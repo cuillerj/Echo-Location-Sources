@@ -10,7 +10,7 @@ function [cost] = AStarActionCost(currentAction,nextAction,stepSize)
 		return
 	else
 	%	cost=cost;
-		cost=cost+stepSize*0.01;   % 0.01 tunned to add some cost to reduce the number of move kind changes - to smooth the path
+		cost=cost+stepSize*0.1;   % 0.1 tunned to add some cost to reduce the number of move kind changes - to smooth the path
 		return
 
 	endif

@@ -34,7 +34,7 @@ robot.SetSimulationMode(simulationMode);  % 0 normal 1 siimulation mode
 %[posX,posY,heading,locProb] = InitCurrentLocation(carto,robot)  % manualy init position if prob >0
 newX=55;
 newY=55;
-newH=0;
+newH=00;
 newProb=100;
 probExpectedMoveOk=50;
 probHardMoveOk=50;
@@ -80,7 +80,7 @@ printf(ctime(time()));
 %[targetX,targetY,targetAngle]=ComputeTargetLocation(carto,robot);
 targetX=370;
 targetY=250;
-targetH=0;;
+targetH=00;;
 printf("robot target is X:%d Y:%d orientation: %d. *** ",targetX,targetY,targetH)
 printf(ctime(time()))
 %
