@@ -19,6 +19,7 @@ The higher is the weight the most likely is the position
 	Ping front and back to get distances
 	Compute and return the weight
 %}
+heading=mod(heading,2*pi());
 [nbLine,nbCol]=size(posX);                  % get the vector size
 WaitServoAlign=robot.servoAlignEnd;          % define the wait for servo motor aligment value
 WaitPingFB=robot.pingFBEnd;                  % define the wait for ping code value
@@ -48,7 +49,25 @@ nnzProj=projection==0;
 nnzProj=nnzProj==0;                    % a matrix that contain 1 for each non zero of projection
 nbnnz=(sum((projection==0)==0,2))';    % get a vector containing the number of non zero in each line
 % ping echo
-robot.RobotAlignServo(floor(90-heading));     % ask the robot to align with X axis taking into account the current heading
+if (heading>=0 && heading <=(pi()/2))
+	a2=pi()/2-heading;
+	a1=pi()-heading;
+endif
+if (heading>pi()/2 && heading <=(pi()))
+	a1=pi()-heading;
+	a2=3*pi()/2-heading;
+endif
+if (heading>pi() && heading <=(3*pi()/2))
+	a2=3*pi()/2-heading;
+	a1=2*pi()-heading;
+endif
+if (heading>3*pi()/2 && heading <=2*pi())
+	a2=5*pi()/2-heading;
+	a1=2*pi()-heading;
+endif
+printf(" servoAlign: %d & %d **** ",a1*180/pi(),a2*180/pi()); % print the points list
+printf(ctime(time()))
+robot.RobotAlignServo(floor(a1*180/pi()));     % ask the robot to align with X axis taking into account the current heading
 WaitFor=WaitServoAlign;                       % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait for robot feedback
 if (retCode!=0)                                % analyse the non zero return code
@@ -79,11 +98,17 @@ endif
 if retCode==simulationMode         % test if we are in simulation mode
 
 else
-	echo0=robot.GetScanDistFront(0);   % if normal mode get the robot echoes
+	if (heading>=0 && heading <=(pi()))
+	echo1=robot.GetScanDistFront(0);   % if normal mode get the robot echoes
 	echo2=robot.GetScanDistBack(0);    % if normal mode get the robot echoes
+	endif
+	if (heading>pi())
+	echo1=robot.GetScanDistBack(0);   % if normal mode get the robot echoes
+	echo2=robot.GetScanDistFront(0);    % if normal mode get the robot echoes
+	endif
 endif
 
-robot.RobotAlignServo(floor(180-heading)); % ask the robot to align with Y axis taking into account the current heading
+robot.RobotAlignServo(floor(a2*180/pi())); % ask the robot to align with Y axis taking into account the current heading
 WaitFor=WaitServoAlign;                       % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
 if (retCode!=0)                     % analyse the non zero return code
@@ -117,21 +142,31 @@ if retCode==simulationMode                 % test if we are in simulation mode
 	printf(ctime(time()));
 	% compute the 4 theoretical distances with the obstacles
 	echo=[projection(simuParam2,1)-posX(simuParam2),projection(simuParam2,2)-posY(simuParam2),projection(simuParam2,3)-posX(simuParam2),projection(simuParam2,4)-posY(simuParam2)];
-	echo=normrnd(echo,abs(echo)/simuParam1);  % add some noise to the theoretical values
+	echo=normrnd(abs(echo),abs(echo)/simuParam1);  % add some noise to the theoretical values
 	printf("simulation echo +X:%d +Y:%d -X:%d -Y:%d *** ",echo(1),echo(2),echo(3),echo(4));
 	printf(ctime(time()));
 	% mode simulation
 else
-	echo1=robot.GetScanDistFront(0);   % if normal mode get the robot echoes
-	echo3=robot.GetScanDistBack(0);    % if normal mode get the robot echoes
-	echo=[echo0,echo1,echo2,echo3];
+	if ((heading>=0 && heading <=(pi()/2)) || (heading>3*pi()/2))
+		echo3=robot.GetScanDistFront(0);   % if normal mode get the robot echoes
+		echo4=robot.GetScanDistBack(0);    % if normal mode get the robot echoes
+	endif
+		if ((heading>=pi()/2 && heading <=(3*pi()/2)) )
+		echo3=robot.GetScanDistBack(0);   % if normal mode get the robot echoes
+		echo4=robot.GetScanDistFront(0);    % if normal mode get the robot echoes
+	endif
+	echo=[echo3,echo1,echo4,echo2];         % +X +Y -X -Y
 	printf("real echo +X:%d +Y:%d -X:%d -Y:%d *** ",echo(1),echo(2),echo(3),echo(4));
 	printf(ctime(time()));
 endif
 % then compute distances for each positions
+echo=[echo(1),echo(2),-echo(3),-echo(4)];
 echo=repmat(echo,nbCol,1);            % create matrix by duplicating echo vector
 % compute the weight taking into account the number of "references" (non zero projections)
 % the higher is the nb references the higher is the weight
+projection
+echo
+pts
 weight=max(1,100-((sqrt(sum((abs(projection-echo-pts).*nnzProj).^2,2))')./(nbnnz))*coefWeight);
 
 

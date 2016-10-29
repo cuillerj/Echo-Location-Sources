@@ -1,6 +1,7 @@
-function [] = AStarShowStep(step) % plot the steps of a move
+function [] = AStarShowStep(step,head) % plot the steps of a move
 step;
 figure()
+title (head);
 hold on;
 load carto1img
 imshow(carto1img,[])

@@ -1,9 +1,9 @@
-function [particles] = ResampleParticles(plotOn,particles)
+function [particles] = ResampleParticles(img,plotOn,particles)
 %load particles
 [nbPart,y]=size(particles);
 omegaMax=max(particles(:,4));
 %idx=[1:nbPart];
-idx=randi(nbPart);
+idx=randi(nbPart-1);
 pick=[];
 beta=0;
 for i=0:nbPart-1
@@ -26,8 +26,10 @@ if (plotOn)
 	figure()
 	title ("particles resampeled");
 	hold on;
+	imshow(img,[])
+	[a,b]=size(img);
 	for i=1:nbPart
-		plot(particles(i,1),particles(i,2),'m');
+		plot(particles(i,1),a+1-particles(i,2),'m');
 	end
 	hold off;
 endif

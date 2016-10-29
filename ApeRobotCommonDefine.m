@@ -12,7 +12,8 @@ defineList= {
 	"securityLenght",
 	"minDistToBeDone",
 	"minRotToBeDone",
-	"stepSize"};
+	"stepSize",
+	"nbPulse"};
 	
 defineValue=[
 	6.3; 
@@ -27,7 +28,8 @@ defineValue=[
 	20;
 	3;
 	5;
-	10
+	10;
+	15;
 	];
 
 loopexit=false;

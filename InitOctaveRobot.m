@@ -1,10 +1,12 @@
-function [robot,carto,shiftNorthXOrientation,zonesXY,all_theta] = InitOctaveRobot()
+function [robot,carto,img,shiftNorthXOrientation,zonesXY,all_theta] = InitOctaveRobot()
 cd C:\Users\jean\Documents\Donnees\octave\robot
 javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
 % create and start robot
 % load matrix
 load carto1;
 carto=carto1;
+load carto1img;
+img=carto1img;
 load "zonesXY.txt"
 shiftNorthXOrientation=267; % shift between north and X direction in degres - that is the average mesurment
 setupPath;					% define paths

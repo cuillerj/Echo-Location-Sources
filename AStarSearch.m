@@ -1,4 +1,4 @@
-function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn)
+function [AStarPath,AStarStep,cost,forward] = AStarSearch(carto,currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn)
 %{ 
  AStarPath will return the ordered list of actions to go from current to target position
  AStarStep will return the list of positions touched to go from current to target position(ordered from target position to  current)
@@ -12,12 +12,15 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,cur
  print=false;   % set true for debug
  debug=false;
  currentHeading=mod(currentHeading+360,360);
- startHeading=-1;
+ direction=[targetX-currentX,targetY-currentY];
+ currentHeadingGrad=currentHeading*pi()/180;
+ vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
+ projectionHeading=direction*vectHeading';
  forward=0;
 
- weightCarto=2;     % weight used to balance way depending on cartography weight and action cost
+ weightCarto=20;     % weight used to balance way depending on cartography weight and action cost
 
- targetHeadingGrad=targetHeading*pi()/180;
+  targetHeadingGrad=targetHeading*pi()/180;
   AStarPath=[];
   AStarStep=[];
   stepSize=10;       % n lenght of the first kind of action must match with carto square size
@@ -30,7 +33,8 @@ function [AStarPath,AStarStep,cost,startHeading,forward] = AStarSearch(carto,cur
 %load carto1;       % cartographie matrix (1x1 cm)
 if (exist("carto")==false)
 	load carto1;
-	printf("load carto *** ")
+	printf(mfilename);
+	printf(" *** load carto *** ")
 	printf(ctime(time()))
 	carto=carto1;
 endif
@@ -55,8 +59,8 @@ shiftRotation=[0,4,2,6,1,7,3,5].*(pi()/4);
 nbActions=size(actions,1);
  mailleRotation=nbActions;
 deltaMailleRotation=360/mailleRotation;
-currentHeadingMaille=floor(currentHeading/deltaMailleRotation)
-currentHeadingGrad= currentHeadingMaille*2*pi()/mailleRotation
+currentHeadingMaille=floor(currentHeading/deltaMailleRotation);
+currentHeadingGrad= currentHeadingMaille*2*pi()/mailleRotation;
 currentH=currentHeadingGrad;
 actionsRotation=mod((shiftRotation).-currentHeadingGrad,2*pi());   
 currentAction=[0,0];
@@ -65,7 +69,7 @@ currentCost=0;
 %}
 AStarPath=[];         
 AStarStep=[];
-cost=0;
+cost=-1;
 closeSet=[];
 openSet=[pos(1),pos(2),currentHeadingMaille+1];
 cameFrom=zeros(nbX,nbY,mailleRotation);
@@ -75,14 +79,14 @@ gScore(pos(1),pos(2),currentHeadingMaille+1)=0;
 fScore=ones(nbX,nbY,mailleRotation).*Inf;
 fScore(pos(1),pos(2),currentHeadingMaille+1)=AStarHeuristic(pos(1),pos(2),targetX,targetY);
 found=false;
-current=[pos(1),pos(2),currentHeadingMaille+1]
+current=[pos(1),pos(2),currentHeadingMaille+1];
 while (size(openSet,1)!=0 || found==true)
 	[valueMin,idxMin]=min(fScore(:));
 	[currentX,currentY,currentH]=ind2sub(size(fScore),idxMin);
 	if ([currentX,currentY]==[targetX,targetY])
-		found=true
+		found=true;
 %		save  ("cameFrom.mat","cameFrom")
-		cost=fScore(currentX,currentY,currentH)
+		cost=fScore(currentX,currentY,currentH);
 		AStarStep=[AStarPath;[currentX,currentY]];
 		a=targetX;
 		b=targetY;
@@ -103,7 +107,7 @@ while (size(openSet,1)!=0 || found==true)
 			AStarStep=[AStarStep;[backX,backY]];         
 			AStarPath=[AStarPath;[actionBack]];
 			if (backX == pos(1) && backY == pos(2))
-				backEnd=true
+				backEnd=true;
 			else
 				currentH=cameWith(currentX,currentY,currentH);
 				currentX=backX;
@@ -115,11 +119,16 @@ while (size(openSet,1)!=0 || found==true)
 		AStarPath=flipud(AStarPath);
 		AStarStep=flipud(AStarStep);
 		if (plotOn)
-			AStarShowStep(AStarStep);
+			AStarShowStep(AStarStep,"AStar search result");
 			hold off
 		endif
-		forward=1;
-		printf("cpu search:%f . ",cputime()-cpu1);
+		if (projectionHeading>=0)
+			forward=1;
+		else
+			forward=-1;
+		endif
+		printf(mfilename);
+		printf(" *** cpu search:%f . ",cputime()-cpu1);
 		printf(ctime(time()))
 		return
 	else

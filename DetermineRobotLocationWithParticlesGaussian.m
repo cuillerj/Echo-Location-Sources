@@ -1,6 +1,7 @@
-function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussian(inX,inY,inProb,plotOn,particles)
+function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussian(inX,inY,inProb,img,plotOn,particles)
 %	sigma=[5,5,10];     % sigma for X, Y, angle
-	sigma=[1,1]*sqrt(inX(1)^2+inY(1)^2);   
+%	sigma=[1,1]*sqrt(inX(1)^2+inY(1)^2);   
+	sigma=[15,15];  
 %	load particles
 	[x,y]=size(particles);
 	z=size(inX,2);
@@ -9,6 +10,7 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 		W=[particles(i,1:2)];       % get(x,y) of particles
 		for j=1:z
 			X=[inX(j),inY(j)]; % get measurment (x,y)
+%			weight=[weight;[normpdf(X,W,sigma)]*inProb(j)+particles(i,4)];           % compute gaussian normal
 			weight=[weight;[normpdf(X,W,sigma)]*inProb(j)];           % compute gaussian normal
 		endfor
 %		[k,l]=max(sum(weight,2))     % sum the weight for each measurment and keep the highest value corresponding to the better choice 
@@ -25,15 +27,17 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 		figure();
 		title ("determined particles");
 		hold on;
+		imshow(img,[])
+		[a,b]=size(img);
 		for i=1:x
-			plot(particles(i,1),particles(i,2))
+			plot(particles(i,1),a+1-particles(i,2))
 		end
-			plot(detX,detY,"color","r","+","markersize",15)
+			plot(detX,a+1-detY,"color","r","+","markersize",15)
 		for j=1:z
 			if (j==1)
-				plot(inX(j),inY(j),"color","g","o","markersize",15)
+				plot(inX(j),a+1-inY(j),"color","g","o","markersize",15)
 			else
-				plot(inX(j),inY(j),"color","k","s","markersize",15)
+				plot(inX(j),a+1-inY(j),"color","c","s","markersize",15)
 			endif
 		endfor
 		hold off;
