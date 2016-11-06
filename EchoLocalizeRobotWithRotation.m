@@ -8,7 +8,7 @@ function [posX,posY,posAngle,posProb,retCode] = EchoLocalizeRobotWithRotation(ro
 % not found in first five =4% 1/28
 heading=orientation
 %probRef=[60,18,06,06,06,04];
-probRef=[30,25,20,15,10,5];
+probRef=[20,15,12,10,8,5,2,2,2,1,1];
 retCode=9;
 robot.Scan360();
 posProb=0;
@@ -20,7 +20,7 @@ callFrom=10;          % to identify the octave function
 WaitFor=robot.scanEnd;
 retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
 	if (retCode!=0)
-		[issue,action]=analyseRetcode(retCode,WaitFor,callFrom)
+		[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom)
 		if action=="stop"
 			break
 		endif
@@ -49,7 +49,7 @@ if (retCode==0)
 	posX=X;
 	posY=Y;
 	posAngle=Angle;
-	for i=1:size(X,2);
+	for i=1:min(size(X,2),size(probRef,2));
 	%	posProb(i)=max(floor((probRef-probCum)/3*2),1);
 		posProb(i)=probRef(i);
 	%	probCum=probCum+posProb(i);

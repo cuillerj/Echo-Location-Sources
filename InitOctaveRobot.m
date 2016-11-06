@@ -8,10 +8,10 @@ carto=carto1;
 load carto1img;
 img=carto1img;
 load "zonesXY.txt"
-shiftNorthXOrientation=267; % shift between north and X direction in degres - that is the average mesurment
 setupPath;					% define paths
 robot=robotJava;            % create the java object
 robot.SetTraceFileOn(1);    % route console to trace file
+shiftNorthXOrientation=267-robot.GetParametersNumValue(1) % shift between north and X direction in degres - that is the average mesurment
 load all_theta;             % load the trained logistic regression matrix
 
 endfunction

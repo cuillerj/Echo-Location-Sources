@@ -3,7 +3,7 @@ function [] = plotEchoScanRobot(robot)
 	figure();
 	title ("Last scan 360 (red:ping front <=> blue:ping back)");
 	ylabel ("Y: is robot front orientation");
-
+	axis ("manual",[-400,400,-400,400])
 	hold on;
 	[param,value,found]=ApeRobotCommonDefine("nbPulse");
 	nbPingByScan=value;

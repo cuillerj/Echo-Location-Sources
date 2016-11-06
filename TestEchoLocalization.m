@@ -1,5 +1,5 @@
  function [] = TestEchoLocalization(simulationMode)
- stepLen=20;
+% stepLen=20;
  cpu1=cputime();
    if (exist("simulationMode"))
   else
@@ -11,7 +11,7 @@
  	printf(ctime(time()))
 endif
 % headingNOrthXOrientation=267; % average heading NO 
-[robot,carto,img,headingNOrthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
+[robot,carto,img,shiftNorthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
 robot.LaunchBatch();        % call java method to start batch
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);
@@ -19,11 +19,13 @@ j=1;
 issue=0;                    % flag used to identify any issues
 targetReached=false;        
 ready=false;
-nbPred=5;                    % define the number of predictions that will be compute for each 360° scan
+nbPred=10;                    % define the number of predictions that will be compute for each 360° scan
 plotOn=true;                 % if true graphics will be provided (reduces performance)
 plotOff=false;               % non graphic
 printf(ctime(time()))
 particlesNumber=1000;
+shiftNorthXOrientation
+headingNOrthXOrientation=267-shiftNorthXOrientation
 WaitInfo=robot.robotInfoUpdated;                 
 WaitScan360=robot.scanEnd;
 WaitMove=robot.moveEnd;
@@ -58,6 +60,7 @@ WaitFor=WaitNorthAlign;
 retCode=WaitForRobot(robot,WaitFor);
 determinedPosList=[];
 expectedPosList=[];
+delta=[];
 if (retCode==0)
 	aligned=true;
 	else
@@ -67,8 +70,9 @@ if (retCode==0)
 	endif
 endif
 count=0;
-robot.SetObstacleDetection(0);  % disable obstacle detection
-while (count<6)
+%robot.SetObstacleDetection(0);  % disable obstacle detection
+located=false;
+while (count<10 && located==false)
 %	retCode=9;
 	count++;
 	NO=robot.GetNorthOrientation;          %  request info
@@ -101,9 +105,12 @@ while (count<6)
 			printf(ctime(time()))
 			detHRadian=detH*pi()/180;
 			determinedPosList=[determinedPosList;[detX,detY,detHRadian]];
+			if (count>1)
+				delta=[delta;[sqrt((detX-expectedPosList(count-1,1))^2+(detY-expectedPosList(count-1,2))^2)]]
+			endif
 			particles=ResampleParticles(img,plotOff,particles);
 			[rotation,lenToDo] = DetermineNextMoveToScan(robot,plotOn)
-			expectedPosList=[expectedPosList;[detX*cos(detHRadian+rotation),detY*sin(detHRadian+rotation)]];
+			expectedPosList=[expectedPosList;[detX+lenToDo*cos(detHRadian+rotation),detY+lenToDo*sin(detHRadian+rotation)]];
 			[rotation,lenToDo] = OptimizeMove(rotation,lenToDo)
 			rotation=rotation*180/pi();
 			printf("move rotation:%d distance:%d. ",rotation,lenToDo)
@@ -127,8 +134,9 @@ while (count<6)
 					resume
 				endif
 			endif
-			particles=MoveParticles(rotation,lenToDo,img,plotOff,particles);
+			particles=MoveParticles(floor(rotation),floor(lenToDo),img,plotOff,particles);
 			NorthOrientation = SpaceNorthOrientation(zonesXY,detX(1),detY(1))
+			prevNO=robot.GetNorthOrientation;          %  request info
 %			robot.NorthAlign(NorthOrientation);    % align robot such that it will be in the same orientation (average valu) as for learning phase
 			robot.NorthAlign(headingNOrthXOrientation);  
 			WaitFor=WaitNorthAlign;
@@ -147,7 +155,16 @@ while (count<6)
 					resume
 				endif
 			endif
+			deltaNOAfterNOAlign=prevNO-robot.GetNorthOrientation
+			particles=MoveParticles(-floor(rotation),0,img,plotOff,particles);
+			if (count>2 && delta(count-1)<=18 && delta(count-1)<=delta(count-2) && delta(count-2)<=delta(count-3))
+				located=true;
+			endif
 end	
 determinedPosList
+det=determinedPosList(:,1:2)
 expectedPosList
+delta
+AStarShowStepV2("Determined & expected postiions ",det,"r",expectedPosList,"g")
+robot.Horn(20);  % horn 20 seconds
 endfunction
