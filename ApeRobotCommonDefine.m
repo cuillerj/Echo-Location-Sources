@@ -1,4 +1,5 @@
 function [param,value,found] = ApeRobotCommonDefine(input)
+% a remplacer par call [param,value,number] = GetParametersValueByName(robot,input,parametersNameList
 defineList= {
 	"iLeftWheelDiameter",
 	"iRightWheelDiameter",

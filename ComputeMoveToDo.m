@@ -1,4 +1,4 @@
-function [rotationToDo,lenToDo] = ComputeMoveToDo(currentX,currentY,currentHeading,nextX,nextY,forward)
+function [rotationToDo,lenToDo] = ComputeMoveToDo(currentX,currentY,currentHeading,nextX,nextY,forward,robot,parametersNameList)
 deltaX=nextX-currentX;
 deltaY=nextY-currentY;
 if (deltaX!=0)
@@ -11,7 +11,8 @@ else
 	endif
 endif
 rotationToDo=deltaAlpha-currentHeading;
-[param,value,found] = ApeRobotCommonDefine("minRotToBeDone");
+%[param,value,found] = ApeRobotCommonDefine("minRotToBeDone");
+[p1,value,p3]=GetParametersValueByName(robot,"minRotToBeDone",parametersNameList);
 if (abs(rotationToDo)<value)
 	rotationToDo=0;
 endif

@@ -1,4 +1,4 @@
-function [nextX,nextY,rotation,distance,direct,forward] = ComputeNextStepToTarget(carto,currentX,currentY,currentHeading,targetX,targetY,newTarget,plotOn)
+function [nextX,nextY,rotation,distance,direct,forward] = ComputeNextStepToTarget(carto,currentX,currentY,currentHeading,targetX,targetY,newTarget,plotOn,robot,parametersNameList)
 % first try direct acces
 nextX=targetX;
 nextY=targetY;
@@ -30,7 +30,7 @@ else
 endif
 % in case direct acces not possible determine path
 if (newTarget==true)
-	[AStarPath,AStarStep,cost,forward] = AStarSearch(carto,RoundTo(currentX,5),RoundTo(currentY,5),currentHeading,RoundTo(targetX,5),RoundTo(targetY,5),0,plotOn);
+	[AStarPath,AStarStep,cost,forward] = AStarSearch(carto,RoundTo(currentX,5),RoundTo(currentY,5),currentHeading,RoundTo(targetX,5),RoundTo(targetY,5),0,plotOn,robot,parametersNameList);
 	if (cost<0)   % no path found
 		forward=0;
 		return
@@ -60,7 +60,7 @@ else
 		nextX=AStarStep(min(size(AStarStep,1),closest+1),1);
 		nextY=AStarStep(min(size(AStarStep,1),closest+1),2);
 	else
-	[AStarPath,AStarStep,cost,forward] = AStarSearch(carto,RoundTo(currentX,5),RoundTo(currentY,5),currentHeading,RoundTo(targetX,5),RoundTo(targetY,5),0,plotOn);
+	[AStarPath,AStarStep,cost,forward] = AStarSearch(carto,RoundTo(currentX,5),RoundTo(currentY,5),currentHeading,RoundTo(targetX,5),RoundTo(targetY,5),0,plotOn,robot,parametersNameList);
 	if (cost<0)   % no path found
 		forward=0;
 		return

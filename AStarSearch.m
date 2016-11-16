@@ -1,4 +1,4 @@
-function [AStarPath,AStarStep,cost,forward] = AStarSearch(carto,currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn)
+function [AStarPath,AStarStep,cost,forward] = AStarSearch(carto,currentX,currentY,currentHeading,targetX,targetY,targetHeading,plotOn,robot,parametersNameList)
 %{ 
  AStarPath will return the ordered list of actions to go from current to target position
  AStarStep will return the list of positions touched to go from current to target position(ordered from target position to  current)
@@ -23,7 +23,8 @@ function [AStarPath,AStarStep,cost,forward] = AStarSearch(carto,currentX,current
   targetHeadingGrad=targetHeading*pi()/180;
   AStarPath=[];
   AStarStep=[];
-  stepSize=10;       % n lenght of the first kind of action must match with carto square size
+ %ù stepSize=10;       % n lenght of the first kind of action must match with carto square size
+  [p1,stepSize,p3]=GetParametersValueByName(robot,"stepSize",parametersNameList);
   currentX=stepSize*(floor(currentX/stepSize))+floor(stepSize/2); % adjust position to center of square carto
   currentY=stepSize*(floor(currentY/stepSize))+floor(stepSize/2);
   targetX=stepSize*(floor(targetX/stepSize))+floor(stepSize/2);

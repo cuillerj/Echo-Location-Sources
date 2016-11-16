@@ -1,20 +1,20 @@
 function [particles] = MoveParticles(rotation,distance,img,plotOn,particles)
 %load particles
-noiseX=2;               % noise on x move
-noiseY=noiseX; 			% noise on y move
-noiseO=1;               % noise on rotation move
-noiseDist=150;
-noiseRot=2050;
-noiseStraight=100;
+%noiseX=2;               % noise on x move
+%noiseY=noiseX; 			% noise on y move
+%noiseO=1;               % noise on rotation move
+noiseDist=100;           % distance can be increase or decrease up to noiseDist/1000 in pourcentage
+noiseRot=6000;           % when rotation required rotation can be increase or decrease up to noiseRot/1000 degres
+noiseStraight=3000;       % when straight move 
 %distance=distance+distance*(randi(noiseDist)-noiseDist/2)/1000 % add noise
 %rotation=rotation+rotation*(randi(noiseRot)-noiseRot/2)/1000;
 [x,y]=size(particles);
 for i=1:x
-	dist=distance+distance*(randi(noiseDist)-noiseDist/2)/1000; % add noise
+	dist=distance+distance*(randi(noiseDist)*sign(randi([-1,1]))/1000); % add noise
 	if (rotation==0)
-		rot=(randi(noiseStraight)-noiseStraight/2)/1000;	
+		rot=(randi(noiseStraight)*(sign(randi([-1,1]))/1000));	
 	else
-		rot=rotation+(randi(noiseRot)-noiseRot/2)/1000;
+		rot=rotation+(randi(noiseRot)*(sign(randi([-1,1]))/1000));
 	endif
 	angle=(particles(i,3)+rot)*pi/180;
 	particles(i,1)=particles(i,1)+dist*cos(angle);  

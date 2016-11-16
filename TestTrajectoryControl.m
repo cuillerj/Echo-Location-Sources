@@ -5,7 +5,7 @@
     simulationMode=1;
   endif
  %simulationMode=1;  % to set simulation 1 on 0 off
-[robot,carto,img,headingNOrthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
+[robot,carto,img,headingNOrthXOrientation,zonesXY,all_theta,parametersNameList,parametersValueList] = InitOctaveRobot();
 robot.LaunchBatch();        % call java method to start batch
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);
@@ -41,10 +41,18 @@ probHardMoveOk=50;
 shiftNO=0;
 printf("robot location is X:%d Y:%d orientation: %d. prob:%d *** ",newX,newY,newH,newProb);
 printf(ctime(time()));
-%particles = CreateLocatedParticles(carto,newX,newY,newH,newProb,particlesNumber,plotOff);
-particles = CreateLocatedParticles(carto,img,-1,-1,-1,0,particlesNumber,plotOn);
+particles = CreateLocatedParticles(carto,img,newX,newY,newH,newProb,particlesNumber,plotOn);
+%particles = CreateLocatedParticles(carto,img,-1,-1,-1,0,particlesNumber,plotOn);
 spaceNO=SpaceNorthOrientation(zonesXY,newX,newY);  % 
 trajectory=[newX,newY];
+if (simulationMode==0)                  % in case real mode
+	robotStatus=0;
+	while (robotStatus<=0)              % wait for robot to be ready
+		robotStatus=robot.runningStatus;
+		sleep(1);
+	end
+[rc] = InitRobotParameters(robot,parametersNameList); % set robot parameters
+endif
 if (simulationMode!=0)
 	NO=normrnd(spaceNO,5);  % simulate noise NO
 	headingNO=mod(360+spaceNO-NO,360);   % determine heading regarding magneto mesurment and value for echo scan reference
@@ -139,7 +147,7 @@ while (issue==false && targetReached==false)
 
 	rotation=0;
 
-			if ((abs(robot.GetHardPosX-floor(newX))<=1  && abs(robot.GetHardPosY-floor(newY))<=1 && abs(robot.GetHardHeading-floor(newH))<=10))
+			if ((abs(robot.GetHardPosX-floor(newX))<=1  && abs(robot.GetHardPosY-floor(newY))<=1 ))
 						if (QueryCartoAvailability(carto,newX,newY,newH*pi()/180,true)==false)
 							currentPositionIssue=true;
 						endif
@@ -148,7 +156,10 @@ while (issue==false && targetReached==false)
 							% check target reached
 						else 
 							% compute trajectory step
-							[nextX,nextY,rotationToDo,lenToDo,direct,forward] = ComputeNextStepToTarget(carto,robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,targetX,targetY,newTarget,plotOn);
+							if (simulationMode==0)
+								inp=eval(input("take a picture ","i"));
+							endif
+							[nextX,nextY,rotationToDo,lenToDo,direct,forward] = ComputeNextStepToTarget(carto,robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,targetX,targetY,newTarget,plotOn,robot,parametersNameList);
 							newTarget=0;
 							if (forward==0)
 								printf("no path found. *** ")
@@ -161,7 +172,7 @@ while (issue==false && targetReached==false)
 							printf(ctime(time()))
 
 %							if (direct==false)
-								[rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,nextX,nextY,forward);
+								[rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,nextX,nextY,forward,robot,parametersNameList);
 %							else
 %								nextX=targetX;         % straight move possible next step is target
 %								nextY=targetY;			% straight move possible next step is target
@@ -183,6 +194,9 @@ while (issue==false && targetReached==false)
 										return
 									endif
 								endif
+							endif
+							if (simulationMode==0)
+								inp=eval(input("ready to move","i"));
 							endif
 							robot.SetHeading(mod(360+robot.GetHardHeading(),360));
 							robot.Move(0,lenToDo); 		 % len sent in cm
@@ -241,22 +255,26 @@ while (issue==false && targetReached==false)
 %							prob=newProb;
 							[line,col]=size(newX);
 							weightEcho=[];
-							alpha1=mod(newH+360,360);
-%							alpha2=mod(headingNO+360,360);
-							alpha3=mod(saveTargetHeading+360,360);
+							alpha1=newH*pi()/180;
+							alpha3=saveTargetHeading*pi()/180;
 							if (simulationMode==1)
-								averageH=floor(mod((alpha1+alpha3)/2,360));
+								averageH=atan2((sin(alpha1)+sin(alpha3)),(cos(alpha1)+cos(alpha3)));
 							else
-								alpha2=mod(headingNO+360,360);
-								averageH=floor(mod((alpha1+alpha2+alpha3)/3,360));
+								alpha2=headingNO*pi()/180;
+								averageH=mod(atan2((sin(alpha1)+sin(alpha2)+sin(alpha3)),(cos(alpha1)+cos(alpha2)+cos(alpha3)))+2*pi(),2*pi());
 							endif
-							printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%d SpaceNO:%d RobotNO:%d *** ",newH,headingNO,saveTargetHeading,averageH,spaceNO,robot.GetNorthOrientation());
+							printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%f SpaceNO:%d RobotNO:%d *** ",newH,headingNO,saveTargetHeading,averageH*180/pi(),spaceNO,robot.GetNorthOrientation());
 							printf(ctime(time()))
-							weightEcho = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH*pi()/180);
-							printf("echo consistancy prob:");
-							for i=1:col	
-								printf(" %d ",weightEcho(i));
-							endfor;		
+							weightEcho = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH);
+							[nbRow,nbCol]=size(weightEcho);
+							if (nbRow+nbCol==0)
+								printf("no echo consistancy data");
+							else
+								printf("echo consistancy prob:");
+								for i=1:col	
+									printf(" %d ",weightEcho(i));
+								endfor;		
+							endif
 							printf("*** ");
 							printf(ctime(time()));
 							[detX,detY,detH,particles]=DetermineRobotLocationWithParticlesGaussian(newX,newY,weightEcho,img,plotOn,particles);
@@ -302,7 +320,7 @@ while (issue==false && targetReached==false)
 					printf("robot location inconsistency X:%f expected:%f Y:%f expected:%f orientation:%f expected:%f. *** ",robot.GetHardPosX,newX,robot.GetHardPosY,newY,robot.GetHardHeading,newH)
 					printf(ctime(time()))
 					issue=1;
-				endif
+			endif
 		printf("total cpu:%f . *** ",cputime()-cpu1);
 		printf(ctime(time()))
 end

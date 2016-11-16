@@ -11,8 +11,15 @@
  	printf(ctime(time()))
 endif
 % headingNOrthXOrientation=267; % average heading NO 
-[robot,carto,img,shiftNorthXOrientation,zonesXY,all_theta] = InitOctaveRobot();
+[robot,carto,img,shiftNorthXOrientation,zonesXY,all_theta,parametersNameList,parametersValueList] = InitOctaveRobot();
 robot.LaunchBatch();        % call java method to start batch
+if (simulationMode==0)                  % in case real mode
+	robotStatus=0;
+	while (robotStatus<=0)              % wait for robot to be ready
+		robotStatus=robot.runningStatus;
+		sleep(1);
+	end
+[rc] = InitRobotParameters(robot,parametersNameList); % set robot parameters
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);
 j=1;
