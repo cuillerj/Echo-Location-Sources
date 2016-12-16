@@ -46,6 +46,14 @@ function [AStarStepSmooth,forward] = SmoothPath(carto,AStarPath,AStarStep,forwar
 	idxAction++;
 end
 AStarStepSmooth=[AStarStepSmooth;[AStarStep(nbSteps,:)]];
+tempStep=[];
+for (i=1:size(AStarStepSmooth,1))                    % to delete double steps
+	if ((i==1) || (i>=2) && ((AStarStepSmooth(i,1) != AStarStepSmooth(i-1,1)) || (AStarStepSmooth(i,2) != AStarStepSmooth(i-1,2))))
+		tempStep=[tempStep;[AStarStepSmooth(i,1),AStarStepSmooth(i,2)]];
+	endif
+end
+AStarStepSmooth=tempStep;
+save ("-mat4-binary","AStarStepSmooth.mat","AStarStepSmooth");
 if (plotOn)
 	AStarShowStep(AStarStepSmooth,"Smoothed path");
 	hold off

@@ -11,6 +11,8 @@ pw=0;
 xPrecision=10;
 yPrecision=10;
 hPrecision=10;
+sigmaDist=2;
+sigmaHeading=2;
 particles=[];
 [x,y]=size(carto);
 lim=particlesNumber*prob/100;
@@ -19,9 +21,12 @@ if (posX<0 || posY<0)
 endif
 i=0;
 while (i<=lim)             % create some particles according to posX posY and heading
-	px=posX+randi(xPrecision)-xPrecision/2;
-	py=posY+randi(yPrecision)-yPrecision/2;
-	po=heading+randi(hPrecision)-hPrecision/2;
+%	px=posX+randi(xPrecision)-(xPrecision+1)/2;
+%	py=posY+randi(yPrecision)-(yPrecision+1)/2;
+%	po=heading+randi(hPrecision)-(hPrecision+1)/2;
+	px=normrnd(posX,sigmaDist);
+	py=normrnd(posY,sigmaDist);
+	po=normrnd(heading,sigmaHeading);
 %		if (QueryCartoAvailability(carto,px,py,po*pi()/180,0)==1)
 	i=i+1;
 		particles=[particles;[px,py,po,pw]];
@@ -33,7 +38,7 @@ if (lim==0 && heading >=0)
 	while (i<=lim)        % create some particles anywhere in any direction
 	px=randi(x);
 	py=randi(y);
-	po=heading+randi((100+hPrecision-prob))-(100+hPrecision-prob)/2;
+	po=heading+randi((100+hPrecision-prob))-(100+hPrecision+1-prob)/2;
 	if (QueryCartoAvailability(carto,px,py,po*pi()/180,0)==1)
 		i=i+1;
 		particles=[particles;[px,py,po,pw]];

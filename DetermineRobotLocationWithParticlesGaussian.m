@@ -3,11 +3,12 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 %	sigma=[1,1]*sqrt(inX(1)^2+inY(1)^2);   
 	sigma=[15,15];  
 %	load particles
+
 	[x,y]=size(particles);
 	z=size(inX,2);
 	for i=1:x
 		weight=[];
-		W=[particles(i,1:2)];       % get(x,y) of particles
+		W=[particles(i,1:2)];      % get(x,y) of particles
 		for j=1:z
 			X=[inX(j),inY(j)]; % get measurment (x,y)
 %			weight=[weight;[normpdf(X,W,sigma)]*inProb(j)+particles(i,4)];           % compute gaussian normal

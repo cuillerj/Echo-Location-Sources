@@ -4,7 +4,6 @@ nextX=targetX;
 nextY=targetY;
 rotation=0;
 currentHeading=mod(currentHeading+360,360);;
-
 forward=0;
 [rotation,distance,possible] = CheckStraightMovePossibility(carto,currentX,currentY,currentHeading,targetX,targetY);
 if (possible==true)
@@ -36,6 +35,7 @@ if (newTarget==true)
 		return
 	endif
 	[AStarStep,forward] = SmoothPath(carto,AStarPath,AStarStep,forward,plotOn);
+	AStarStep
 	save ("-mat4-binary","AStarStep.mat","AStarStep");
 	nextX=AStarStep(2,1);
 	nextY=AStarStep(2,2);

@@ -1,4 +1,4 @@
-function [weight] = TestLocationEchoConsistancy(robot,carto,posX,posY,heading)
+function [weight,retValue] = TestLocationEchoConsistancy(robot,carto,posX,posY,heading)
 %{
 This function does 4 echos measurments based on the (X,Y) cartography referential
 Parameters are:
@@ -33,11 +33,11 @@ printf ("Check echoConsistancy for points:");
 for i=1:nbCol
 	printf(" (%d,%d)",pts(i,1),pts(i,2)); % print the points list
 endfor
-pts=repmat(pts,1,2);   % create matric of points (2,nbCol) (x,y)
+pts=repmat(pts,1,2)   % create matric of points (2,nbCol) (x,y)
 printf (" *** ");
 printf(ctime(time()));
 weight=[];
-
+retValue=0;
 % create matrix to project obstacle on (X,Y) absolute referential
 projection=[];
 for i=1:nbCol         
@@ -67,33 +67,21 @@ if (heading>3*pi()/2 && heading <=2*pi())
 endif
 printf(" servoAlign: %d & %d **** ",a1*180/pi(),a2*180/pi()); % print the points list
 printf(ctime(time()))
-robot.RobotAlignServo(floor(a1*180/pi()));     % ask the robot to align with X axis taking into account the current heading
+robot.RobotAlignServo(round(a1*180/pi()));     % ask the robot to align with X axis taking into account the current heading
 WaitFor=WaitServoAlign;                       % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait for robot feedback
-if (retCode!=0)                                % analyse the non zero return code
+if (retCode!=0 && retCode!=simulationMode )                                % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
-	if action=="stop.."
-		return
-	endif
-	if action=="break."
-		break
-	endif
-	if action=="resume"
-	endif
+	retValue=-1;
+	return
 endif
 robot.PingEchoFrontBack();             %  ask the robot to ping echo front and back
 WaitFor=WaitPingFB;                        % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait fo robot feedback
-if (retCode!=0)                           % analyse the non zero return code
+if (retCode!=0 && retCode!=simulationMode)                           % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
-	if action=="stop.."
-		return
-	endif
-	if action=="break."
-		break
-	endif
-	if action=="resume"
-	endif
+	retValue=-1;
+	return
 endif
 if retCode==simulationMode         % test if we are in simulation mode
 
@@ -108,34 +96,23 @@ else
 	endif
 endif
 
-robot.RobotAlignServo(floor(a2*180/pi())); % ask the robot to align with Y axis taking into account the current heading
+robot.RobotAlignServo(round(a2*180/pi())); % ask the robot to align with Y axis taking into account the current heading
 WaitFor=WaitServoAlign;                       % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
-if (retCode!=0)                     % analyse the non zero return code
+if (retCode!=0 && retCode!=simulationMode)                     % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
-	if action=="stop.."
-		return
-	endif
-	if action=="break."
-		break
-	endif
-	if action=="resume"
-	endif
+	retValue=-1;
+	return
 endif
 robot.PingEchoFrontBack();                 %  ask the robot to ping echo front and back
 WaitFor=WaitPingFB;                         % define the waiting for value for the wairFor function
 retCode=WaitForRobot(robot,WaitFor);			% wait fo robot
-if (retCode!=0)                              % analyse the non zero return code
+if (retCode!=0 && retCode!=simulationMode)                              % analyse the non zero return code
 	[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
-	if action=="stop.."
-		return
-	endif
-	if action=="break."
-		break
-	endif
-	if action=="resume"
-		endif
+	retValue=-1;
+	return
 endif
+retValue=0;
 if retCode==simulationMode                 % test if we are in simulation mode
 	simuParam2=floor(rand*nbCol+1);  % to choose wich value will be the simulation reference
 	printf ("simulator choice for echo simulation is the %d position *** ",simuParam2);
@@ -145,13 +122,14 @@ if retCode==simulationMode                 % test if we are in simulation mode
 	echo=normrnd(abs(echo),abs(echo)/simuParam1);  % add some noise to the theoretical values
 	printf("simulation echo +X:%d +Y:%d -X:%d -Y:%d *** ",echo(1),echo(2),echo(3),echo(4));
 	printf(ctime(time()));
+
 	% mode simulation
 else
 	if ((heading>=0 && heading <=(pi()/2)) || (heading>3*pi()/2))
 		echo3=robot.GetScanDistFront(0);   % if normal mode get the robot echoes
 		echo4=robot.GetScanDistBack(0);    % if normal mode get the robot echoes
 	endif
-		if ((heading>=pi()/2 && heading <=(3*pi()/2)) )
+	if ((heading>=pi()/2 && heading <=(3*pi()/2)) )
 		echo3=robot.GetScanDistBack(0);   % if normal mode get the robot echoes
 		echo4=robot.GetScanDistFront(0);    % if normal mode get the robot echoes
 	endif
@@ -164,10 +142,5 @@ echo=[echo(1),echo(2),-echo(3),-echo(4)];
 echo=repmat(echo,nbCol,1);            % create matrix by duplicating echo vector
 % compute the weight taking into account the number of "references" (non zero projections)
 % the higher is the nb references the higher is the weight
-projection
-echo
-pts
 weight=max(1,100-((sqrt(sum((abs(projection-echo-pts).*nnzProj).^2,2))')./(nbnnz))*coefWeight);
-
-
 endfunction

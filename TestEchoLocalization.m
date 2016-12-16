@@ -19,6 +19,8 @@ if (simulationMode==0)                  % in case real mode
 		robotStatus=robot.runningStatus;
 		sleep(1);
 	end
+robot.QueryMotorsPWM();
+endif
 [rc] = InitRobotParameters(robot,parametersNameList); % set robot parameters
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
 predLocMatrix=InitLocMatrix(all_theta);

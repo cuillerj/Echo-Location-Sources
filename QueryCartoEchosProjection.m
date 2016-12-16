@@ -13,6 +13,8 @@ Return 4 points (x,y)
 		p2 oriented -X 
 		p3 oriented -Y  		
 %}
+posX=round(posX);
+posY=round(posY);
 cartoObstacleValue=200;        % the cartography value that determines a "reliable" obstacle (reliable echo quality)
 %[a,b]=size(carto);
 [nbLine,nbCol]=size(carto);

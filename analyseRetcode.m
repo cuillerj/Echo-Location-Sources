@@ -6,18 +6,23 @@ if retCode==-1
 	issue=true;
 	action="stop..";
 else
-	if (currentAction == robot.moveEnd)
-		if (retCode == robot.moveUnderLimitation)
+	testedValue=robot.moveEnd;
+	if (currentAction == testedValue)
+		testedValue=robot.moveUnderLimitation;
+		if (retCode == testedValue)
 				action="noMove."
 		endif
-		if (retCode == robot.moveKoDueToSpeedInconsistancy)
+		testedValue=robot.moveKoDueToSpeedInconsistancy
+		if (retCode == testedValue)
 				action="inMove"
 		endif
-		if (retCode == robot.moveKoDueToObstacle)
+		testedValue=robot.moveKoDueToObstacle
+		if (retCode == testedValue)
 				action="obstac"
 		endif
 	endif
-	if (currentAction == robot.pingFBEnd)
+	testedValue=robot.pingFBEnd;
+	if (currentAction == testedValue)
 		if (retCode == 90)
 			printf("Simulation function:%d *** ",currentAction)
 			printf(ctime(time()))
