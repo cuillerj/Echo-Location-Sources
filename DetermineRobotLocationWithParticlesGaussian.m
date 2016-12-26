@@ -2,8 +2,9 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 %	sigma=[5,5,10];     % sigma for X, Y, angle
 %	sigma=[1,1]*sqrt(inX(1)^2+inY(1)^2);   
 	sigma=[15,15];  
+%	sigma=[0.1,0.1];  
 %	load particles
-
+	inProb=inProb/sum(inProb); % normalyze 
 	[x,y]=size(particles);
 	z=size(inX,2);
 	for i=1:x
@@ -12,7 +13,7 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 		for j=1:z
 			X=[inX(j),inY(j)]; % get measurment (x,y)
 %			weight=[weight;[normpdf(X,W,sigma)]*inProb(j)+particles(i,4)];           % compute gaussian normal
-			weight=[weight;[normpdf(X,W,sigma)]*inProb(j)];           % compute gaussian normal
+			weight=[weight;[normpdf(W,X,sigma)]*inProb(j)];           % compute gaussian normal
 		endfor
 %		[k,l]=max(sum(weight,2))     % sum the weight for each measurment and keep the highest value corresponding to the better choice 
 		[k,l]=max(prod(weight,2));     % sum the weight for each measurment and keep the highest value corresponding to the better choice 

@@ -24,7 +24,7 @@ particles=[newParticles,z];
 %save ("-mat4-binary","particles.mat","particles");
 if (plotOn)
 	figure()
-	title ("particles resampeled");
+	title ("resampled particles ");
 	hold on;
 	imshow(img,[])
 	[a,b]=size(img);

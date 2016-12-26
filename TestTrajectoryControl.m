@@ -60,6 +60,7 @@ traceMove=[];
 traceNext=[];
 traceRobot=[];
 traceEcho=[];
+echoBalance=[1,1,1]  % theoritical , encoder , gyroscope
 gyroBasedX=newX;
 gyroBasedY=newY;
 gyroBasedH=newH*pi()/180;
@@ -219,6 +220,9 @@ while (issue==false && targetReached==false)
 							printf(ctime(time()));
 							saveTargetHeading=robot.GetHeading()+rotationToDo;  % replace rotation by rotationToDo le 28/09
 							saveHeading=robot.GetHeading();
+							if (simulationMode==1)
+								rotationToDo=rotationParticlesToDo;
+							endif
 							if (rotationToDo!=0)
 								printf(ctime(time()))
 								if (rotationType==1)
@@ -284,6 +288,9 @@ while (issue==false && targetReached==false)
 							endif
 							%}
 							gyroLenToDo=lenParticlesToDo;
+							if (simulationMode==1)
+								lentoDo=lenParticlesToDo; 		 % len sent in cm
+							endif
 							robot.Move(0,lenToDo); 		 % len sent in cm
 							lastParticles=particles;          % to be able to recover in case of move failure
 		
@@ -326,7 +333,7 @@ while (issue==false && targetReached==false)
 								probExpectedMoveOk=1;
 							endif
 							robot.ValidHardPosition();
-							gyroBasedH=gyroBasedH+robot.GetGyroHeading()*pi()/180;
+							gyroBasedH=mod(gyroBasedH+robot.GetGyroHeading()*pi()/180,2*pi());
 							gyroBasedX=round(gyroBasedX+gyroLenToDo*cos(gyroBasedH));
 							gyroBasedY=round(gyroBasedY+gyroLenToDo*sin(gyroBasedH));
 							newX=[nextX,robot.GetHardPosX(),gyroBasedX];
@@ -366,9 +373,20 @@ while (issue==false && targetReached==false)
 							endif
 							printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%f SpaceNO:%d RobotNO:%d Gyro:%d*** ",newH,headingNO,saveTargetHeading,averageH*180/pi(),spaceNO,robot.GetNorthOrientation(),robot.GetGyroHeading());
 							printf(ctime(time()))
-							[weightEcho,retValue] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH)
+							[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH)
+							traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo]];					
+							if (median(weightEcho)<50)
+								[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH);
+							endif
+							traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo]];
+							if (median(weightEcho)<50 && max(weightEcho)<80)
+								weightEcho=[1,1,1]; 		%non significative mesurments							
+							else
+								if (((median(weightEcho)-min(weightEcho))/mean(weightEcho)) < 0.3)
+									weightEcho=[1,1,1];   %non significative diffrences beetwen mesurments		 
+								endif
+							endif
 							[nbRow,nbCol]=size(weightEcho);
-
 							if (retValue!=0)
 								printf("no echo consistancy data");
 								for i=1:col	
@@ -378,11 +396,11 @@ while (issue==false && targetReached==false)
 								printf("echo consistancy prob:");
 								for i=1:col	
 									printf(" %d ",weightEcho(i));
-								endfor;
-							traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho]];								
+								endfor;		
 							endif
 							printf("*** ");
 							printf(ctime(time()));
+							weightEcho=weightEcho.*echoBalance   % 
 							[detX,detY,detH,particles]=DetermineRobotLocationWithParticlesGaussian(newX,newY,weightEcho,img,plotOn,particles);
 							traceDet=[traceDet;[time,loopCount,detX,detY,detH]];
 							printf("detX: %f ",round(detX))

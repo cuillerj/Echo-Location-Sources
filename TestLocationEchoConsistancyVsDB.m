@@ -19,6 +19,9 @@ The higher is the weight the most likely is the position
 	Ping front and back to get distances
 	Compute and return the weight
 %}
+robot.GetClosestReferenceEcho(300,1,34,0)
+
+robot.echoClosestCount
 heading=mod(heading,2*pi());
 [nbLine,nbCol]=size(posX);                  % get the vector size
 WaitServoAlign=robot.servoAlignEnd;          % define the wait for servo motor aligment value

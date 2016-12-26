@@ -48,7 +48,12 @@ else
 		if (dist<=prevDist)
 			[rotation,distance,possible] = CheckStraightMovePossibility(carto,currentX,currentY,currentHeading,AStarStep(i,1),AStarStep(i,2));
 			if (possible==1)
-				closest=i;
+					[rotation2,distance2,possible2] = CheckStraightMovePossibility(carto,currentX,currentY,currentHeading,AStarStep(i+1,1),AStarStep(i+1,2));
+					if (possible2==1)
+						closest=i+1;
+					else
+						closest=i;
+					endif
 				prevDist=dist;
 			endif
 		endif
