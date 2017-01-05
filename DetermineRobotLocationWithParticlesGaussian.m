@@ -31,17 +31,23 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 		hold on;
 		imshow(img,[])
 		[a,b]=size(img);
+		axis([1,b,1,a],"on","xy");
 		for i=1:x
-			plot(particles(i,1),a+1-particles(i,2))
+%			plot(particles(i,1),a+1-particles(i,2))
+			plot(particles(i,1),particles(i,2))
 		end
-			plot(detX,a+1-detY,"color","r","+","markersize",15)
+%			plot(detX,a+1-detY,"color","r","+","markersize",15)
+			plot(detX,detY,"color","k","+","markersize",15)
 		for j=1:z
 			if (j==1)
-				plot(inX(j),a+1-inY(j),"color","g","o","markersize",15)
+%				plot(inX(j),a+1-inY(j),"color","g","o","markersize",15)
+				plot(inX(j),inY(j),"color","k","o","markersize",15)
 			else
-				plot(inX(j),a+1-inY(j),"color","c","s","markersize",15)
+%				plot(inX(j),a+1-inY(j),"color","c","s","markersize",15)
+				plot(inX(j),inY(j),"color","k","s","markersize",15)
 			endif
 		endfor
+    grid minor;
 		hold off;
 	endif
 

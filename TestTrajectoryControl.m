@@ -1,4 +1,5 @@
  function [] = TestTrajectoryControl(simulationMode)
+   more off
  cpu1=cputime();
    if (exist("simulationMode"))
   else
@@ -7,12 +8,14 @@
  %simulationMode=1;  % to set simulation 1 on 0 off
  rotationType=2  % select 1="northOrientation" 2="gyroscope" 3="wheels"
 [robot,carto,img,headingNOrthXOrientation,zonesXY,all_theta,parametersNameList,parametersValueList] = InitOctaveRobot();
+[p1,shiftEchoVsRotationCenter,p3]=GetParametersValueByName(robot,"shiftEchoVsRotationCenter",parametersNameList);
+shiftEchoVsRotationCenter=shiftEchoVsRotationCenter/10;
 robot.LaunchBatch();        % call java method to start batch
 if (simulationMode==0)                  % in case real mode
 	robotStatus=0;
 	while (robotStatus<=0)              % wait for robot to be ready
 		robotStatus=robot.runningStatus;
-		sleep(1);
+		pause(1);
 	end
 robot.QueryMotorsPWM();
 endif
@@ -27,7 +30,7 @@ nbPred=5;                    % define the number of predictions that will be com
 plotOn=true;                 % if true graphics will be provided (reduces performance)
 plotOff=false;               % non graphic
 printf(ctime(time()))
-particlesNumber=1000;
+particlesNumber=100;
 WaitInfo=robot.robotInfoUpdated;                 
 WaitScan360=robot.scanEnd;
 WaitMove=robot.moveEnd;
@@ -60,7 +63,7 @@ traceMove=[];
 traceNext=[];
 traceRobot=[];
 traceEcho=[];
-echoBalance=[1,1,1]  % theoritical , encoder , gyroscope
+echoBalance=[1,0.9,1.1]  % theoritical , encoder , gyroscope
 gyroBasedX=newX;
 gyroBasedY=newY;
 gyroBasedH=newH*pi()/180;
@@ -68,7 +71,7 @@ if (simulationMode==0)                  % in case real mode
 	robotStatus=0;
 	while (robotStatus<=0)              % wait for robot to be ready
 		robotStatus=robot.runningStatus;
-		sleep(1);
+		pause(1);
 	end
 [rc] = InitRobotParameters(robot,parametersNameList); % set robot parameters
 endif
@@ -111,7 +114,7 @@ printf(ctime(time()));
 %[targetX,targetY,targetAngle]=ComputeTargetLocation(carto,robot);
 targetX=385;
 targetY=250;
-targetH=0;;
+targetH=00;;
 newTarget=1;
 printf("robot target is X:%d Y:%d orientation: %d. *** ",targetX,targetY,targetH)
 printf(ctime(time()))
@@ -187,17 +190,17 @@ while (issue==false && targetReached==false)
 							% compute trajectory step
 							if (simulationMode==0)
 								robot.Horn(5);  % horn 20 seconds
-								sleep(5);
+								pause(5);
 %							inp=input("take a picture ");
 							endif
-							[nextX,nextY,rotationToDo,lenToDo,direct,forward] = ComputeNextStepToTarget(carto,robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,targetX,targetY,newTarget,plotOn,robot,parametersNameList);
+							[nextX,nextY,direct,forward] = ComputeNextStepToTarget(carto,robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,targetX,targetY,newTarget,plotOn,robot,parametersNameList);
 							newTarget=0;
 							if (forward==0)
 								printf("no path found. *** ")
 								printf(ctime(time()))
 								issue=true;
 %								pause
-								AStarShowStep(trajectory,"actual trajectory");
+								AStarShowStep(trajectory,"determined trajectory");
 								save ("-mat4-binary","traceDet.mat","traceDet");
 								save ("-mat4-binary","traceMove.mat","traceMove");
 								save ("-mat4-binary","traceNext.mat","traceNext");
@@ -291,10 +294,12 @@ while (issue==false && targetReached==false)
 							if (simulationMode==1)
 								lentoDo=lenParticlesToDo; 		 % len sent in cm
 							endif
+              robot.Horn(2);  % horn 20 seconds
+              pause(5);
 							robot.Move(0,lenToDo); 		 % len sent in cm
 							lastParticles=particles;          % to be able to recover in case of move failure
 		
-							particles=MoveParticles(rotationParticlesToDo,lenParticlesToDo,img,plotOff,particles);
+							particles=MoveParticles(rotationToDo,lenToDo,img,plotOn,particles,shiftEchoVsRotationCenter);
 							retCode=WaitForRobot(robot,WaitMove);
 							if (retCode>=99)  
 								[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
@@ -314,7 +319,7 @@ while (issue==false && targetReached==false)
 								newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
 								printf("incompleted DueToSpeedInconsistancy expected: %d actual:%d %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
 								printf(ctime(time()))
-								particles=MoveParticles(rotationParticlesToDo,newLenToDo,img,plotOff,lastParticles);
+								particles=MoveParticles(rotationParticlesToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
 								probExpectedMoveOk=25;
 								gyroLenToDo=newLenToDo;
 							endif	
@@ -322,7 +327,7 @@ while (issue==false && targetReached==false)
 								newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
 								printf("incompleted move due to obstacle expected: %d actual:%d  %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
 								printf(ctime(time()))
-								particles=MoveParticles(rotationParticlesToDo,newLenToDo,img,plotOff,lastParticles);
+								particles=MoveParticles(rotationParticlesToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
 								probExpectedMoveOk=25;				
 								gyroLenToDo=newLenToDo;
 							endif														
@@ -373,8 +378,12 @@ while (issue==false && targetReached==false)
 							endif
 							printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%f SpaceNO:%d RobotNO:%d Gyro:%d*** ",newH,headingNO,saveTargetHeading,averageH*180/pi(),spaceNO,robot.GetNorthOrientation(),robot.GetGyroHeading());
 							printf(ctime(time()))
-							[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH)
-							traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo]];					
+%							[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH)
+							[weightEcho,retValue,echo,quality] = TestLocationEchoConsistancyVsDB(robot,carto,newX,newY,averageH,parametersNameList);
+							if (retValue==0)
+								traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
+							endif
+%{							
 							if (median(weightEcho)<50)
 								[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH);
 							endif
@@ -386,6 +395,7 @@ while (issue==false && targetReached==false)
 									weightEcho=[1,1,1];   %non significative diffrences beetwen mesurments		 
 								endif
 							endif
+%}
 							[nbRow,nbCol]=size(weightEcho);
 							if (retValue!=0)
 								printf("no echo consistancy data");
@@ -395,10 +405,11 @@ while (issue==false && targetReached==false)
 							else
 								printf("echo consistancy prob:");
 								for i=1:col	
-									printf(" %d ",weightEcho(i));
-								endfor;		
+									printf(" %f ",weightEcho(i));
+								endfor;
+								printf("best quality (0: one is perfect):%f",quality);
 							endif
-							printf("*** ");
+							printf(" *** ");
 							printf(ctime(time()));
 							weightEcho=weightEcho.*echoBalance   % 
 							[detX,detY,detH,particles]=DetermineRobotLocationWithParticlesGaussian(newX,newY,weightEcho,img,plotOn,particles);
@@ -425,14 +436,9 @@ while (issue==false && targetReached==false)
 								retCode=WaitForRobot(robot,WaitFor);
 								if (retCode!=0)
 									[issue,action]=analyseRetcode(retCode,WaitFor,callFrom);
-									if action=="stop.."
-										return
-									endif
-									if action=="break."
-										break
-									endif
-									if action=="resume"
-									endif
+									robot.UpdateHardRobotLocation();	
+									WaitFor=WaitRobotUpdate;
+									retCode=WaitForRobot(robot,WaitFor);
 								endif
 							end
 							particles=ResampleParticles(img,plotOff,particles);

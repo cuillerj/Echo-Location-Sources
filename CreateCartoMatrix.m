@@ -23,7 +23,9 @@ strfin='.mat';
 matrix=strcat(name,strfin);
 %name=carto1;
 save ("-mat4-binary","carto1.mat","carto1")
-carto1img=rot90(carto2);
+%imshow(carto2,[])
+%carto1img=rot90(carto2);
+carto1img=flipud(rot90(carto2));
 strfin='.mat';
 matrix=strcat(name,strfin);
 %name=carto1mg;

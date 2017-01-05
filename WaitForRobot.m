@@ -10,6 +10,6 @@ while (retCode==99)
 		printf(ctime(time()));
 	endif
 	idx++;
-	sleep(1)
+	pause(1)
 end
 endfunction

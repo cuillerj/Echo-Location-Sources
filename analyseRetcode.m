@@ -10,7 +10,7 @@ else
 	if (currentAction == testedValue)
 		testedValue=robot.moveUnderLimitation;
 		if (retCode == testedValue)
-				action="noMove."
+				action="noMove"
 		endif
 		testedValue=robot.moveKoDueToSpeedInconsistancy
 		if (retCode == testedValue)

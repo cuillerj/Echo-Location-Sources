@@ -25,7 +25,15 @@ if (abs(rotationParticlesToDo)<value)
 		rotationParticlesToDo=0;
 	endif
 endif
+if (nextX-currentX<0)
+	rotationParticlesToDo=180+rotationParticlesToDo;
+endif
+if (forward==-1)
+%	rotationParticlesToDo=-rotationParticlesToDo;
+	rotationParticlesToDo=mod(rotationParticlesToDo+180,360);
+endif
 rotationParticlesToDo=round(mod(rotationParticlesToDo+360,360));
 lenParticlesToDo=round(sqrt((nextX-currentX)^2+(nextY-currentY)^2))*forward;
-
+printf("Compute Move Patricles rotation:%d dist:%d. *** ",rotationParticlesToDo,lenParticlesToDo);
+printf(ctime(time()));
 endfunction

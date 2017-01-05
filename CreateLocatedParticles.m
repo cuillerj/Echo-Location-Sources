@@ -11,8 +11,8 @@ pw=0;
 xPrecision=10;
 yPrecision=10;
 hPrecision=10;
-sigmaDist=2;
-sigmaHeading=2;
+sigmaDist=0.2;  %2
+sigmaHeading=0.0;
 particles=[];
 [x,y]=size(carto);
 lim=particlesNumber*prob/100;
@@ -65,8 +65,9 @@ if (plotOn)
 	hold on;
 	imshow(img,[])
 	[a,b]=size(img);
+	axis([1,b,1,a],"on","xy");
 	for i=1:particlesNumber
-		plot(particles(i,1),a+1-particles(i,2))
+		plot(particles(i,1),particles(i,2))
 	end
 	hold off;
 endif

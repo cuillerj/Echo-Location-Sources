@@ -1,5 +1,11 @@
-function [nextX,nextY,rotation,distance,direct,forward] = ComputeNextStepToTarget(carto,currentX,currentY,currentHeading,targetX,targetY,newTarget,plotOn,robot,parametersNameList)
-% first try direct acces
+function [nextX,nextY,direct,forward] = ComputeNextStepToTarget(carto,currentX,currentY,currentHeading,targetX,targetY,newTarget,plotOn,robot,parametersNameList)
+%{ 
+  compute next step to get the target (robot as a single point)
+  first try to reach target in direct acces
+  this is a new target use astar search to find a path and store this path
+  look for the closest next stored step
+  determine forward or backard
+%}
 nextX=targetX;
 nextY=targetY;
 rotation=0;

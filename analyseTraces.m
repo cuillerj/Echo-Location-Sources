@@ -37,6 +37,7 @@ for (i=1:size(traceEcho,1))
 	traceDetails(idx,22)=traceEcho(i,5);
 	traceDetails(idx,23)=traceEcho(i,8);
 	traceDetails(idx,24)=traceEcho(i,11);
+	traceDetails(idx,25:29)=traceEcho(i,12:16);
 endfor
 csvwrite("traceDetails.csv",traceDetails);
 ;csvwrite("traceEcho.csv",traceEcho);
