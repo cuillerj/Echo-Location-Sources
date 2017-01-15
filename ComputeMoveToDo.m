@@ -44,6 +44,8 @@ lenToDo=sqrt((nextX-(rotationCenterX+shiftRotationX))^2+(nextY-(rotationCenterY+
 printf("Compute Move Robot rotCenterX:%d rotCenterY:%d rotation:%d dist:%d. *** ",rotationCenterX,rotationCenterY,rotationToDo,lenToDo);
 printf(ctime(time()));
 [rotationToDo,lenToDo,forward] = OptimizeMoveToDo(rotationToDo,lenToDo,forward)
+rotationToDo=round(rotationToDo)
+lenToDo=round(lenToDo)
 printf("optimize Move Robot  rotation:%d dist:%d. *** ",rotationToDo,lenToDo);
 printf(ctime(time()));
 endfunction

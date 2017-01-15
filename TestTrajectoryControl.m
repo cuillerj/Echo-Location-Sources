@@ -18,6 +18,9 @@ if (simulationMode==0)                  % in case real mode
 		pause(1);
 	end
 robot.QueryMotorsPWM();
+else
+  robot.noiseLevel=1.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
+  robot.noiseRetCode=1;                 % boolean (0 move 100% completed 1 move can be incompleted)
 endif
 
 nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
@@ -30,7 +33,7 @@ nbPred=5;                    % define the number of predictions that will be com
 plotOn=true;                 % if true graphics will be provided (reduces performance)
 plotOff=false;               % non graphic
 printf(ctime(time()))
-particlesNumber=100;
+particlesNumber=1000;
 WaitInfo=robot.robotInfoUpdated;                 
 WaitScan360=robot.scanEnd;
 WaitMove=robot.moveEnd;
@@ -63,7 +66,7 @@ traceMove=[];
 traceNext=[];
 traceRobot=[];
 traceEcho=[];
-echoBalance=[1,0.9,1.1]  % theoritical , encoder , gyroscope
+echoBalance=[1,0.95,1.05]  % theoritical , encoder , gyroscope
 gyroBasedX=newX;
 gyroBasedY=newY;
 gyroBasedH=newH*pi()/180;
@@ -174,7 +177,9 @@ if (simulationMode==0)
 				printf(ctime(time()))
 endif
 loopCount=0;	
-traceNext=[traceNext;[time,loopCount,posX,posY]];		
+traceNext=[traceNext;[time,loopCount,posX,posY]];
+gyroBasedX=gyroBasedX-shiftEchoVsRotationCenter*cos(newH);           % set position to rotation center
+gyroBasedY=gyroBasedY-shiftEchoVsRotationCenter*sin(newH);           % set position to rotation center
 while (issue==false && targetReached==false)
 	loopCount++;
 	rotation=0;
@@ -213,7 +218,7 @@ while (issue==false && targetReached==false)
 							traceNext=[traceNext;[time,loopCount,nextX,nextY]];
 %							if (direct==false)
 							[rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,nextX,nextY,forward,robot,parametersNameList);
-							[rotationParticlesToDo,lenParticlesToDo]=ComputeMoveParticlesToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,nextX,nextY,forward,robot,parametersNameList)
+%							[rotationParticlesToDo,lenParticlesToDo]=ComputeMoveParticlesToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,nextX,nextY,forward,robot,parametersNameList)
 %							else
 %								nextX=targetX;         % straight move possible next step is target
 %								nextY=targetY;			% straight move possible next step is target
@@ -224,7 +229,7 @@ while (issue==false && targetReached==false)
 							saveTargetHeading=robot.GetHeading()+rotationToDo;  % replace rotation by rotationToDo le 28/09
 							saveHeading=robot.GetHeading();
 							if (simulationMode==1)
-								rotationToDo=rotationParticlesToDo;
+	%							rotationToDo=rotationParticlesToDo;
 							endif
 							if (rotationToDo!=0)
 								printf(ctime(time()))
@@ -290,16 +295,16 @@ while (issue==false && targetReached==false)
 								endif
 							endif
 							%}
-							gyroLenToDo=lenParticlesToDo;
+							gyroLenToDo=lenToDo;
 							if (simulationMode==1)
-								lentoDo=lenParticlesToDo; 		 % len sent in cm
+	%							lentoDo=lenParticlesToDo; 		 % len sent in cm
 							endif
               robot.Horn(2);  % horn 20 seconds
               pause(5);
 							robot.Move(0,lenToDo); 		 % len sent in cm
 							lastParticles=particles;          % to be able to recover in case of move failure
 		
-							particles=MoveParticles(rotationToDo,lenToDo,img,plotOn,particles,shiftEchoVsRotationCenter);
+							particles=MoveParticles(rotationToDo,lenToDo,img,plotOff,particles,shiftEchoVsRotationCenter);
 							retCode=WaitForRobot(robot,WaitMove);
 							if (retCode>=99)  
 								[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
@@ -319,7 +324,7 @@ while (issue==false && targetReached==false)
 								newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
 								printf("incompleted DueToSpeedInconsistancy expected: %d actual:%d %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
 								printf(ctime(time()))
-								particles=MoveParticles(rotationParticlesToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
+								particles=MoveParticles(rotationToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
 								probExpectedMoveOk=25;
 								gyroLenToDo=newLenToDo;
 							endif	
@@ -327,7 +332,7 @@ while (issue==false && targetReached==false)
 								newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
 								printf("incompleted move due to obstacle expected: %d actual:%d  %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
 								printf(ctime(time()))
-								particles=MoveParticles(rotationParticlesToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
+								particles=MoveParticles(rotationToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
 								probExpectedMoveOk=25;				
 								gyroLenToDo=newLenToDo;
 							endif														
@@ -339,10 +344,12 @@ while (issue==false && targetReached==false)
 							endif
 							robot.ValidHardPosition();
 							gyroBasedH=mod(gyroBasedH+robot.GetGyroHeading()*pi()/180,2*pi());
-							gyroBasedX=round(gyroBasedX+gyroLenToDo*cos(gyroBasedH));
-							gyroBasedY=round(gyroBasedY+gyroLenToDo*sin(gyroBasedH));
+							gyroBasedX=round(gyroBasedX+gyroLenToDo*cos(gyroBasedH)+shiftEchoVsRotationCenter*cos(gyroBasedH));
+							gyroBasedY=round(gyroBasedY+gyroLenToDo*sin(gyroBasedH)+shiftEchoVsRotationCenter*sin(gyroBasedH));
 							newX=[nextX,robot.GetHardPosX(),gyroBasedX];
 							newY=[nextY,robot.GetHardPosY(),gyroBasedY];
+ 							gyroBasedX=gyroBasedX-shiftEchoVsRotationCenter*cos(gyroBasedH); % set position to rotation center
+ 							gyroBasedY=gyroBasedY-shiftEchoVsRotationCenter*sin(gyroBasedH); % set position to rotation center
 							if (rotationType==2)
 								newH=[mod(360+gyroBasedH*180/pi(),360)];
 							else
@@ -458,7 +465,7 @@ while (issue==false && targetReached==false)
 		printf(ctime(time()))
 end
 robot.Horn(20);  % horn 20 seconds
-AStarShowStep(trajectory,"actual trajectory");
+AStarShowStep(trajectory,"determined trajectory");
 save ("-mat4-binary","traceDet.mat","traceDet");
 save ("-mat4-binary","traceMove.mat","traceMove");
 save ("-mat4-binary","traceNext.mat","traceNext");
