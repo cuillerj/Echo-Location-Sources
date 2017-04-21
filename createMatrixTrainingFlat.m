@@ -3,7 +3,8 @@
 % 
 nbMesurementByTrain=getNbStepsRotation(); % get the number of steps for a 180 rotation
 load ('scanResult.txt');
-nbTrain=size(scanResult,1)
+nbTrain=size(scanResult,1);
+printf("training records number:%d,number of mesurment by train:%d",nbtrain,nbMesurementByTrain)
 pixelBF=zeros(2,181);
 trainMatFlat=zeros((nbTrain/nbMesurementByTrain),362);
 trainResultFlat=zeros((nbTrain/nbMesurementByTrain),1);
@@ -11,12 +12,11 @@ trainNumber=1;
 j=1;
 i=1;
 while(j < nbTrain)  % loop untill the end of data
-	trainNumber;
+	printf("train number:%d",trainNumber);
 	pixelBF=zeros(2,181);
 	idScan=scanResult(j,1);  % get the ScanID
 	trainResultFlat(trainNumber)=scanResult(j,5);  % get the zone/angle value
 		while (scanResult(j,1)<=idScan && j < nbTrain)  % loop for each ScanID
-				scanResult(j,2);  
 				angle=scanResult(j,2); % get the angle value
 				k=angle;
 				pixelBF(1,k+1)=scanResult(j,3); % get the front distance value

@@ -46,5 +46,5 @@ i=1;
 		analyseMat(1,:)=reshape (pixelBF,1,[]);
 
 end
-size(analyseMat)
+
 save  ("-mat4-binary","analyseMat.mat","analyseMat")

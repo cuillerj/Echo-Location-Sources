@@ -38,7 +38,11 @@ while (lambda<=lambdamax)
 	save  ("-mat4-binary","accuracy.mat","accuracy")
 	ctime (time ())
 	fprintf('\nTraining Set Accuracy: %f\n', mean(double(predTrain == Yv4)) * 100);
-	lambda=lambda+delta/4;
-	i=i+1;
+	if (lambdamin<lambdamax)
+		lambda=lambda+delta/4;
+		i=i+1;
+	else
+		lambda=lambdamax+1
+	endif
 end
 

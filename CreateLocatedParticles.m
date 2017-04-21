@@ -12,7 +12,11 @@ xPrecision=10;
 yPrecision=10;
 hPrecision=10;
 sigmaDist=2;  %2
-sigmaHeading=0.5;
+if (posX==-1 && prob==100)      % means robot is only nort oriented
+	sigmaHeading=2;
+else
+	sigmaHeading=0.5;
+endif
 particles=[];
 [x,y]=size(carto);
 lim=particlesNumber*prob/100;

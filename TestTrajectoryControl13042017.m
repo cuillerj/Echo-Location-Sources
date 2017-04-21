@@ -95,7 +95,7 @@ if (simulationMode!=0)
 	headingNO=mod(360+spaceNO-NO,360);   % determine heading regarding magneto mesurment and value for echo scan reference
 	shiftNO=spaceNO-NO
 else
-	NO=robot.northOrientation;          %  request NO info
+	NO=robot.GetNorthOrientation;          %  request NO info
 	WaitFor=WaitInfo;
 	retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
 	if (retCode!=0)
@@ -109,7 +109,7 @@ else
 		if action=="resume"
 			resume
 		endif
-	NO=robot.northOrientation;           % get the up to date info
+	NO=robot.GetNorthOrientation;           % get the up to date info
 	headingNO=mod(360+spaceNO-NO,360); 
 	shiftNO=spaceNO-NO
 	endif

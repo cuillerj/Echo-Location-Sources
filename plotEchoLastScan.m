@@ -1,5 +1,5 @@
 function [] = plotEchoLastScan(robot,plotOn)
-createMatrixLastScan(robot) % creat matrix
+createMatrixLastScan(robot); % creat matrix
 load ('analyseMat.mat'); % load the created matrix
 % rec correspond a la combinaison case angle
 

@@ -19,7 +19,7 @@ function [AStarPath,AStarStep,cost,forward] = AStarSearch(carto,currentX,current
  forward=0;
 
  weightCarto=20;     % weight used to balance way depending on cartography weight and action cost
-
+% weightCarto=0;     % weight used to balance way depending on cartography weight and action cost
   targetHeadingGrad=targetHeading*pi()/180;
   AStarPath=[];
   AStarStep=[];
@@ -52,13 +52,12 @@ actions=[
 		[stepSize,stepSize]; [stepSize,-stepSize];  % actions list (deltaX,deltaY)
 		[-stepSize,stepSize];[-stepSize,-stepSize];
 		];
-
 shiftRotation=[0,4,2,6,1,7,3,5].*(pi()/4);     
   
 %AStarHeading=currentHeadingGrad
 
 nbActions=size(actions,1);
- mailleRotation=nbActions;
+mailleRotation=nbActions;
 deltaMailleRotation=360/mailleRotation;
 currentHeadingMaille=floor(currentHeading/deltaMailleRotation);
 currentHeadingGrad= currentHeadingMaille*2*pi()/mailleRotation;

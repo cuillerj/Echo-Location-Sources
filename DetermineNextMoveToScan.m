@@ -1,3 +1,6 @@
+%{
+
+%}
 function [rotation,moveDist] = DetermineNextMoveToScan(robot,plotOn)
 	[param,value,found]=ApeRobotCommonDefine("nbPulse");
 	nbPingByScan=value-1;
@@ -8,7 +11,7 @@ function [rotation,moveDist] = DetermineNextMoveToScan(robot,plotOn)
 	shiftAngle=pi()/(nbPingByScan);
 	minDistance=60;
 	validMoveList=[];
-	maxDist=200;
+	maxDist=150;
 	if (plotOn)
 		plotEchoScanRobot(robot);
 	endif

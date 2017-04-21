@@ -19,6 +19,47 @@ The higher is the weight the most likely is the position
 	Ping front and back to get distances
 	Compute and return the weight
 %}
+WaitInfo=robot.robotInfoUpdated; 
+%{
+lastBNOmode=robot.BNOMode;
+[param,value,number]=GetParametersValueByName(robot,"CompasMode",parametersNameList);
+CompasMode=value;
+if (lastBNOmode!=CompasMode)
+	robot.setBNOMode(CompasMode);
+		WaitFor=WaitInfo;
+		retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
+		if (retCode!=0)
+			[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+			if action=="stop.."
+				return
+			endif
+			if action=="break."
+				break
+			endif
+			if action=="resume"
+				resume
+			endif
+		endif
+
+		while (robot.BNOMode!=CompasMode)
+			printf("wait for BNOMode");
+			robot.setBNOMode(CompasMode);
+			retCode=WaitForRobot(robot,WaitFor); 	% wait for up to date
+			if (retCode!=0)
+				[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+				if action=="stop.."
+					return
+				endif
+				if action=="break."
+					break
+				endif
+				if action=="resume"
+					resume
+				endif
+			endif
+			sleep(2);
+		end
+				%}
 [param,value,number]=GetParametersValueByName(robot,"tileSize1",parametersNameList);
 tileSize=value/10;
 countPos=zeros(size(posX));
@@ -188,7 +229,8 @@ endfor
 	echo'
 	quality=min(sum(abs(projection-echo'),1))
 	weight=(sum(sum(abs(projection-echo'),1))-sum(abs(projection-echo'),1)).*countPos;
-	weight=max(weight/sum(weight),[0.001,0.001,0.001]);
+	minMatrixValue=ones(size(weight)).*0.001
+	weight=max(weight/sum(weight),minMatrixValue);
 %	weight=max(1,100-((sqrt(sum((abs(projection-echo).*nnzProj).^2,2))')./(nbnnz))*coefWeight);
 
 echo=echo(1,:);

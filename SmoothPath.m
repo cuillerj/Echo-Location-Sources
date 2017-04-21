@@ -5,47 +5,59 @@ function [AStarStepSmooth,forward] = SmoothPath(carto,AStarPath,AStarStep,forwar
  cpu1=cputime();
  nbActions=size(AStarPath,1);
  nbSteps=size(AStarStep,1);
- AStarStepSmooth=AStarStep(1,:);
+ AStarStepSimplified=AStarStep(1,:);
  idxAction=1;
  prevAction=AStarPath(1);
  countSameAction=0;
- smoothMinLength=3;    % 
- smoothMaxLength=6;
+ smoothMinLength=40;    % 
+ smoothMaxLength=120;
+
+ 
+ % eliminate steps that are reached with straight moves
  while (idxAction<nbActions)
-	if (AStarPath(idxAction)==prevAction)
-		countSameAction++;
-		newAction=false;
-	else
-		newAction=true;
+	if (AStarPath(idxAction)!=prevAction)        % only keep step if there is a new kind of action
 		prevAction=AStarPath(idxAction);
-	endif
-	if (newAction==true && countSameAction >=smoothMinLength)
-%		for i = idxAction-countSameAction+1:idxAction
-			AStarStepSmooth=[AStarStepSmooth;[AStarStep(idxAction,:)]];
-%		endfor
-	countSameAction=0;
-	else
-		i=smoothMaxLength;
-		while(i>1)
-			idxStart=idxAction-countSameAction+1;
-			idxEnd=min(nbSteps,idxAction-countSameAction+i+1);
-%			heading=atan((AStarStep(idxEnd,1)-AStarStep(idxStart,1)/(AStarStep(idxEnd,1)-AStarStep(idxStart,1))));
-				[rotation,distance,possible]=CheckStraightMovePossibility(carto,AStarStep(idxStart,1),AStarStep(idxStart,2),0,AStarStep(idxEnd,1),AStarStep(idxEnd,2));
-				if (possible==1)
-					AStarStepSmooth=[AStarStepSmooth;[AStarStep(idxEnd,:)]];
-					idxAction=idxEnd-1;
-					i=0;
-				endif
-				if (idxEnd>=nbSteps)
-%					AStarStepSmooth=[AStarStepSmooth;[AStarStep(nbSteps,:)]];
-					i=0;
-				endif
-		i--;
-		end
+		AStarStepSimplified=[AStarStepSimplified;[AStarStep(idxAction,:)]];
 	endif
 	idxAction++;
 end
-AStarStepSmooth=[AStarStepSmooth;[AStarStep(nbSteps,:)]];
+	AStarStepSimplified=[AStarStepSimplified;[AStarStep(nbSteps,:)]];
+
+%  try to smooth the moves
+prevStep=AStarStepSimplified(1,:);
+AStarStepSmooth=AStarStepSimplified(1,:);
+i=2;
+
+while (i<size(AStarStepSimplified-1,1))
+	if (((AStarStepSimplified(i,1)-prevStep(1))^2+(AStarStepSimplified(i,2)-prevStep(2))^2)<smoothMinLength^2)
+		if (((AStarStepSimplified(i+1,1)-prevStep(1))^2+(AStarStepSimplified(i+1,2)-prevStep(2))^2)<smoothMaxLength^2)
+			i=i+1;
+		endif
+	endif
+	prevStep=AStarStepSimplified(i,:);
+	AStarStepSmooth=[AStarStepSmooth;[AStarStepSimplified(i,:)]];
+	i=i+1;	
+end
+AStarStepSmooth=[AStarStepSmooth;[AStarStepSimplified(size(AStarStepSimplified,1),:)]];
+AStarStepSimplified=AStarStepSmooth;
+prevStep=AStarStepSimplified(1,:);
+AStarStepSmooth=AStarStepSimplified(1,:);
+i=2;
+
+while (i<size(AStarStepSimplified-1,1))
+	if (((AStarStepSimplified(i,1)-prevStep(1))^2+(AStarStepSimplified(i,2)-prevStep(2))^2)<smoothMinLength^2)
+		if (((AStarStepSimplified(i+1,1)-prevStep(1))^2+(AStarStepSimplified(i+1,2)-prevStep(2))^2)<smoothMaxLength^2)
+			i=i+1;
+		endif
+	endif
+	prevStep=AStarStepSimplified(i,:);
+	AStarStepSmooth=[AStarStepSmooth;[AStarStepSimplified(i,:)]];
+	i=i+1;	
+end
+
+AStarStepSmooth=[AStarStepSmooth;[AStarStepSimplified(size(AStarStepSimplified,1),:)]];
+
+% to evenutaly delete 2 identical steps
 tempStep=[];
 for (i=1:size(AStarStepSmooth,1))                    % to delete double steps
 	if ((i==1) || (i>=2) && ((AStarStepSmooth(i,1) != AStarStepSmooth(i-1,1)) || (AStarStepSmooth(i,2) != AStarStepSmooth(i-1,2))))

@@ -29,15 +29,16 @@ for (i=1:size(traceEcho,1))
 	idx=find(traceTime==traceEcho(i,1));
 	traceDetails(idx,2)=traceEcho(i,2);
 	traceDetails(idx,16)=traceEcho(i,3);
-	traceDetails(idx,17)=traceEcho(i,6);
-	traceDetails(idx,18)=traceEcho(i,9);
-	traceDetails(idx,19)=traceEcho(i,4);
-	traceDetails(idx,20)=traceEcho(i,7);
+	traceDetails(idx,17)=traceEcho(i,8);
+	traceDetails(idx,18)=traceEcho(i,4);
+	traceDetails(idx,19)=traceEcho(i,9);
+	traceDetails(idx,20)=traceEcho(i,5);
 	traceDetails(idx,21)=traceEcho(i,10);
-	traceDetails(idx,22)=traceEcho(i,5);
-	traceDetails(idx,23)=traceEcho(i,8);
-	traceDetails(idx,24)=traceEcho(i,11);
-	traceDetails(idx,25:29)=traceEcho(i,12:16);
+	traceDetails(idx,22)=traceEcho(i,6);
+	traceDetails(idx,23)=traceEcho(i,11);
+	traceDetails(idx,24)=traceEcho(i,7);
+	traceDetails(idx,25)=traceEcho(i,12);
+	traceDetails(idx,26:30)=traceEcho(i,18:22);
 endfor
 csvwrite("traceDetails.csv",traceDetails);
 ;csvwrite("traceEcho.csv",traceEcho);

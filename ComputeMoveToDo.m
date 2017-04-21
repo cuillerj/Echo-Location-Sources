@@ -23,8 +23,8 @@ else
 	endif
 endif
 rotationToDo=deltaAlpha-currentHeading;
-shiftRotationX=shiftEchoVsRotationCenter*cos(rotationToDo*pi/180)
-shiftRotationY=shiftEchoVsRotationCenter*sin(rotationToDo*pi/180)
+shiftRotationX=shiftEchoVsRotationCenter*cos(deltaAlpha*pi/180)
+shiftRotationY=shiftEchoVsRotationCenter*sin(deltaAlpha*pi/180)
 %[param,value,found] = ApeRobotCommonDefine("minRotToBeDone");
 [p1,value,p3]=GetParametersValueByName(robot,"minRotToBeDone",parametersNameList);
 if (abs(rotationToDo)<value)
