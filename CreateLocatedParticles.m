@@ -43,7 +43,7 @@ if (lim==0 && heading >=0)
 	px=randi(x);
 	py=randi(y);
 	po=heading+randi((100+hPrecision-prob))-(100+hPrecision+1-prob)/2;
-	if (QueryCartoAvailability(carto,px,py,po*pi()/180,0)==1)
+	if (ApQueryCartoAvailability(carto,px,py,po*pi()/180,0)==1)
 		i=i+1;
 		particles=[particles;[px,py,po,pw]];
 	endif

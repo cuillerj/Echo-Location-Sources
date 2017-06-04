@@ -8,8 +8,14 @@ carto=carto1;
 load carto1img;
 img=carto1img;
 load "zonesXY.txt"
+ if (exist("robot"))
+    printf("java object already exist")
+ else
+    printf("create java object")
+    robot=robotJava;            % create the java object  
+ endif
 setupPath;					% define paths
-robot=robotJava;            % create the java object
+
 robot.SetTraceFileOn(1);    % route console to trace file
 %shiftNorthXOrientation=267-robot.GetParameterNumValue(1) % shift between north and X direction in degres - that is the average mesurment
 if (flat==true)

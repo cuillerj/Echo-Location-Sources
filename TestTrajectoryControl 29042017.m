@@ -7,7 +7,7 @@
     endif
    %simulationMode=1;  % to set simulation 1 on 0 off
    rotationType=2  % select 1="northOrientation" 2="gyroscope" 3="wheels"
-   flat=true    % determine regression logistic flat or not 
+   flat=true    % determine regression logique flat or not 
   [robot,carto,img,headingNOrthXOrientation,zonesXY,all_theta,parametersNameList,parametersValueList] = InitOctaveRobot(flat);
   [p1,shiftEchoVsRotationCenter,p3]=GetParametersValueByName(robot,"shiftEchoVsRotationCenter",parametersNameList);
   shiftEchoVsRotationCenter=shiftEchoVsRotationCenter/10;
@@ -17,10 +17,6 @@
   NDOFMode=value;
   [param,value,number]=GetParametersValueByName(robot,"CompasMode",parametersNameList);
   CompasMode=value;
-  [param,value,number]=GetParametersValueByName(robot,"minDistToBeDone",parametersNameList);
-  minDistToBeDone=value;
-    [param,value,number]=GetParametersValueByName(robot,"minRotGyroAbility",parametersNameList);
-  minRotGyroAbility=value;
   robot.LaunchBatch();        % call java method to start batch
   if (simulationMode==0)                  % in case real mode
     robotStatus=0;
@@ -30,11 +26,8 @@
     end
   robot.QueryMotorsPWM();
   else
-    robot.noiseLevel=0.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
+    robot.noiseLevel=1.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
     robot.noiseRetCode=1;                 % boolean (0 move 100% completed 1 move can be incompleted)
-    robot.noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen
-    printf("Simulation noiseLevel:%f noiseRetCode:%d noiseRetValue:%d *** ",robot.noiseLevel,robot.noiseRetCode,robot.noiseRetValue);
-    printf(ctime(time()));
   endif
   
   nbLocPossibility=size(all_theta,1); % determine the number of zones used during the trainning phase
@@ -81,7 +74,7 @@
   traceRobot=[];
   traceEcho=[];
   if (simulationMode==0)
-    echoBalance=[1,0.95,1.05,1.1,1.1]  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right
+    echoBalance=[1,0.95,1.05,1,1]  % theoritical , encoder , gyroscope
   else
     echoBalance=[1,0.95,1.05]  % theoritical , encoder , gyroscope
   endif
@@ -148,7 +141,7 @@
   robot.SetCurrentLocProb(locProb);
   printf("update hard robot. *** X:%d Y:%d H:%d *** ",robot.GetPosX(),robot.GetPosY(),robot.GetHeading())
   printf(ctime(time()))
-  while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || mod(robot.GetHeading(),360)!=mod(robot.GetHardHeading(),360))
+  while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || robot.GetHeading()!=robot.GetHardHeading())
     robot.UpdateHardRobotLocation();	
     WaitFor=WaitRobotUpdate;
     retCode=WaitForRobot(robot,WaitFor);
@@ -172,7 +165,7 @@
           robot.SetCurrentLocProb(newProb);
           printf("update hard robot.. *** X:%d Y:%d H:%d *** ",robot.GetPosX(),robot.GetPosY(),robot.GetHeading());
           printf(ctime(time()));
-          while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || mod(robot.GetHeading(),360)!=mod(robot.GetHardHeading(),360))
+          while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || robot.GetHeading()!=robot.GetHardHeading())
             robot.UpdateHardRobotLocation();
             WaitFor=WaitRobotUpdate;
             retCode=WaitForRobot(robot,WaitFor);
@@ -199,7 +192,7 @@
   while (issue==false && targetReached==false)
     loopCount++;
     rotation=0;
-   
+  
         if ((abs(robot.GetHardPosX-round(newX))<=1  && abs(robot.GetHardPosY-round(newY))<=1 ))
               if (QueryCartoAvailability(carto,newX,newY,newH*pi()/180,true)==false)
                 currentPositionIssue=true;
@@ -234,7 +227,11 @@
                 traceNext=[traceNext;[time,loopCount,nextX,nextY]];
   %							if (direct==false)
                 [rotationToDo,lenToDo]=ComputeMoveToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,nextX,nextY,forward,robot,parametersNameList);
-                saveLocation=[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading];
+  %							[rotationParticlesToDo,lenParticlesToDo]=ComputeMoveParticlesToDo(robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading,nextX,nextY,forward,robot,parametersNameList)
+  %							else
+  %								nextX=targetX;         % straight move possible next step is target
+  %								nextY=targetY;			% straight move possible next step is target
+  %							endif
                 traceMove=[traceMove;[time,loopCount,rotationToDo,lenToDo]];
                 printf("rotation:%d distance:%d *** ",rotationToDo,lenToDo);
                 printf(ctime(time()));
@@ -244,25 +241,55 @@
     %							rotationToDo=rotationParticlesToDo;
   %              endif
                 if (rotationToDo!=0)
-				   robot.Horn(1);  % horn x seconds
-                   [retCode,action]=robotRotate(rotationToDo);
-                   traceRobot=[traceRobot;[time,loopCount,1,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
-                   %{
-                  if (retCode==robot.moveKoDueToSpeedInconsistancy)
-                      printf("rotate back to try to remove from obstacle:%d ",-sign(rotationToDo)*minRotGyroAbility)
-                      printf(" *** ");
-                      robotRotate(-sign(rotationToDo)*minRotGyroAbility);      % eventualy try to remove from obstacle
-                      pause(5);
-                   endif
-                   %}
-                   
-                   if (action=="stop..")
-                     printf("stop due to pb rotation")
-                     printf(" *** ");
-                     issue==true;
-                     lenToDo=0;
-                   endif
+                  printf(ctime(time()))
+                  if (rotationType==1)
+                    saveNO=robot.northOrientation;
+                    printf("NO rotate robot NO: %d rotation:%d  *** ",robot.northOrientation,rotationToDo)
+                    printf(ctime(time()));									
+                    robot.RobotNorthRotate(mod(round(rotationToDo)+360,360));    % rotation based on north orientation
+                    WaitFor=WaitNorthAlign;
+                  endif
+                  if (rotationType==2)
+                    printf("gyro rotate robot  rotation:%d  *** ",rotationToDo)
+                    printf(ctime(time()));						
+                    robot.RobotGyroRotate(round(rotationToDo));    % rotation based gyroscope
+                    WaitFor=WaitMove;
+                  endif
+                  if (rotationType==3)
+                    printf("wheels rotate robot  rotation:%d  *** ",rotationToDo)
+                    printf(ctime(time()));							
+                    robot.Move(round(rotationToDo),0);    % rotation based on wheels encoders
+                    WaitFor=WaitMove;
+                  endif								
+                  retCode=WaitForRobot(robot,WaitFor);
+                  lastParticles=particles;
+                  particles=MoveParticles(rotationToDo,0,img,plotOff,particles,shiftEchoVsRotationCenter);
+                  if (retCode==0)
+                    aligned=true;
+                  else
+                      if (retCode==robot.moveKoDueToNotEnoughSpace)
+                            printf("no rotation moveKoDueToNotEnoughSpace. *** ")
+                            printf(ctime(time()))
+                            particles=lastParticles;
+                       else
+                            [issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+                            if (action=="stop..")
+                              return;
+                            endif
+                       endif
+                  endif
 
+                if (rotationType==1)
+                  robot.SetHeading(mod(360+robot.GetHardHeading()+robot.northOrientation-saveNO,360));
+                endif
+                if (rotationType==2)
+                  robot.SetHeading(mod(360+saveHeading+robot.GetGyroHeading(),360));
+                  gyroBasedH=gyroBasedH+robot.GetGyroHeading()*pi()/180;
+                endif
+                if (rotationType==3)
+                  robot.SetHeading(mod(360+robot.GetHardHeading(),360));
+                endif
+                traceRobot=[traceRobot;[time,loopCount,1,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
                 endif
                 gyroLenToDo=lenToDo;
 %                if (simulationMode==1)
@@ -270,107 +297,150 @@
   %              endif
                 robot.Horn(2);  % horn 2 seconds
                 pause(5);
-                if (lenToDo!=0&&retCode==0)
-                  retCode=robotMoveStraight(lenToDo);
-                endif
-                while (retCode==robot.moveKoDueToNotEnoughSpace)
-                  if (robot.retCodeDetail>=minDistToBeDone)
-                    {
-                    lenToDo=robot.retCodeDetail;
-                    printf(" try new length  x:%d *** ",lenToDo)
-                    printf(ctime(time()))
-                    retCode=robotMoveStraight(lenToDo);
-                    gyroLenToDo=lenToDo; 
-                    nextX(1)=round(saveLocation(1)+cos((saveLocation(3)+rotationToDo)*pi()/180)*lenToDo)
-                    nextY(1)=round(saveLocation(2)+sin((saveLocation(3)+rotationToDo)*pi()/180)*lenToDo)
-                    }           
-                  else{
-                    issue=true;
-                    printf(" no possible move max distance:%d *** ",robot.retCodeDetail);
-                    printf(ctime(time()));
-                    retCode=99;
-                   }
-                  endif       
-                end
-                  %{
-                  if (retCode==robot.moveKoDueToSpeedInconsistancy)
-                    printf("move back to try to remove from obstacle: %d,-sign(lenToDo)*minDistToBeDone ")
-                    printf(" *** ");
-                    robotMoveStraight(-sign(lenToDo)*minDistToBeDone);      % eventualy try to remove from obstacle
-                    pause(5);
+                robot.Move(0,lenToDo); 		 % len sent in cm
+                lastParticles=particles;          % to be able to recover in case of move failure
+      
+                particles=MoveParticles(0,lenToDo,img,plotOff,particles,shiftEchoVsRotationCenter);
+                retCode=WaitForRobot(robot,WaitMove);
+                if (retCode>=99)  
+                  [issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+                  if action=="stop.."
+                    return
                   endif
-                  %}
-                  subsystemLeftX=robot.BNOLeftPosX;
-                  subsystemLeftY=robot.BNOLeftPosY;
-                  subsystemRightX=robot.BNORightPosX;
-                  subsystemRightY=robot.BNORightPosY;
-                  subsystemHeading=robot.BNOLocHeading;
-                  printf("Subsystem location leftX:%d leftY:%d rightX:%d rightY:%d heading:%d",subsystemLeftX,subsystemLeftY,subsystemRightX,subsystemRightY,subsystemHeading);
-                  printf(" *** ");
-                  printf(ctime(time()));
-                  gyroBasedH=mod(gyroBasedH+robot.GetGyroHeading()*pi()/180,2*pi());
-                  gyroBasedX=round(gyroBasedX+gyroLenToDo*cos(gyroBasedH)+shiftEchoVsRotationCenter*cos(gyroBasedH));
-                  gyroBasedY=round(gyroBasedY+gyroLenToDo*sin(gyroBasedH)+shiftEchoVsRotationCenter*sin(gyroBasedH));
-                  if (simulationMode==0)
-                    newX=[nextX,robot.GetHardPosX(),gyroBasedX,subsystemLeftX,subsystemRightX];
-                    newY=[nextY,robot.GetHardPosY(),gyroBasedY,subsystemLeftY,subsystemRightY];
-                  else
-                    newX=[nextX,robot.GetHardPosX(),gyroBasedX];
-                    newY=[nextY,robot.GetHardPosY(),gyroBasedY];
+                  if action=="break."
+                    break
                   endif
-                  gyroBasedX=gyroBasedX-shiftEchoVsRotationCenter*cos(gyroBasedH); % set position to rotation center
-                  gyroBasedY=gyroBasedY-shiftEchoVsRotationCenter*sin(gyroBasedH); % set position to rotation center
-                  if (rotationType==2)
-                    newH=[mod(360+gyroBasedH*180/pi(),360)];
-                  else
-                    newH=[mod(360+robot.GetHardHeading(),360)];
-                  endif
-                  [available,retCode]=QueryCartoAvailability(carto,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading()*pi()/180,1);
-                  if(available==false)
-                    probHardMoveOk=1;  % the hard position is theoriticaly not possible
-                    printf("the hard position is theoriticaly not possible. *** x:%d y:%d h:%d ",robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading())
-                    printf(ctime(time()))
-                  endif
-                  newProb=[probExpectedMoveOk,probHardMoveOk];
-                  if (probExpectedMoveOk >= probHardMoveOk)
-                    spaceNO=SpaceNorthOrientation(zonesXY,newX(1),newY(1))-shiftNO-robot.northOrientation;  
-                  else
-                    spaceNO=SpaceNorthOrientation(zonesXY,newX(2),newY(2))-shiftNO-robot.northOrientation;
-                  endif
-                  headingNO=mod(360+spaceNO+shiftNO,360); 
-    %							prob=newProb;
-                  [line,col]=size(newX);
-                  weightEcho=[];
-                  if (rotationType==2)
-                    averageH=gyroBasedH;
-                  else
-                    alpha1=newH*pi()/180;
-                    alpha3=saveTargetHeading*pi()/180;
-                    if (simulationMode==1)
-                      averageH=atan2((sin(alpha1)+sin(alpha3)),(cos(alpha1)+cos(alpha3)));
-                    else
-                      alpha2=headingNO*pi()/180;
-                      averageH=mod(atan2((sin(alpha1)+sin(alpha2)+sin(alpha3)),(cos(alpha1)+cos(alpha2)+cos(alpha3)))+2*pi(),2*pi());
+                  if action=="resume"
                     endif
-                  endif
-                  printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%f SpaceNO:%d RobotNO:%d Gyro:%d*** ",newH,headingNO,saveTargetHeading,averageH*180/pi(),spaceNO,robot.northOrientation,robot.GetGyroHeading());
+                endif
+  %							robot.GetGyroHeading
+                traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
+                probExpectedMoveOk=50;
+                if (retCode==robot.moveKoDueToSpeedInconsistancy )
+                  newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
+                  printf("incompleted DueToSpeedInconsistancy expected: %d actual:%d %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
                   printf(ctime(time()))
-    %							[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH)
+                  particles=MoveParticles(rotationToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
+                  probExpectedMoveOk=25;
+                  gyroLenToDo=newLenToDo;
+                endif	
+                if (retCode==robot.moveKoDueToObstacle )
+                  newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
+                  printf("incompleted move due to obstacle expected: %d actual:%d  %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
+                  printf(ctime(time()))
+                  particles=MoveParticles(rotationToDo,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
+                  probExpectedMoveOk=25;				
+                  gyroLenToDo=newLenToDo;
+                endif														
+                if (retCode==robot.moveUnderLimitation)
+                  printf("no move moveUnderLimitation. *** ")
+                  printf(ctime(time()))
+                  particles=lastParticles;
+                  probExpectedMoveOk=1;
+                endif
+                if (retCode==robot.moveKoDueToNotEnoughSpace)
+                  printf("no move moveKoDueToNotEnoughSpace. *** ")
+                  printf(ctime(time()))
+                  particles=lastParticles;
+                  probExpectedMoveOk=1;
+                endif
+                if (robot.BNOLocFlag==0)
+                  robot.ValidHardPosition();
+                else
+                  pause(1);
+                  robot.ValidHardPosition();
+                endif
+                subsystemLeftX=robot.BNOLeftPosX;
+                subsystemLeftY=robot.BNOLeftPosY;
+                subsystemRightX=robot.BNORightPosX;
+                subsystemRightY=robot.BNORightPosY;
+                subsystemHeading=robot.BNOLocHeading;
+                printf("Subsystem location leftX:%d leftY:%d rightX:%d rightY:%d heading:%d",subsystemLeftX,subsystemLeftY,subsystemRightX,subsystemRightY,subsystemHeading);
+                printf(" *** ");
+                printf(ctime(time()));
+                gyroBasedH=mod(gyroBasedH+robot.GetGyroHeading()*pi()/180,2*pi());
+                gyroBasedX=round(gyroBasedX+gyroLenToDo*cos(gyroBasedH)+shiftEchoVsRotationCenter*cos(gyroBasedH));
+                gyroBasedY=round(gyroBasedY+gyroLenToDo*sin(gyroBasedH)+shiftEchoVsRotationCenter*sin(gyroBasedH));
+                if (simulationMode==0)
+                  newX=[nextX,robot.GetHardPosX(),gyroBasedX,subsystemLeftX,subsystemRightX];
+                  newY=[nextY,robot.GetHardPosY(),gyroBasedY,subsystemLeftY,subsystemRightY];
+                else
+                  newX=[nextX,robot.GetHardPosX(),gyroBasedX];
+                  newY=[nextY,robot.GetHardPosY(),gyroBasedY];
+                endif
+                gyroBasedX=gyroBasedX-shiftEchoVsRotationCenter*cos(gyroBasedH); % set position to rotation center
+                gyroBasedY=gyroBasedY-shiftEchoVsRotationCenter*sin(gyroBasedH); % set position to rotation center
+                if (rotationType==2)
+                  newH=[mod(360+gyroBasedH*180/pi(),360)];
+                else
+                  newH=[mod(360+robot.GetHardHeading(),360)];
+                endif
+                [available,retCode]=QueryCartoAvailability(carto,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading()*pi()/180,1);
+                if(available==false)
+                  probHardMoveOk=1;  % the hard position is theoriticaly not possible
+                  printf("the hard position is theoriticaly not possible. *** x:%d y:%d h:%d ",robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading())
+                  printf(ctime(time()))
+                endif
+                newProb=[probExpectedMoveOk,probHardMoveOk];
+                if (probExpectedMoveOk >= probHardMoveOk)
+                  spaceNO=SpaceNorthOrientation(zonesXY,newX(1),newY(1))-shiftNO-robot.northOrientation;  
+                else
+                  spaceNO=SpaceNorthOrientation(zonesXY,newX(2),newY(2))-shiftNO-robot.northOrientation;
+                endif
+                headingNO=mod(360+spaceNO+shiftNO,360); 
+  %							prob=newProb;
+                [line,col]=size(newX);
+                weightEcho=[];
+                if (rotationType==2)
+                  averageH=gyroBasedH;
+                else
+                  alpha1=newH*pi()/180;
+                  alpha3=saveTargetHeading*pi()/180;
+                  if (simulationMode==1)
+                    averageH=atan2((sin(alpha1)+sin(alpha3)),(cos(alpha1)+cos(alpha3)));
+                  else
+                    alpha2=headingNO*pi()/180;
+                    averageH=mod(atan2((sin(alpha1)+sin(alpha2)+sin(alpha3)),(cos(alpha1)+cos(alpha2)+cos(alpha3)))+2*pi(),2*pi());
+                  endif
+                endif
+                printf ("Heading hard H:%d  NO:%d Theoretical H:%d  Average:%f SpaceNO:%d RobotNO:%d Gyro:%d*** ",newH,headingNO,saveTargetHeading,averageH*180/pi(),spaceNO,robot.northOrientation,robot.GetGyroHeading());
+                printf(ctime(time()))
+  %							[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH)
+                [weightEcho,retValue,echo,quality] = TestLocationEchoConsistancyVsDB(robot,carto,newX,newY,averageH,parametersNameList);
+                if (retValue==0)
+                  traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
+                endif
+  %{							
+                if (median(weightEcho)<50)
+                  [weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH);
+                endif
+                traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo]];
+                if (median(weightEcho)<50 && max(weightEcho)<80)
+                  weightEcho=[1,1,1]; 		%non significative mesurments							
+                else
+                  if (((median(weightEcho)-min(weightEcho))/mean(weightEcho)) < 0.3)
+                    weightEcho=[1,1,1];   %non significative diffrences beetwen mesurments		 
+                  endif
+                endif
+  %}
+                [nbRow,nbCol]=size(weightEcho);
+                if (retValue!=0)
                   [weightEcho,retValue,echo,quality] = TestLocationEchoConsistancyVsDB(robot,carto,newX,newY,averageH,parametersNameList);
                   if (retValue==0)
                     traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
                   else
-                      printf("no echo consistancy data *** ");
-                      printf(ctime(time()));
-                      for i=1:col	
+                    printf("no echo consistancy data");
+                    for i=1:col	
                       weightEcho(i)=1;
-                      endfor;	                
+                    endfor;	
                   endif
-
-                [nbRow,nbCol]=size(weightEcho);
-
-                printf("best quality (0: one is perfect):%f",quality);
-
+                else
+                  printf("echo consistancy prob:");
+                  for i=1:col	
+                    printf(" %f ",weightEcho(i));
+                  endfor;
+                  printf("best quality (0: one is perfect):%f",quality);
+                endif
                 printf(" *** ");
                 printf(ctime(time()));
                 weightEcho=weightEcho.*echoBalance   % 
@@ -392,7 +462,7 @@
   %							robot.SetCurrentLocProb(prob(1));
                 printf("update hard robot... *** X:%d Y:%d H:%d *** ",robot.GetPosX(),robot.GetPosY(),robot.GetHeading())
                 printf(ctime(time()))
-                while(robot.GetPosX()!=robot.GetHardPosX() || mod(robot.GetPosY(),360)!=mod(robot.GetHardPosY(),360) || mod(robot.GetHeading(),360)!=mod(robot.GetHardHeading(),360))
+                while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || robot.GetHeading()!=robot.GetHardHeading())
                   robot.UpdateHardRobotLocation();	
                   WaitFor=WaitRobotUpdate;
                   retCode=WaitForRobot(robot,WaitFor);
@@ -404,7 +474,7 @@
                   endif
                 end
                 particles=ResampleParticles(img,plotOff,particles);
-              
+                
                 if (mod(360+newH,360)-mod(360+headingNO,360)>15)  % to much difference between robot calculation and NO
                   printf("inconsitancy heading:%d headingNO:%d NO:%d SpaceNO:%d *** ",newH,headingNO,robot.northOrientation,spaceNO)
                   printf(ctime(time()))
@@ -430,113 +500,4 @@
   save ("-mat4-binary","traceRobot.mat","traceRobot");
   save ("-mat4-binary","traceEcho.mat","traceEcho");
   hold off
-    function [retCode,action]=robotRotate(rotation)
-                  printf(ctime(time()))
-                  aligned=false;
-                  action="......";
-                  lastParticles=particles;          % to be able to recover in case of move failure   
-                  if (rotationType==1)
-                    saveNO=robot.northOrientation;
-                    printf("NO rotate robot NO: %d rotation:%d  *** ",robot.northOrientation,rotationToDo)
-                    printf(ctime(time()));									
-                    robot.RobotNorthRotate(mod(round(rotationToDo)+360,360));    % rotation based on north orientation
-                    WaitFor=WaitNorthAlign;
-                  endif
-                  if (rotationType==2)
-                    printf("gyro rotate robot  rotation:%d  *** ",rotationToDo)
-                    printf(ctime(time()));						
-                    robot.RobotGyroRotate(round(rotationToDo));    % rotation based gyroscope
-                    WaitFor=WaitMove;
-                  endif
-                  if (rotationType==3)
-                    printf("wheels rotate robot  rotation:%d  *** ",rotationToDo)
-                    printf(ctime(time()));							
-                    robot.Move(round(rotationToDo),0);    % rotation based on wheels encoders
-                    WaitFor=WaitMove;
-                  endif								
-                  retCode=WaitForRobot(robot,WaitFor);
-                  particles=MoveParticles(rotationToDo,0,img,plotOff,particles,shiftEchoVsRotationCenter);
-                  if (retCode==0)
-                    aligned=true;
-                  else
-                      if (retCode==robot.moveKoDueToNotEnoughSpace)
-                            printf("no rotation moveKoDueToNotEnoughSpace. *** ")
-                            printf(ctime(time()))
-                            particles=lastParticles;
-                       else
-                            [issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
-                            if (action=="stop..")
-                              return;
-                            endif
-                       endif
-                  endif
-
-                if (rotationType==1 && aligned==true)
-                  robot.SetHeading(mod(360+robot.GetHardHeading()+robot.northOrientation-saveNO,360));
-                endif
-                if (rotationType==2&& aligned==true)
-                  robot.SetHeading(mod(360+saveHeading+robot.GetGyroHeading(),360));
-                  gyroBasedH=gyroBasedH+robot.GetGyroHeading()*pi()/180;
-                endif
-                if (rotationType==3&& aligned==true)
-                  robot.SetHeading(mod(360+robot.GetHardHeading(),360));
-                endif
-
-    endfunction
-    function retCode=robotMoveStraight(lenToDo)
-                robot.Move(0,lenToDo); 		 % len sent in cm
-                lastParticles=particles;          % to be able to recover in case of move failure     
-                particles=MoveParticles(0,lenToDo,img,plotOff,particles,shiftEchoVsRotationCenter);
-                retCode=WaitForRobot(robot,WaitMove);
-                if (retCode>=99)  
-                  [issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
-                  if action=="stop.."
-                    return
-                  endif
-                  if action=="break."
-                    break
-                  endif
-                  if action=="resume"
-                    endif
-                endif  
-  %							robot.GetGyroHeading
-                traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
-                probExpectedMoveOk=50;
-                if (retCode==robot.moveKoDueToWheelStopped )
-                  newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
-                  printf("incompleted moveKoDueToWheelStopped expected: %d actual:%d %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
-                  printf(ctime(time()))
-                  particles=lastParticles;
-                  particles=MoveParticles(0,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
-                  probExpectedMoveOk=25;
-                  gyroLenToDo=newLenToDo;
-                endif	
-                if (retCode==robot.moveKoDueToObstacle )
-                  newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
-                  printf("incompleted move due to obstacle ! Expected dist: %d actual:%d  %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
-                  printf(ctime(time()))
-                  particles=lastParticles;
-                  particles=MoveParticles(0,newLenToDo,img,plotOff,lastParticles,shiftEchoVsRotationCenter);
-                  probExpectedMoveOk=25;				
-                  gyroLenToDo=newLenToDo;
-                endif														
-                if (retCode==robot.moveUnderLimitation)
-                  printf("no move moveUnderLimitation. *** ")
-                  printf(ctime(time()))
-                  particles=lastParticles;
-                  probExpectedMoveOk=1;
-                endif
-                if (retCode==robot.moveKoDueToNotEnoughSpace)
-                  printf("no move moveKoDueToNotEnoughSpace. *** ")
-                  printf(ctime(time()))
-                  particles=lastParticles;
-                  probExpectedMoveOk=1;
-                endif
-                if (robot.BNOLocFlag==0)
-                  robot.ValidHardPosition();
-                else
-                  pause(1);
-                  robot.ValidHardPosition();
-                endif
-              endfunction
   endfunction

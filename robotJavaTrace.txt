@@ -1,0 +1,318 @@
+create trace
+2017-05-25 18:59:00.02 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 18:59:02.657 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 18:59:06.16 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 18:59:06.162 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 18:59:11.761 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 18:59:15.148 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 18:59:17.801 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 18:59:21.279 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 18:59:21.282 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 18:59:26.878 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 18:59:30.306 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 18:59:32.939 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 18:59:36.413 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 18:59:36.415 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 18:59:42.02 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 18:59:45.404 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 18:59:48.041 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 18:59:51.521 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 18:59:51.523 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 18:59:57.139 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:00:00.535 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:00:03.213 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:00:06.72 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:00:06.722 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:00:12.277 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:00:15.679 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:00:18.301 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:00:21.782 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:00:21.784 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:00:27.401 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:00:30.782 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:00:33.424 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:00:36.903 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:00:36.905 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:00:42.52 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:00:44.377 SendUDP: send init
+2017-05-25 19:00:45.163 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:00:45.165 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:00:45.982 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:00:45.983 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:00:51.608 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:00:54.99 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:00:57.623 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:01:01.103 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:01:01.104 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:01:06.723 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:01:10.104 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:01:12.743 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:01:16.223 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:01:16.225 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:01:21.842 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:01:25.224 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:01:27.884 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:01:30.312 SendUDP: send init
+2017-05-25 19:01:31.085 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:01:31.087 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:01:31.843 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:01:31.844 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:01:36.989 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:01:40.384 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:01:43.031 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:01:46.494 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:01:46.495 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:01:52.105 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:01:55.485 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:01:58.125 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:02:01.625 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:02:01.627 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:02:07.236 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:02:10.611 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:02:13.247 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:02:16.751 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:02:16.753 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:02:22.343 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:02:25.746 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:02:28.395 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:02:31.886 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:02:31.887 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:02:37.493 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:02:40.871 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:02:43.506 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:02:46.986 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:02:46.987 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:02:52.607 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:02:55.987 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:02:58.626 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:03:02.126 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:03:02.127 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:03:07.726 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:03:11.106 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:03:13.767 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:03:17.247 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:03:17.248 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:03:22.851 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:03:26.246 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:03:28.888 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:03:32.375 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:03:32.376 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:03:37.987 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:03:41.368 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:03:44.008 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:03:47.489 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:03:47.49 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:03:53.112 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:03:56.492 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:03:59.128 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:04:02.628 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:04:02.63 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:04:08.228 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:04:11.608 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:04:14.357 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:04:17.747 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:04:17.748 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:04:23.35 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:04:26.749 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:04:29.389 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:04:32.893 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:04:32.895 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:04:38.5 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:04:41.878 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:04:44.53 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:04:48.016 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:04:48.018 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:04:53.61 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:04:56.989 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:04:59.629 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:05:03.129 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:05:03.131 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:05:08.734 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:05:12.113 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:05:14.774 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:05:18.248 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:05:18.25 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:05:23.851 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:05:27.25 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:05:29.89 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:05:33.372 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:05:33.374 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:05:38.994 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:05:42.373 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:05:45.009 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:05:48.5 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:05:48.502 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:05:54.122 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:05:57.509 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:06:00.142 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:06:03.632 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:06:03.633 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:06:09.231 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:06:12.612 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:06:15.27 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:06:18.78 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:06:18.78 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:06:24.38 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:06:27.762 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:06:30.408 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:06:33.881 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:06:33.882 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:06:39.493 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:06:42.873 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:06:45.513 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:06:48.994 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:06:48.995 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:06:54.614 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:06:57.992 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:07:00.633 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:07:04.134 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:07:04.136 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:07:09.734 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:07:13.113 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:07:15.774 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:07:19.252 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:07:19.253 RobotBatchServer: posX:55 posY:55 angle:0
+2017-05-25 19:07:26.818 RobotBatchServer:  BNO status mode 0x:0 calibration status 0x:0 system status 0x:0 system error 0x:0
+2017-05-25 19:07:30.295 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0xFF  I2C:0x04
+2017-05-25 19:07:30.296 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:07:35.895 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:07:39.274 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:07:41.935 RobotBatchServer:  BNO status mode 0x:0 calibration status 0x:0 system status 0x:0 system error 0x:0
+2017-05-25 19:07:46.836 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0xFF  I2C:0x04
+2017-05-25 19:07:46.837 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:07:50.095 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0xFF  I2C:0x04
+2017-05-25 19:07:50.097 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:07:53.135 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:07:53.137 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:07:58.734 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:08:02.174 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:08:04.756 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:08:08.237 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:08:08.238 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:08:13.86 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:08:17.236 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:08:19.877 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:08:23.356 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:08:23.357 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:08:28.977 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:08:32.356 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:08:34.996 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:08:38.476 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:08:38.477 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:08:44.096 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:08:47.477 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:08:50.118 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:08:53.618 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:08:53.619 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:08:59.215 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:09:02.598 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:09:05.255 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:09:08.755 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:09:08.757 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:09:14.357 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:09:17.767 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:09:20.4 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:09:23.875 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:09:23.876 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:09:29.477 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:09:32.858 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:09:35.497 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:09:38.978 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:09:38.98 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:09:44.598 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:09:47.976 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:09:50.619 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:09:54.119 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:09:54.121 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:09:59.719 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:10:03.098 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:10:05.759 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:10:09.238 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:10:09.239 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:10:14.839 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:10:18.239 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:10:20.878 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:10:24.358 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:10:24.36 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:10:29.99 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:10:33.362 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:10:36.003 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:10:39.491 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:10:39.493 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:10:45.119 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:10:48.48 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:10:51.121 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:10:54.62 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:10:54.622 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:11:00.22 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:11:03.601 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:11:06.261 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:11:09.746 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:11:09.747 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:11:15.338 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:11:18.758 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:11:21.397 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:11:24.886 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:11:24.887 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:11:48.871 RobotBatchServer:  BNO status mode 0x:0 calibration status 0x:0 system status 0x:0 system error 0x:0
+2017-05-25 19:11:49.627 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0xFF  I2C:0x00
+2017-05-25 19:11:49.628 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:11:50.247 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:11:50.925 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:11:51.228 RobotBatchServer:  BNO status mode 0x:0 calibration status 0x:0 system status 0x:0 system error 0x:0
+2017-05-25 19:11:54.667 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0xFF  I2C:0x04
+2017-05-25 19:11:54.668 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:11:57.907 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0xFF  I2C:0x04
+2017-05-25 19:11:57.908 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:12:00.927 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:12:00.928 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:12:06.526 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:12:09.905 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:12:12.547 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:12:16.046 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:12:16.047 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:12:21.649 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:12:25.026 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:12:27.69 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:12:31.178 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:12:31.179 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:12:36.769 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:12:40.147 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:12:42.812 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:12:46.288 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:12:46.29 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:12:51.887 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:12:55.287 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:12:57.941 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:13:01.41 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:13:01.411 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:13:07.009 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:13:10.409 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:13:13.048 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:13:16.529 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:13:16.53 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:13:22.151 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:13:25.528 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:13:28.169 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:bf system status 0x:5 system error 0x:0
+2017-05-25 19:13:31.649 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:13:31.65 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:13:37.269 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:13:40.658 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:13:43.289 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:13:46.794 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:13:46.795 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:13:52.393 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:13:55.777 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:13:58.434 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:14:01.916 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:14:01.917 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:14:07.513 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:14:10.911 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:14:13.552 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:14:17.048 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:14:17.048 RobotBatchServer: posX:0 posY:0 angle:0
+2017-05-25 19:14:22.651 RobotBatchServer: leftHoles RightHoles  0 0
+2017-05-25 19:14:26.03 RobotBatchServer: encoder leftHigh leftMaxLevel leftLow leftMinLevel rightHigh rightMaxLevel rightLow rightMinLevel  650 0 250 0 640 0 220 0
+2017-05-25 19:14:28.67 RobotBatchServer:  BNO status mode 0x:c calibration status 0x:ff system status 0x:5 system error 0x:0
+2017-05-25 19:14:32.152 RobotBatchServer:  diagPower:0x00  Motors:0x00  Robot:0x00  I2C:0x04
+2017-05-25 19:14:32.152 RobotBatchServer: posX:0 posY:0 angle:0

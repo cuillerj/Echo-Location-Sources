@@ -1,4 +1,8 @@
 function [rc] = InitRobotParameters(robot,parametersNameList);
+  %{
+  this function get some parameters target values and download this value inside the robot using Java driver
+  %}
+  
 if (robot.runningStatus<=0)
 	rc=-1
 	return

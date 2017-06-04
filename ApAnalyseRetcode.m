@@ -1,5 +1,6 @@
-function [issue,action] = analyseRetcode(robot,retCode,currentAction,callFrom)
-
+function [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode)
+currentAction=apGet(apRobot,"waitFor");
+callFrom=apGet(apRobot,"callFrom")
 if retCode==-1
 	printf("timeout action: %d  called from: %d *** ",currentAction,callFrom)
 	printf(ctime(time()))
@@ -12,11 +13,11 @@ else
 		if (retCode == testedValue)
 				action="noMove"
 		endif
-		testedValue=robot.moveKoDueToSpeedInconsistancy
+		testedValue=robot.moveKoDueToWheelStopped;
 		if (retCode == testedValue)
 				action="inMove"
 		endif
-		testedValue=robot.moveKoDueToObstacle
+		testedValue=robot.moveKoDueToObstacle;
 		if (retCode == testedValue)
 				action="obstac"
 		endif

@@ -22,9 +22,9 @@ function [detX,detY,detH,particles] = DetermineRobotLocationWithParticlesGaussia
 	endfor
 	particles(:,4)=particles(:,4)/sum(particles(:,4));  % normalyze the weight to get probability
 	[w,idx]=max(particles(:,4));
-	detX=particles(idx,1);
-	detY=particles(idx,2);
-	detH=particles(idx,3);
+	detX=round(particles(idx,1));
+	detY=round(particles(idx,2));
+	detH=round(mod(particles(idx,3),360));
 	if (plotOn)
 		figure();
 		title ("determined particles");
