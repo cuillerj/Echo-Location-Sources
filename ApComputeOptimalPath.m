@@ -7,49 +7,69 @@ function [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,targe
   optimalPath=apGet(apRobot,"optimalPath");
   carto=apGet(apRobot,"carto");
   stepSize=apGet(apRobot,"stepSize");
+  farPointDistance=apGet(apRobot,"farPointDistance");
   [apRobot,robot,closestStartOptimalPoint,startIdx] = ApFindClosestOptimalLocation(apRobot,robot,currentL);
   [apRobot,robot,closestEndOptimalPoint,endIdx] = ApFindClosestOptimalLocation(apRobot,robot,targetL);
   printf(mfilename);
   printf(" current loc: %d %d %d optimal start %d %d %d optimal end %d %d %d target %d %d %d *** ",currentL(1),currentL(2),currentL(3),closestStartOptimalPoint(1),closestStartOptimalPoint(2),closestStartOptimalPoint(3),closestEndOptimalPoint(1),closestEndOptimalPoint(2),closestEndOptimalPoint(3),targetL(1),targetL(2),targetL(3));
  	printf(ctime(time())); 
   if (sum(currentL(1:2)==closestStartOptimalPoint(1:2))!=2)  % (x,y) are different
-     printf("1:");
   	 [rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,[closestStartOptimalPoint(1),closestStartOptimalPoint(2),closestStartOptimalPoint(3)]);
      if (possible)
-         printf(mfilename);
-         printf(" call astar search to reach the optimal path *** ");
- 	       printf(ctime(time())); 
-       pathStep=[pathStep;[closestStartOptimalPoint(1),closestStartOptimalPoint(2)]]
+       pathStep=[pathStep;[closestStartOptimalPoint(1),closestStartOptimalPoint(2)]];
      else
+       printf(mfilename);
+       printf(" call astar search to reach the optimal path *** ");
+ 	     printf(ctime(time())); 
        [apRobot,robot,AStarPath,pathStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,closestStartOptimalPoint,plotOn);
      endif
   endif
-  if (endIdx-startIdx>2)
+  lastStep=[closestStartOptimalPoint(1),closestStartOptimalPoint(2)];
+  if (startIdx>endIdx)
+    idx=startIdx;
+    startIdx=endIdx;
+    endIdx=idx;
+    optimalPath=flipud(optimalPath);
+    optimalPath(:,3)=mod(optimalPath(:,3)+180,360);
+  endif
+  if (abs(endIdx-startIdx)>2)
     for i=startIdx+1:endIdx-1
       if (i==endIdx-1)
         pathStep=[pathStep;[optimalPath(i,1),optimalPath(i,2)]];      
       else
         if (optimalPath(i+1,3)!=optimalPath(i,3))
           pathStep=[pathStep;[optimalPath(i,1),optimalPath(i,2)]];
+          lastStep=[optimalPath(i,1),optimalPath(i,2)];
          endif
+         if (sqrt((lastStep(1)-optimalPath(i,1))^2+(lastStep(2)-optimalPath(i,2))^2)>=farPointDistance-1)
+           pathStep=[pathStep;[optimalPath(i,1),optimalPath(i,2)]];
+           lastStep=[optimalPath(i,1),optimalPath(i,2)];
+          endif
       endif
     end
   endif
   if (sum(targetL(1:2)==closestEndOptimalPoint(1:2))!=2)
-      printf("2:");
      [rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,[closestEndOptimalPoint(1),closestEndOptimalPoint(2),closestEndOptimalPoint(3)],targetL);
      if (possible)
-         printf(mfilename);
-         printf(" call astar search to leave the optimal path *** ");
- 	       printf(ctime(time())); 
        pathStep=[pathStep;[closestEndOptimalPoint(1),closestEndOptimalPoint(2)]];
      else
+       printf(mfilename);
+       printf(" call astar search to leave the optimal path *** ");
+ 	     printf(ctime(time()));      
       [apRobot,robot,AStarPath,pathStep,cost,forward] = ApAStarSearch(apRobot,robot,closestEndOptimalPoint,targetL,plotOn);
      endif     
-
+       printf(mfilename);
+       printf("  path= ");
+       for i=1:size(pathStep,1)      
+          printf(" (%d,%d) ",pathStep(i,1),pathStep(i,2));
+       end
+ 	     printf(ctime(time())); 
   endif
        pathStep=[pathStep;[targetL(1),targetL(2)]];
        apRobot = setfield(apRobot,"pathStep",pathStep);
-       next=pathStep(1,1:2)
+       next=pathStep(1,1:2);
+       if (plotOn)
+          ApShowStep(apRobot,pathStep,"optimal path");
+       endif 
   endfunction
   

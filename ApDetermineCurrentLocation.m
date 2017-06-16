@@ -1,7 +1,7 @@
-function [apRobot,robot] = ApDetermineCurrentLocation(apRobot,robot,manualMode);
-  printf("ApDetermineCurrentLocation\n")
+function [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robot,manualMode);
   locationProbThresholdHigh=apGet(apRobot,"locProbThresholdHigh");  % limit over wich location quality is reliable
   locationProbThresholdLow=apGet(apRobot,"locProbThresholdLow");  % limit under wich location quality is not reliable
+  stopRequested=false;
   if (!exist("manualMode"))  % automatic location discovery is default mode 
      manualMode=true;
   endif
@@ -9,25 +9,35 @@ function [apRobot,robot] = ApDetermineCurrentLocation(apRobot,robot,manualMode);
   if (manualMode==true )   % terminal input expected
       validate=false;
       while (validate==false)
-        initialLocation(1)=input("enter current location X: ");
-        initialLocation(2)=input("enter current location Y: ");
-        initialLocation(3)=input("enter current location heading: ");
-        initialProb=input("enter current location probability: ");
+        initialLocation(1)=input("enter current location X (0 to stop): ");
+        initialLocation(2)=input("enter current location Y (0 to stop): ");
+        initialLocation(3)=input("enter current location heading (0 to stop): ");
+        initialProb=input("enter current location probability (0 to stop): ");
         printf("do you confirm this location: X=%d Y=%d H=%d Prob=%d ? ",initialLocation(1),initialLocation(2),initialLocation(3),initialProb);
         validate=yes_or_no("yes or no");
+        if (initialLocation(1)==0 && initialLocation(2)==0 &&initialLocation(3)==0 && initialProb==0)
+          printf(mfilename);
+          printf(" stop requested  *** ");
+          printf(ctime(time()));
+          stopRequested=true;
+          return
+        endif
         [available,retCode] = ApQueryCartoAvailability(apRobot,initialLocation,0,1);
-        if(!available)
-          printf("current location not available: X=%d Y=%d H=%d ? ",initialLocation(1),initialLocation(2),initialLocation(3));
+        if(!available )
+          printf(mfilename);
+          printf(" current location not available: X=%d Y=%d H=%d ? ",initialLocation(1),initialLocation(2),initialLocation(3));
+          printf(ctime(time()));
           validate=false;
         endif
       end
     apRobot = setfield(apRobot,"location",initialLocation);
-    apRobot = setfield(apRobot,"gyroLocation",[initialLocation(1),initialLocation(2),initialLocation(3)*pi()/180]);
+    apRobot = setfield(apRobot,"gyroLocation",initialLocation);
     apRobot = setfield(apRobot,"locationProb",initialProb);
     if (realMode)  % real mode running
          robotStatus=robot.runningStatus;
          if (robotStatus<=0)
-          printf("wait for robot to be ready  *** ");
+          printf(mfilename);
+          printf(" wait for robot to be ready  *** ");
           printf(ctime(time()));
          endif
         while (robotStatus<=0)              % wait for robot to be ready

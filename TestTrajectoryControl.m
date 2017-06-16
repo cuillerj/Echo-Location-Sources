@@ -499,7 +499,7 @@
                   if action=="resume"
                     endif
                 endif  
-  %							robot.GetGyroHeading
+ 
                 traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
                 probExpectedMoveOk=50;
                 if (retCode==robot.moveKoDueToWheelStopped )

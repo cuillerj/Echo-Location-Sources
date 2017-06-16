@@ -17,7 +17,10 @@ rotationCenterX=currentX-shiftEchoVsRotationCenter*cos(currentHeadingGrad);
 rotationCenterY=currentY-shiftEchoVsRotationCenter*sin(currentHeadingGrad);
 if ((nextX-rotationCenterX)!=0)
 %	if((nextY-rotationCenterY)!=0)
-		deltaAlpha=atan((nextY-rotationCenterY)/(nextX-rotationCenterX))*180/pi
+		deltaAlpha=atan((nextY-rotationCenterY)/(nextX-rotationCenterX))*180/pi;
+    if ((nextX-rotationCenterX)<0)
+      forward=-forward;
+    endif
 %	else
 %		deltaAlpha=0
 %	endif
@@ -29,8 +32,8 @@ else
 	endif
 endif
 rotationToDo=deltaAlpha-currentHeading;
-shiftRotationX=shiftEchoVsRotationCenter*cos(deltaAlpha*pi/180)
-shiftRotationY=shiftEchoVsRotationCenter*sin(deltaAlpha*pi/180)
+shiftRotationX=shiftEchoVsRotationCenter*cos(deltaAlpha*pi/180);
+shiftRotationY=shiftEchoVsRotationCenter*sin(deltaAlpha*pi/180);
 minRotToBeDone=apGet(apRobot,"minRotToBeDone");
 if (abs(rotationToDo)<minRotToBeDone)
 	if (minRotToBeDone-abs(rotationToDo)<minRotToBeDone/2)
@@ -49,9 +52,9 @@ lenToDo=sqrt((nextX-(rotationCenterX+shiftRotationX))^2+(nextY-(rotationCenterY+
 printf(mfilename);
 printf(" Compute Move Robot rotCenterX:%d rotCenterY:%d rotation:%d dist:%d. *** ",rotationCenterX,rotationCenterY,rotationToDo,lenToDo);
 printf(ctime(time()));
-[rotationToDo,lenToDo,forward] = OptimizeMoveToDo(rotationToDo,lenToDo,forward);
+[rotationToDo,lenToDo,forward] = ApOptimizeMoveToDo(rotationToDo,lenToDo,forward);
 rotationToDo=round(rotationToDo);
-lenToDo=round(lenToDo);
+lenToDo=round(lenToDo)*forward;
 printf(mfilename);
 printf(" optimize Move Robot  rotation:%d dist:%d. *** ",rotationToDo,lenToDo);
 printf(ctime(time()));

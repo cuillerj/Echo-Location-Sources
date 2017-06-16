@@ -17,7 +17,7 @@ function [apRobot] = ApSetDestinationLocation(apRobot,inputMode);
          validate=false;
       endif
     end
-    apRobot = setfield(apRobot,"destLocation",destLocation);
+    apRobot = setfield(apRobot,"destination",destLocation);
     apRobot = setfield(apRobot,"newTarget",true);
     return
   else

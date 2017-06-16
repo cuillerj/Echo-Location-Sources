@@ -37,9 +37,9 @@ if (apGet(apRobot,"simulationMode")==0)
 endif
   
 [nbLine,nbCol]=size(posX);                  % get the vector size
-WaitServoAlign=robot.servoAlignEnd;          % define the wait for servo motor aligment value
-WaitPingFB=robot.pingFBEnd;                  % define the wait for ping code value
-callFrom=1;          % define the main function for the waitFor function
+%WaitServoAlign=robot.servoAlignEnd;          % define the wait for servo motor aligment value
+%WaitPingFB=robot.pingFBEnd;                  % define the wait for ping code value
+%callFrom=1;          % define the main function for the waitFor function
 coefWeight=1;        % reserved to adjust weight if necessary
 simuParam1=10;       % coefficient used to determine the noise in simulation mode - Increasing the value will increase the noise
 simulationMode=90;    % used to identify the simulation mode  (retCode of waitFor function)
@@ -84,7 +84,8 @@ endif
 printf(" servoAlign: %d & %d **** ",a1*180/pi(),a2*180/pi()); % print the points list
 printf(ctime(time()))
 robot.RobotAlignServo(round(a1*180/pi()));     % ask the robot to align with X axis taking into account the current heading
-apRobot = setfield(apRobot,"waitFor",servoAlignEnd);
+apRobot = setfield(apRobot,"waitFor",robot.servoAlignEnd);
+[apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 if (retCode!=0 && retCode!=simulationMode )                                % analyse the non zero return code
   [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode)
 	retValue=-1;
@@ -92,6 +93,7 @@ if (retCode!=0 && retCode!=simulationMode )                                % ana
 endif
 robot.PingEchoFrontBack();             %  ask the robot to ping echo front and back
 apRobot = setfield(apRobot,"waitFor",robot.pingFBEnd);
+[apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 if (retCode!=0 && retCode!=simulationMode)                           % analyse the non zero return code
   [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode)
 	retValue=-1;
@@ -111,7 +113,8 @@ else
 endif
 
 robot.RobotAlignServo(round(a2*180/pi())); % ask the robot to align with Y axis taking into account the current heading
-apRobot = setfield(apRobot,"waitFor",servoAlignEnd);
+apRobot = setfield(apRobot,"waitFor",robot.servoAlignEnd);
+[apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 if (retCode!=0 && retCode!=simulationMode)                     % analyse the non zero return code
   [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode)
 	retValue=-1;
@@ -119,6 +122,7 @@ if (retCode!=0 && retCode!=simulationMode)                     % analyse the non
 endif
 robot.PingEchoFrontBack();                 %  ask the robot to ping echo front and back
 apRobot = setfield(apRobot,"waitFor",robot.pingFBEnd);
+[apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 if (retCode!=0 && retCode!=simulationMode)                              % analyse the non zero return code
   [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode)
 	retValue=-1;

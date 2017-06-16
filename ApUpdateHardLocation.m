@@ -22,6 +22,7 @@ function [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,location,prob);
          endif
      endif
    end
+   apRobot = setfield(apRobot,"location",location);
    printf(mfilename);
    printf(" hardPosX:%d hardPosY:%d prob:%d *** ",robot.GetHardPosX(),robot.GetHardPosY(),robot.GetCurrentLocProb());
    printf(ctime(time()))

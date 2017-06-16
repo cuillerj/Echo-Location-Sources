@@ -60,17 +60,21 @@ y=yIn;
 retCode=0;
 if (x <= 0 || x > cartoX)
 	available=false;
-  printf(mfilename);
-	printf(" *** carto not available (1.1) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
-	printf(ctime(time()))
+  if(debugOn)
+    printf(mfilename);
+    printf(" *** carto not available:%d (1.1) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
+    printf(ctime(time()))
+  endif
 	retCode=1;
 	return
 endif
-if (y <= shitfCartoY || y > cartoY+shitfCartoY)
+if (y <= 0 || y > cartoY)
 	available=false;
-  printf(mfilename);
-	printf(" *** carto not available (1.2) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
-	printf(ctime(time()))
+  if(debugOn)
+    printf(mfilename);
+    printf(" *** carto not available:%d (1.2) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
+    printf(ctime(time()))
+  endif
 	retCode=2;
 	return
 endif
@@ -79,7 +83,7 @@ if (carto(x,y)>cartoMaxAvailableValue)
 	available=false;
 	if(debugOn)
   printf(mfilename);
-	printf(" *** carto not available (1.3) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
+	printf(" *** carto not available:%d (1.3) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
 	printf(ctime(time()))
 	endif
 	retCode=3;
@@ -94,7 +98,7 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available center(0-x) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d center(0-x) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=4;
 		return
@@ -103,16 +107,16 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available center (0-x) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d center (0-x) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=5;
 		return
 	endif
 	if (carto(x,y)>cartoMaxAvailableValue)     % check availabity of echo position
 		available=false;
-		if(debugOn)
+ 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available center(0-x) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d center(0-x) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=6;
 		return
@@ -127,7 +131,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back(9-x) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back(9-x) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=7;
 		return
@@ -136,7 +140,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back (9-x) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back (9-x) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=8;
 		return
@@ -145,7 +149,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back(9-x) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back(9-x) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=9;
 		return
@@ -160,7 +164,7 @@ for i=0:round(RobotFrontWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available front(0-1) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d front(0-1) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=10;
 		return
@@ -169,7 +173,7 @@ for i=0:round(RobotFrontWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available front (0-1) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d front (0-1) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=11;
 		return
@@ -178,7 +182,7 @@ for i=0:round(RobotFrontWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available front(0-1) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d front(0-1) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=12;
 		return
@@ -193,7 +197,7 @@ for i=0:round(RobotFrontWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available front(0-3) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d front(0-3) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=13;
 		return
@@ -202,7 +206,7 @@ for i=0:round(RobotFrontWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available front(0-3) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d front(0-3) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=14;
 		return
@@ -211,7 +215,7 @@ for i=0:round(RobotFrontWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available front(0-3) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d front(0-3) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=15;
 		return
@@ -226,7 +230,7 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available right side (1-2) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d right side (1-2) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=16;
 		return
@@ -235,7 +239,7 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available right side (1-2) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d right side (1-2) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=17;
 		return
@@ -244,7 +248,7 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available right side(1-2) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d right side(1-2) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=18;
 		return
@@ -259,7 +263,7 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available left side(3-4) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d left side(3-4) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=19;
 		return
@@ -268,7 +272,7 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
      printf(mfilename);
-			printf(" *** carto not available left side (3-4) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d left side (3-4) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=20;
 		return
@@ -277,7 +281,7 @@ for i=0:round(frontLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available left side(3-4) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d left side(3-4) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=21;
 		return
@@ -292,7 +296,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back right side(5-7) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back right side(5-7) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=22;
 		return
@@ -301,7 +305,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back right side(5-7) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back right side(5-7) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=23;
 		return
@@ -310,7 +314,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back right side(5-7) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back right side(5-7) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=24;
 		return
@@ -325,7 +329,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back left side(6-8) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back left side(6-8) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=25;
 		return
@@ -334,7 +338,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back left side(6-8) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back left side(6-8) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=26;
 		return
@@ -343,7 +347,7 @@ for i=0:round(backLenght/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back left side (6-8) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back left side (6-8) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=27;
 		return
@@ -360,7 +364,7 @@ for i=0:round(RobotBackWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back right(7-9) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back right(7-9) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=28;
 		return
@@ -370,7 +374,7 @@ for i=0:round(RobotBackWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back right(7-9) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back right(7-9) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=29;
 		return
@@ -379,7 +383,7 @@ for i=0:round(RobotBackWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back right(7-9) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back right(7-9) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=30;
 		return
@@ -394,7 +398,7 @@ for i=0:round(RobotBackWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back left(8-9) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d back left(8-9) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=31;
 		return
@@ -404,7 +408,7 @@ for i=0:round(RobotBackWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back left(8-9) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d  back left(8-9) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=32;
 		return
@@ -413,7 +417,7 @@ for i=0:round(RobotBackWidth/gapSize)
 		available=false;
 		if(debugOn)
       printf(mfilename);
-			printf(" *** carto not available back left(8-9) X:%d Y:%d orientation deg: %f .\n",x,y,heading*180/pi())
+			printf(" *** carto not available:%d  back left(8-9) X:%d Y:%d orientation deg: %f .\n",carto(x,y),x,y,heading*180/pi())
 		endif
 		retCode=33;
 		return

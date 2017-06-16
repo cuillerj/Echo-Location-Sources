@@ -14,7 +14,7 @@ function [apRobot,robot,closestOptimalPoint,closestIdx] = ApFindClosestOptimalLo
         closestIdx=i;
 		endif
 	endfor
-  closestOptimalPoint=apGet(apRobot,"optimalPath")(closestIdx,:)
+  closestOptimalPoint=apGet(apRobot,"optimalPath")(closestIdx,:);
 	printf(mfilename);
 	printf(" *** closest optimal step is: X:%d Y:%d H:%d. *** ", closestOptimalPoint(1),closestOptimalPoint(2),closestOptimalPoint(3));
 	printf(ctime(time()));

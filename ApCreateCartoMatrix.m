@@ -11,8 +11,8 @@ carto2=zeros(10*x,10*y);
 for i=0:x-1
 	for j=0:y-1
 		init=X(i+1,j+1);
-			for k=10*i+1:10*i+11
-				for l=10*j+1:10*j+11
+			for k=10*i+1:10*i+10
+				for l=10*j+1:10*j+10
 					carto1(k,l)=init;
 					carto2(k,l)=mod(init+56,256);
 				endfor
@@ -27,7 +27,7 @@ matrix=strcat(name,strfin);
 %name=carto1mg;
 save ("-mat4-binary","carto1img.mat","carto1img")
 clf
-imshow(carto1img,[])
+imshow(flipud(carto1img),[])
 endfunction
 
 

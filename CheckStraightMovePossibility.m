@@ -22,7 +22,7 @@ if (deltaX<0)
 endif
 newAngle=mod(rotation+currentHeading,360);
 cosA=cos(mod(rotation+currentHeading,360)*pi()/180);
-sinA=cos(mod(rotation+currentHeading,360)*pi()/180);
+sinA=sin(mod(rotation+currentHeading,360)*pi()/180);
 distance = sqrt(deltaX^2 + deltaY^2);
 delta=10;
 while (delta<distance && possible==true)

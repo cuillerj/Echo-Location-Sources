@@ -37,7 +37,6 @@ if (abs(rotationToDo)<value)
 endif
 
 if (forward==-1)
-
 	rotationToDo=mod(rotationToDo+180,360);
 endif
 lenToDo=sqrt((nextX-(rotationCenterX+shiftRotationX))^2+(nextY-(rotationCenterY+shiftRotationY))^2)*forward;
