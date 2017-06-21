@@ -14,7 +14,7 @@ function [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,targe
   printf(" current loc: %d %d %d optimal start %d %d %d optimal end %d %d %d target %d %d %d *** ",currentL(1),currentL(2),currentL(3),closestStartOptimalPoint(1),closestStartOptimalPoint(2),closestStartOptimalPoint(3),closestEndOptimalPoint(1),closestEndOptimalPoint(2),closestEndOptimalPoint(3),targetL(1),targetL(2),targetL(3));
  	printf(ctime(time())); 
   if (sum(currentL(1:2)==closestStartOptimalPoint(1:2))!=2)  % (x,y) are different
-  	 [rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,[closestStartOptimalPoint(1),closestStartOptimalPoint(2),closestStartOptimalPoint(3)]);
+  	 [apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,[closestStartOptimalPoint(1),closestStartOptimalPoint(2),closestStartOptimalPoint(3)]);
      if (possible)
        pathStep=[pathStep;[closestStartOptimalPoint(1),closestStartOptimalPoint(2)]];
      else
@@ -25,9 +25,9 @@ function [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,targe
      endif
   endif
   lastStep=[closestStartOptimalPoint(1),closestStartOptimalPoint(2)];
-  if (startIdx>endIdx)
-    idx=startIdx;
-    startIdx=endIdx;
+  if (startIdx>endIdx)                  % means we are going backward regarding path
+    idx=size(optimalPath)(1)-startIdx;   % reverse path and idx
+    startIdx=size(optimalPath)(1)-endIdx;
     endIdx=idx;
     optimalPath=flipud(optimalPath);
     optimalPath(:,3)=mod(optimalPath(:,3)+180,360);
@@ -49,7 +49,7 @@ function [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,targe
     end
   endif
   if (sum(targetL(1:2)==closestEndOptimalPoint(1:2))!=2)
-     [rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,[closestEndOptimalPoint(1),closestEndOptimalPoint(2),closestEndOptimalPoint(3)],targetL);
+     [apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,[closestEndOptimalPoint(1),closestEndOptimalPoint(2),closestEndOptimalPoint(3)],targetL);
      if (possible)
        pathStep=[pathStep;[closestEndOptimalPoint(1),closestEndOptimalPoint(2)]];
      else

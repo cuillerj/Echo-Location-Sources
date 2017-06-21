@@ -13,10 +13,10 @@ function [apRobot,robot,closestPathPoint,closestIdx] = ApFindClosestPathLocation
       currentX=location(1);
       currentY=location(2);
       prevDist=inf;
-      closestIdx=1;
+      closestIdx=0;
       for i=1:size(pathStep,1)  % look for the a step close enough to the current poistion
         dist=sqrt((pathStep(i,1)-currentX)^2+(pathStep(i,2)-currentY)^2);
-        if (dist<closePathDistance)
+        if (dist<closePathDistance && ApCheckStraightMovePossibility(apRobot,[currentX,currentY,location(3)],[pathStep(i,1),pathStep(i,2),location(3)],0))
           closestIdx=i;
           i=size(pathStep,1)+1;
         endif

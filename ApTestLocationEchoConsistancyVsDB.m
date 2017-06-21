@@ -103,12 +103,8 @@ endfor
 	printf(ctime(time()));
 	weight=[];
 	retValue=0;
-	% create matrix to project obstacle on (X,Y) absolute referential
-
-       
+	% create matrix to project obstacle on (X,Y) absolute referential   
 	projection=abs([xFrontEchoRef;yFrontEchoRef;xBackEchoRef;yBackEchoRef]);  % keep the significative values following (+X,+Y,-X,-Y)
-
-
 	% ping echo
   printf(mfilename);  
 	printf(" servoAlign: %d & %d **** ",a1*180/pi(),a2*180/pi()); % print the points list
@@ -117,7 +113,7 @@ endfor
   apRobot = setfield(apRobot,"waitFor",robot.servoAlignEnd);
   [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 	if (retCode!=0 && retCode!=simulationMode )                                % analyse the non zero return code
-		[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+		[apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode);
 		retValue=-1;
 		return
 	endif
@@ -125,7 +121,7 @@ endfor
   apRobot = setfield(apRobot,"waitFor",robot.pingFBEnd);
   [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 	if (retCode!=0 && retCode!=simulationMode)                           % analyse the non zero return code
-		[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+		[apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode);
 		retValue=-1;
 		return
 	endif
@@ -145,7 +141,7 @@ endfor
   apRobot = setfield(apRobot,"waitFor",robot.servoAlignEnd);
   [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 	if (retCode!=0 && retCode!=simulationMode)                     % analyse the non zero return code
-		[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+     [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode);
 		retValue=-1;
 		return
 	endif
@@ -153,7 +149,7 @@ endfor
   apRobot = setfield(apRobot,"waitFor",robot.pingFBEnd);
   [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
 	if (retCode!=0 && retCode!=simulationMode)                              % analyse the non zero return code
-		[issue,action]=analyseRetcode(robot,retCode,WaitFor,callFrom);
+    [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode);
 		retValue=-1;
 		return
 	endif

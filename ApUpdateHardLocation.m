@@ -10,7 +10,7 @@ function [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,location,prob);
      [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
     
      if (retCode!=0)
-         [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot);
+         [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
          if action=="stop.."
              return
           endif

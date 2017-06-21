@@ -1,7 +1,7 @@
   function [apRobot,robot] = ApRobotMain(flatLogRegMode,currentInputMode,destInputMode,realMode,plotValue);
   %{
-  start apRobot octave and java code
-  parameters are: 
+    start apRobot octave and java code
+    parameters are: 
     flatLogRegMode to determine logistice regression mode flat (default) or rotated
     currentInputMode to determine the way to set the current staring location - 0: automatic localization requested, 1 manual location requested
     destInputMode to determine the way to set the destination - 0: hard coded 1: terminal input (default) other to be done
@@ -22,13 +22,18 @@
     startingState=true;
     validate=true;
     loopCount=0;
-  % below to trace events
+   % below to trace events
     trajectory=[];
     traceDet=[];
     traceMove=[];
     traceNext=[];
     traceRobot=[];
     traceEcho=[];
+    delete('traceDet.mat');
+    delete('traceMove.mat');
+    delete('traceNext.mat');
+    delete('traceRobot.mat');
+    delete('traceEcho.mat');
     degreUnit=false;
     radianUnit=true;
     debugOn=true;
@@ -43,8 +48,8 @@
     if (!exist("currentInputMode"))  % terminal input is default mode 
        currentInputMode=1;
     endif
-    if (!exist("realMode"))  % real is default mode 
-       realMode=1;
+    if (!exist("realMode"))  % simulation is default mode 
+       realMode=0;
     endif
     if (!exist("plotValue"))  % real is default mode 
        plotValue=1;
@@ -94,7 +99,6 @@
         printf(ctime(time()));
         saveContext(apRobot,traceDet,traceMove,traceNext,traceRobot,traceEcho);
         return;
-
       endif
       apRobot=ApSetDestinationLocation(apRobot,destInputMode);  % set the destination
   %    apRobot = setfield(apRobot,"destination",destLocation);
@@ -114,10 +118,11 @@
         if (apGet(apRobot,"locationProb")>=apGet(apRobot,"locProbThresholdHigh"))
               break;
         endif
-        if (realMode && startingState)
-          [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);  % download paramters inside the robot
-        endif  
+
       end
+      if (realMode && startingState)
+         [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);  % download paramters inside the robot
+      endif  
       currentLocation=apGet(apRobot,"location");
       currentLocationProb=apGet(apRobot,"locationProb");
       trajectory=[apGet(apRobot,"trajectory");currentLocation];
@@ -181,8 +186,7 @@
           [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,plotOff);
            if (action=="retry.")
              printf(mfilename);
-             printf(" no rotation >> retry ");
-             printf(" *** ");
+             printf(" no rotation >> retry *** ");
              printf(ctime(time()));
              issue=true;
              lenToDo=0;
@@ -190,8 +194,7 @@
           endif
           if (action=="stop..")
              printf(mfilename);
-             printf(" stop due to pb rotation");
-             printf(" *** ");
+             printf(" stop due to pb rotation *** ");
              printf(ctime(time()))
              issue=true;
              lenToDo=0;
@@ -204,17 +207,17 @@
          retCode=0;       
          if (lenToDo!=0)
             [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,forward,plotOff);
-            traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
+            traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),retCode]];
          endif
          while (retCode==robot.moveKoDueToNotEnoughSpace && lenToDo!=0) % loop decrease move length until move possible
-             if (robot.retCodeDetail>=apGet(apRobot,"minDistToBeDone"))
+             if (robot.GetRetcodeDetail()>=apGet(apRobot,"minDistToBeDone"))
                 {
-                 lenToDo=robot.retCodeDetail;
+                 lenToDo=floor(robot.GetRetcodeDetail()-apGet(apRobot,"securityLenght"))*sign(lenToDo);
                  printf(mfilename);
                  printf(" try new length  x:%d *** ",lenToDo)
                  printf(ctime(time()))
                 [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,plotOn);
-                 traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
+                traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),retCode]];
                  gyroLenToDo=lenToDo; 
                  }           
               else{
@@ -226,16 +229,29 @@
                   }
               endif       
          end
+         if (retCode==-1)    % timeout
+           printf(mfilename);
+           printf(" move straight timeout");
+           printf(ctime(time()));
 
+           if (apGet(apRobot,"saveLocation")(1)==robot.GetHardPosX() && apGet(apRobot,"saveLocation")(2)==robot.GetHardPosY()) % no move
+                  apRobot = setfield(apRobot,"nextLocation",apGet(apRobot,"saveLocation"));
+                  apRobot = setfield(apRobot,"gyroLocation",apGet(apRobot,"saveLocation"));   
+                  printf(mfilename);
+                  printf(" hard position not changed >> no move *** ");
+                  printf(ctime(time()));
+             endif
+         endif  
+           [apRobot,robot]=ApUpdateLocations(apRobot,robot);  
+           [apRobot,robot,northOrientation,headingNO] = ApSpaceNorthOrientation(apRobot,robot); % get heading based on compass
          if (realMode)
             printf(mfilename);    
             printf(" Subsystem location leftX:%d leftY:%d LHeading:%d rightX:%d rightY:%d RHeading:%d",apGet(apRobot,"subsytemLeft")(1),apGet(apRobot,"subsytemLeft")(2),apGet(apRobot,"subsytemLeft")(3),apGet(apRobot,"subsytemRight")(1),apGet(apRobot,"subsytemRight")(2),apGet(apRobot,"subsytemRight")(3));
             printf(" *** ");
             printf(ctime(time()));
           endif
-           [apRobot,robot]=ApUpdateLocations(apRobot,robot);  
-           [apRobot,robot,northOrientation,headingNO] = ApSpaceNorthOrientation(apRobot,robot); % get heading based on compass
-           if (realMode)
+
+          if (realMode)
                newX=round([apGet(apRobot,"nextLocation")(1),robot.GetHardPosX(),apGet(apRobot,"gyroLocation")(1),apGet(apRobot,"subsytemLeft")(1),apGet(apRobot,"subsytemRight")(1)]);
                newY=round([apGet(apRobot,"nextLocation")(2),robot.GetHardPosY(),apGet(apRobot,"gyroLocation")(2),apGet(apRobot,"subsytemLeft")(2),apGet(apRobot,"subsytemRight")(2)]);
           else
@@ -309,6 +325,7 @@
        end
     end
     function [] = saveContext(apRobot,traceDet,traceMove,traceNext,traceRobot,traceEcho)
+           cd c:\Users\jean\Documents\Donnees\octave\robot;
            printf(mfilename);    
            printf(" end program *** ");
            printf(ctime(time()))

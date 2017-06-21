@@ -23,8 +23,8 @@ robot.SetEncoderThreshold(1,apGet(apRobot,"leftIncoderLowValue"), apGet(apRobot,
 pause(1);
 robot.SetEncoderThreshold(0,apGet(apRobot,"rightIncoderLowValue"), apGet(apRobot,"rightIncoderHighValue"));
 pause(1);
-robot.QueryEncodersValues();
+%robot.QueryEncodersValues();
 pause(1);
-robot.QueryMotorsPWM();
+%robot.QueryMotorsPWM();
 pause(1);
 endfunction
