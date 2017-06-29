@@ -46,7 +46,6 @@ endif
 %printf("shift between X axis and north is %d degres *** ",shiftNorthXOrientation)
 %printf(ctime(time()));
 apRobot = setfield(apRobot,"location",[0,0,0]);                        % defined / determined location 
-apRobot = setfield(apRobot,"gyroLocation",[0,0,0]);                    % location computed base on gyroscope data
 apRobot = setfield(apRobot,"destination",[0,0,0]);                     % target to be reached
 apRobot = setfield(apRobot,"newTarget",true);                          % flag to defined a new target that need to compute a new path
 apRobot = setfield(apRobot,"locationProb",0);                          % location proalility

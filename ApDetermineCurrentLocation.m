@@ -45,6 +45,7 @@ function [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robo
           pause(2);
           printf(".");
         end
+        pause(2);
     endif
     [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,initialLocation,initialProb);
     if (robot.currentLocProb>=locationProbThresholdLow) %  the location stored inside the robot must be taken into account

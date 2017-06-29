@@ -20,6 +20,7 @@ hold on;
 imshow(img,[])
 axis([1-shitfCartoX,b,-1-shitfCartoY,a],"on","xy");
 plot(currentL(1)+shitfCartoX,currentL(2)+shitfCartoY,"k:x")
+i=0;
 for i=1:size(step,1)-1
 %	x=x+step(i,1);
 %	y=y+step(i,2);

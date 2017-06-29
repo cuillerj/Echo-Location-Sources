@@ -19,6 +19,8 @@ robot.SetPWMMotor(0,apGet(apRobot,"rightMotorPWM"));
 pause(1);
 robot.SetMotorsRatio(apGet(apRobot,"leftToRightDynamicAdjustRatio"));
 pause(1);
+robot.SetSlowPWMRatio(apGet(apRobot,"SlowPWMRatio"));
+pause(1);
 robot.SetEncoderThreshold(1,apGet(apRobot,"leftIncoderLowValue"), apGet(apRobot,"leftIncoderHighValue"));
 pause(1);
 robot.SetEncoderThreshold(0,apGet(apRobot,"rightIncoderLowValue"), apGet(apRobot,"rightIncoderHighValue"));

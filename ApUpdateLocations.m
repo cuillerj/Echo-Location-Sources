@@ -13,6 +13,8 @@
           apRobot = setfield(apRobot,"subsytemLeft",[robot.BNOLeftPosX,robot.BNOLeftPosY,robot.BNOLocHeading]);
           apRobot = setfield(apRobot,"subsytemRight",[robot.BNORightPosX,robot.BNORightPosY,robot.BNOLocHeading]);  
               % compute locations   
+ %             apGet(apRobot,"gyroLocation")
+  %            apGet(apRobot,"lastRotation")
           gyroBasedH=mod(apGet(apRobot,"gyroLocation")(3)+apGet(apRobot,"lastRotation"),360);
           gyroBasedX=round(apGet(apRobot,"gyroLocation")(1)+apGet(apRobot,"lastMove")*cos(gyroBasedH*pi()/180)+shiftEchoVsRotationCenter*cos(gyroBasedH*pi()/180));
           gyroBasedY=round(apGet(apRobot,"gyroLocation")(2)+apGet(apRobot,"lastMove")*sin(gyroBasedH*pi()/180)+shiftEchoVsRotationCenter*sin(gyroBasedH*pi()/180));

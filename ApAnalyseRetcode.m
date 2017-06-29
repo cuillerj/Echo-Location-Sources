@@ -1,6 +1,7 @@
 function [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode)
 currentAction=apGet(apRobot,"waitFor");
-callFrom=apGet(apRobot,"callFrom");
+callFrom=apGet(apRobot,"callFrom");	
+issue=false;
 if retCode==-1
 	printf("timeout action: %d  called from: %d *** ",currentAction,callFrom);
 	printf(ctime(time()));
@@ -30,7 +31,7 @@ else
 			retCode=0;    % force RC=0
 		endif
 	endif
-	issue=false;
+
 	action="resume";
 endif
 return

@@ -14,33 +14,43 @@ function [apRobot,robot,closestPathPoint,closestIdx] = ApFindClosestPathLocation
       currentY=location(2);
       prevDist=inf;
       closestIdx=0;
-      for i=1:size(pathStep,1)  % look for the a step close enough to the current poistion
-        dist=sqrt((pathStep(i,1)-currentX)^2+(pathStep(i,2)-currentY)^2);
-        if (dist<closePathDistance && ApCheckStraightMovePossibility(apRobot,[currentX,currentY,location(3)],[pathStep(i,1),pathStep(i,2),location(3)],0))
-          closestIdx=i;
-          i=size(pathStep,1)+1;
-        endif
+      i=0;
+      while(i<(size(pathStep,1)-1))
+          i=i+1;
+          [apRobot,rotation,distance,possible]=ApCheckStraightMovePossibility(apRobot,[currentX,currentY,location(3)],[pathStep(i,1),pathStep(i,2),location(3)],0);    
+          if (possible)
+               dist=sqrt((pathStep(i,1)-currentX)^2+(pathStep(i,2)-currentY)^2);
+                if (dist<prevDist)
+                  prevDist=dist;
+                  closestIdx=i;
+                else
+                  closestIdx=i-1;
+                  break
+                endif    
+          endif
+       
       end
-      newPath=[];
-      for i=closestIdx+1:size(pathStep,1)   % delete previous steps
-        newPath=[newPath;[pathStep(i,:)]];
-      end
-      apRobot = setfield(apRobot,"pathStep",newPath);
-      closestIdx=1;
-      for i=1:size(newPath,1)
-        dist=sqrt((newPath(i,1)-currentX)^2+(newPath(i,2)-currentY)^2);
-        if (dist<=prevDist && dist>=closePathDistance)
-            [apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,location,newPath(i,:),0);
-            if (possible)
-              prevDist=dist;
-              closestIdx=i;
-            endif
+      printf(mfilename);
+      if (closestIdx>0)
+        pathStep(closestIdx,3)=pathStep(closestIdx,3)+1;
+        if(sqrt((pathStep(closestIdx+1,1)-currentX)^2+(pathStep(closestIdx+1,2)-currentY)^2)<farPointDistance)  % too close to this step
+          [apRobot,rotation,distance,possible]=ApCheckStraightMovePossibility(apRobot,[currentX,currentY,location(3)],[pathStep(closestIdx+1,1),pathStep(closestIdx+1,2),location(3)],0);    
+          if (possible)         % if possible skip one step
+            closestIdx=closestIdx+1;
+            pathStep(closestIdx,3)=pathStep(closestIdx,3)+1;
+          endif
         endif
-      endfor
-      closestPathPoint=[newPath(closestIdx,1),newPath(closestIdx,2)];
+        closestPathPoint=[pathStep(closestIdx,1),pathStep(closestIdx,2)];
+        printf(" *** closest step is: X:%d Y:%d idx:%d *** ", closestPathPoint(1),closestPathPoint(2),closestIdx);
+       else 
+         closestPathPoint=[,];
+         closestIdx=-1;
+         printf(" *** closest step not found *** ");
+       endif
+       	printf(ctime(time()));
   endif
-	printf(mfilename);
-	printf(" *** closest step is: X:%d Y:%d H:%d. *** ", closestPathPoint(1),closestPathPoint(2));
-	printf(ctime(time()));
+
+
+
 
 endfunction
