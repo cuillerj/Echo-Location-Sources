@@ -16,8 +16,8 @@
     printf(ctime(time()))
     particlesNumber=1000;        % define number of particles use with particules filter
    % noise parameters for simulator
-    noiseLevel=0.05;                 % coefficent (float) of noise of simualtion mode 0 no noise
-    noiseRetCode=1;                 % boolean (0 move 100% completed 1 move can be incompleted)
+    noiseLevel=0.00;                 % coefficent (float) of noise of simualtion mode 0 no noise
+    noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
     noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen
     startingState=true;
     validate=true;
@@ -83,14 +83,14 @@
       printf(" Simulation noiseLevel:%f noiseRetCode:%d noiseRetValue:%d *** ",robot.noiseLevel,robot.noiseRetCode,robot.noiseRetValue);
       printf(ctime(time()));
     else
-       echoBalance=[1,0.95,1.05,1.1,1.1];  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right      
+       echoBalance=[1,1,1,1.1,1.1];  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right      
     endif
     % set destination
     noMoreDestination=false;
     %{
       loop until no more destination 
     %}
-    while (!noMoreDestination)          
+    while (!noMoreDestination && robot.runningStatus >=0)          
       if (!startingState)
           for i=1:5
               robot.Horn(1);  % horn x seconds
@@ -124,6 +124,7 @@
         endif
 
       end
+      traceDet=[traceDet;[time,loopCount,apGet(apRobot,"location")(1),apGet(apRobot,"location")(2),apGet(apRobot,"location")(3)]];
       if (realMode && startingState)
          [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);  % download paramters inside the robot
       endif  
@@ -152,7 +153,7 @@
         plotOn=false;
       endif
  %   [apRobot,robot,next,direct,forward] = ApComputeNextStepToTarget(apRobot,robot,plotOn);
-    while(!ApTargetReached(apRobot,robot))
+    while(!ApTargetReached(apRobot,robot) && robot.runningStatus>=0)
         if (apGet(apRobot,"newTarget"))
           [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,apGet(apRobot,"destination"),plotOn);
         endif
@@ -201,8 +202,10 @@
                  apRobot = setfield(apRobot,"nextLocation",apGet(apRobot,"saveLocation"));
                  apRobot = setfield(apRobot,"gyroLocation",apGet(apRobot,"saveLocation"));
                  apRobot = setfield(apRobot,"lastRotation",0);
-                 apRobot = setfield(apRobot,"lastMove",0);     
+                 apRobot = setfield(apRobot,"lastMove",0);
+                 apRobot = setfield(apRobot,"particles",apGet(apRobot,"lastParticles"));  % restaure particles
               endif
+              traceRobot=[traceRobot;[time,loopCount,1,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),retCode]];
               if (action=="stop..")
                  printf(mfilename);
                  printf(" stop due to pb rotation *** ");
@@ -227,28 +230,38 @@
          while (retCode==robot.moveKoDueToNotEnoughSpace && lenToDo!=0) % loop decrease move length until move possible
              if (robot.GetRetcodeDetail()>=apGet(apRobot,"minDistToBeDone"))
                 {
-     %            lenToDo=floor(robot.GetRetcodeDetail()-apGet(apRobot,"securityLenght"))*sign(lenToDo);
                  lenToDo=floor(robot.GetRetcodeDetail())*sign(lenToDo);
                  printf(mfilename);
                  printf(" try new length  x:%d *** ",lenToDo)
                  printf(ctime(time()))
+                                     printf("debug -3\n");
                 [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,plotOn);
+                                    printf("debug -2\n");
                  traceRobot=[traceRobot;[time,loopCount,3,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),retCode]];
-                    printf("debug -1\n");
+                 printf("debug -1\n");
                  gyroLenToDo=lenToDo; 
-                 }           
+                 printf("debug -1.1\n");
+                   }           
               else{
+                  printf("debug -1.2\n");
                  issue=true;
                  printf(mfilename);
                  apRobot = setfield(apRobot,"lastMove",0);
                  printf(" no possible move max distance:%d *** ",robot.retCodeDetail);
                  printf(ctime(time()));
-                 retCode=99;
+                 retCode=-99;
                   }
               endif       
          end
-              printf("debug0\n");
-         if (retCode==-1)    % timeout
+         if (retCode==-99)     % robot timeout
+           printf(mfilename);
+           printf(" robot no longer communicate ");
+           printf(ctime(time())); 
+           saveContext(apRobot,traceDet,traceMove,traceNext,traceRobot,traceEcho,realMode);
+           return;
+           
+         endif  
+         if (retCode==-1)    % action timeout 
            printf(mfilename);
            printf(" move straight timeout");
            printf(ctime(time()));
@@ -257,12 +270,12 @@
                   apRobot = setfield(apRobot,"nextLocation",apGet(apRobot,"saveLocation"));
                   apRobot = setfield(apRobot,"gyroLocation",apGet(apRobot,"saveLocation"));
                   apRobot = setfield(apRobot,"lastMove",0);   
+                  apRobot = setfield(apRobot,"particles",apGet(apRobot,"lastParticles"));  % restaure particles
                   printf(mfilename);
                   printf(" hard position not changed >> no move *** ");
                   printf(ctime(time()));
-             endif
+           endif
          endif  
-           printf("debug1\n");
            if (apGet(apRobot,"lastRotation")!=0 || apGet(apRobot,"lastMove")!=0 )
                [apRobot,robot]=ApUpdateLocations(apRobot,robot);  
                                 printf("debug2\n");
@@ -346,9 +359,15 @@
                 apRobot = setfield(apRobot,"trajectory",trajectory);
                 trajectory=[trajectory;[detX,detY,detH]];
                 prob=round(robot.currentLocProb*.95);
-                [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,[detX,detY,detH],prob);
+                [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,[detX,detY,detH],prob);
+                if (retCode==-99)
+                    printf(mfilename);
+                    printf(" robot no longer communicate ");
+                    printf(ctime(time())); 
+                    saveContext(apRobot,traceDet,traceMove,traceNext,traceRobot,traceEcho,realMode);
+                    return;                
+                endif
                 [apRobot] = ApClearPathStep(apRobot);
- 
            endif
        end
     end

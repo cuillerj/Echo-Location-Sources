@@ -4,6 +4,7 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                 lastParticles=apGet(apRobot,"particles");          % to be able to recover in case of move failure   
 %                WaitMove=robot.moveEnd;
  %               WaitNorthAlign=robot.northAlignEnd;
+                debugOn=1;
                 apRobot = setfield(apRobot,"lastRotation",rotationToDo);
                 apRobot = setfield(apRobot,"saveLocation",apGet(apRobot,"location")); 
                 callFrom=apGet(apRobot,"callFrom");
@@ -32,7 +33,11 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                   apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
                 endif
                 [apRobot,robot]=ApMoveParticles(apRobot,robot,rotationToDo,0,plotOn);       
-                [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
+                [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot,debugOn);
+                if (retCode==-99)
+                     action="stop..";
+                     return;                 
+                endif
                 if (retCode==0)
                   aligned=true;
                 else
@@ -52,14 +57,14 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                      endif
                 endif
                apRobot = setfield(apRobot,"waitFor",robot.robotUpdatedEnd);
-               [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot);       % wait for updated information from robot
+               [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
                 retry=0;
                 robot.ValidHardPosition(); 
                while (robot.BNOLocFlag!=0 && retry<=3)
                    pause(1);
                    retry=retry+1;
                    robot.ValidHardPosition();          % the new hard heading will be taken into account by java code
-                end
+               end
 %{               
               if (rotationType==1 && aligned==true)
                 robot.SetHeading(mod(360+robot.GetHardHeading()+robot.northOrientation-saveNO,360));

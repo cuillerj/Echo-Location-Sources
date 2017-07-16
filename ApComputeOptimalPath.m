@@ -72,6 +72,7 @@ function [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,targe
        apRobot = setfield(apRobot,"pathStep",pathStep);
        if (plotOn)
           ApShowStep(apRobot,pathStep(:,1:2),"optimal path");
-       endif 
+       endif
+       pathStep
   endfunction
   

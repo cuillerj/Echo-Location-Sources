@@ -1,8 +1,9 @@
-function [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,location,prob);
+function [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,location,prob);
   robot.SetPosX(location(1));
   robot.SetPosY(location(2));
   robot.SetHeading(location(3));
   robot.SetCurrentLocProb(prob);
+  retCode=0;
   while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || mod(robot.GetHeading(),360)!=mod(robot.GetHardHeading(),360))
      robot.UpdateHardRobotLocation();
      WaitFor=robot.robotUpdatedEnd;

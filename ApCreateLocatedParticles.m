@@ -68,6 +68,7 @@ if posX and posY <0 and heading > 0 prob will not be used
     endif
   end
   apRobot = setfield(apRobot,"particles",particles);
+  apRobot = setfield(apRobot,"lastParticles",particles);
 %  save ("-mat4-binary","particles.mat","particles")
   if (plotOn)
     figure();

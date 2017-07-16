@@ -7,7 +7,7 @@ function [apRobot] = ApClearPathStep(apRobot)
     currentY=location(2);
     updatedPath=[];
     i=1;
-    while(pathStep(i,3)!=0 && i<size(pathStep,1))   % step already tried
+    while(pathStep(i,3)!=0 && i<size(pathStep,1))   % step already tryied
           if (sqrt((pathStep(i,1)-currentX)^2+(pathStep(i,2)-currentY)^2)<=closePathDistance)
             % skip step
             i=i+1;

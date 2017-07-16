@@ -2,6 +2,7 @@
                 if (!exist("plotOn"))  % flat logistic regression is default mode 
                     plotOn=false;
                 endif
+                debugOn=1;
                 printf(mfilename);
                 printf(" move: %d  *** ",lenToDo);
                 printf(ctime(time()));
@@ -11,10 +12,11 @@
                 apRobot = setfield(apRobot,"lastMove",lenToDo);      
                 [apRobot,robot]=ApMoveParticles(apRobot,robot,0,lenToDo,plotOn);
                 apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
-                [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot);
+                [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
                 if (retCodeMove>=99)  
                   [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCodeMove);
-                  if action=="stop.."
+                  if action=="stop.."    % 
+                    retCodeMove=-99;
                     return
                   endif
                   if action=="break."
@@ -29,9 +31,24 @@
                   printf(mfilename);
                   printf(" incompleted moveKoDueToWheelStopped expected: %d actual:%d %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY);
                   printf(ctime(time()));
+                  robot.Move(0,-sign(lenToDo)*apGet(apRobot,"backMoveWhenCollision")); 		 % len sent in cm
                   apRobot = setfield(apRobot,"particles",lastParticles);
+                  newLenToDo=newLenToDo-sign(lenToDo)*apGet(apRobot,"backMoveWhenCollision");
                   apRobot = setfield(apRobot,"lastMove",newLenToDo);   
                   [apRobot,robot]=ApMoveParticles(apRobot,robot,0,newLenToDo,plotOn);
+                   apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
+                  [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
+                if (retCodeMove>=99)  
+                  [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCodeMove);
+                  if action=="stop.."
+                    return
+                  endif
+                  if action=="break."
+                    break
+                  endif
+                  if action=="resume"
+                    endif
+                endif  
                   probExpectedMoveOk=25;
  %                 gyroLenToDo=newLenToDo;
                 endif	
@@ -63,12 +80,11 @@
                   printf(ctime(time()));
                   apRobot = setfield(apRobot,"particles",lastParticles);
                   apRobot = setfield(apRobot,"lastMove",0);
-                  apRobot = setfield(apRobot,"newTarget",1);   
                   apRobot = setfield(apRobot,"location",apGet(apRobot,"saveLocation"));
                   probExpectedMoveOk=1;
                 endif
                apRobot = setfield(apRobot,"waitFor",robot.robotInfoUpdated);
                robot.requestBNOData();
-               [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot);       % wait for updated information from robot   
+               [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot   
 
 endfunction

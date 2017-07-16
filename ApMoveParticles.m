@@ -1,6 +1,7 @@
 function [apRobot,robot] = ApMoveParticles(apRobot,robot,rotation,distance,plotOn)
 rotation=mod(rotation+360,360);
-particles=apGet(apRobot,"particles");       
+particles=apGet(apRobot,"particles");      
+apRobot = setfield(apRobot,"lastParticles",particles); 
 location=apGet(apRobot,"location");  
 img=apGet(apRobot,"img");  
 shiftEchoVsRotationCenter=apGet(apRobot,"shiftEchoVsRotationCenter")/10;           
