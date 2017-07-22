@@ -26,10 +26,11 @@ for i=1:x
 %		rot=rotation+(randi(noiseRot)*(sign(randi([-1,1]))/1000));
 	endif
   currentH=particles(i,3)*pi/180;
-	angle=currentH+rot*pi/180;
-	particles(i,1)=particles(i,1)+dist*cos(angle)+shiftEchoVsRotationCenter*cos(angle)-shiftEchoVsRotationCenter*cos(currentH);  
-	particles(i,2)=particles(i,2)+dist*sin(angle)+shiftEchoVsRotationCenter*sin(angle)-shiftEchoVsRotationCenter*sin(currentH);
-	particles(i,3)=mod(angle*180/pi,360);
+	newH=currentH+rot*pi/180;
+	particles(i,1)=particles(i,1)+dist*cos(newH)+shiftEchoVsRotationCenter*cos(newH)-shiftEchoVsRotationCenter*cos(currentH);  
+	particles(i,2)=particles(i,2)+dist*sin(newH)+shiftEchoVsRotationCenter*sin(newH)-shiftEchoVsRotationCenter*sin(currentH);
+
+	particles(i,3)=mod(newH*180/pi,360);
 endfor
 
 %save ("-mat4-binary","particles.mat","particles")

@@ -83,7 +83,7 @@
       printf(" Simulation noiseLevel:%f noiseRetCode:%d noiseRetValue:%d *** ",robot.noiseLevel,robot.noiseRetCode,robot.noiseRetValue);
       printf(ctime(time()));
     else
-       echoBalance=[1,1,1,1.1,1.1];  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right      
+       echoBalance=[1,1,1,1.15,1.1];  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right      
     endif
     % set destination
     noMoreDestination=false;
@@ -249,7 +249,7 @@
                  apRobot = setfield(apRobot,"lastMove",0);
                  printf(" no possible move max distance:%d *** ",robot.retCodeDetail);
                  printf(ctime(time()));
-                 retCode=-99;
+                 retCode=-98;
                   }
               endif       
          end

@@ -19,7 +19,7 @@ function [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,location,p
             break
          endif
          if action=="resume"
-            resume
+            return
          endif
      endif
    end

@@ -55,7 +55,8 @@ if (forward==-1)
 endif
 newX=rotationCenterX+shiftRotationX;
 newY=rotationCenterY+shiftRotationY;
-lenToDo=sqrt(((nextX-newX)^2+(nextY-newY)^2));
+
+lenToDo=sqrt(((nextX-rotationCenterX)^2+(nextY-rotationCenterY)^2))-shiftEchoVsRotationCenter;
 printf(mfilename);
 printf(" Computed Move Robot rotCenterX:%d rotCenterY:%d rotation:%d dist:%d. *** ",rotationCenterX,rotationCenterY,rotationToDo,lenToDo);
 printf(ctime(time()));
