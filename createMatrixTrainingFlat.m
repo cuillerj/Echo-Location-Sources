@@ -1,10 +1,11 @@
 % create a 360° matrix trainMatFlat 
 % the original data are extrapolated to provide distances for each degree
 % 
+function [] = createMatrixTrainingFlat()
 nbMesurementByTrain=getNbStepsRotation(); % get the number of steps for a 180 rotation
 load ('scanResult.txt');
 nbTrain=size(scanResult,1);
-printf("training records number:%d,number of mesurment by train:%d",nbtrain,nbMesurementByTrain)
+printf("training records number:%d,number of mesurment by train:%d",nbTrain,nbMesurementByTrain)
 pixelBF=zeros(2,181);
 trainMatFlat=zeros((nbTrain/nbMesurementByTrain),362);
 trainResultFlat=zeros((nbTrain/nbMesurementByTrain),1);
@@ -52,3 +53,4 @@ end
 size(trainMatFlat)
 save  ("-mat4-binary","training/trainMatFlat.mat","trainMatFlat")
 save  ("-mat4-binary","training/trainResultFlat.mat","trainResultFlat")
+endfunction

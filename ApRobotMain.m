@@ -55,19 +55,20 @@
        plotValue=1;
     endif
     simulationMode=!realMode;
+    apRobot = setfield(apRobot,"simulationMode",simulationMode);
+    apRobot = setfield(apRobot,"realMode",realMode);
     printf(mfilename);
     printf(" starting mode flatLogRegMode: %d currentInputMode:%d destInputMode:%d realMode:%d plotValue:%d \n",flatLogRegMode,currentInputMode,destInputMode,realMode,plotValue);
   % init context octave and java objects
     if (!exist("robot"))  % real is default mode 
        robot=true;
     endif
-    [apRobot,robot] =ApInitApRobot(flatLogRegMode);
+    [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode);
     %locationProbThresholdHigh=apGet(apRobot,"locProbThresholdHigh") 
     carto=apGet(apRobot,"carto");
     img=apGet(apRobot,"img");
     rotationType=apGet(apRobot,"rotationType");
-    apRobot = setfield(apRobot,"simulationMode",simulationMode);
-    apRobot = setfield(apRobot,"realMode",realMode);
+
     shiftEchoVsRotationCenter=apGet(apRobot,"shiftEchoVsRotationCenter")/10;
     if (realMode)
       robot.LaunchBatch();        % call java method to start all batchs
@@ -191,7 +192,7 @@
          endif
          if (rotationToDo!=0)     
               robot.Horn(2);  % horn x seconds
-              pause(3);
+              pause(5);
               [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,plotOff);
                if (action=="retry.")
                  printf(mfilename);
@@ -219,7 +220,7 @@
          endif
          gyroLenToDo=lenToDo;
          robot.Horn(2);  % horn 2 seconds
-         pause(3);
+         pause(5);
          retCode=0;       
          if (lenToDo!=0)
             [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,forward,plotOff);

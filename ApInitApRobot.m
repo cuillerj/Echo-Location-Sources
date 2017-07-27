@@ -1,10 +1,13 @@
-function [apRobot,robot] = ApInitApRobot(flat);
+function [apRobot,robot] = ApInitApRobot(flat,realMode);
 more off
 printf(mfilename);
 cd C:\Users\jean\Documents\Donnees\octave\robot
 javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
 if (!exist("flat"))  % flat or rotated IA echo location 
      flat=true;
+endif
+if (!exist("realMode"))  % flat or rotated IA echo location 
+     realMode=false;
 endif
 % create and start apRobot  & robot (the physical interface)
 load carto1;  % load cartography
@@ -73,6 +76,7 @@ WheelDiameter=apGet(apRobot,"iLeftWheelDiameter");
 WheelEncoderHoles=apGet(apRobot,"leftWheelEncoderHoles");
 apRobot = setfield(apRobot,"angleOneHole",((pi*WheelDiameter)/WheelEncoderHoles)/(pi*RobotWidth)*360);
 apRobot = setfield(apRobot,"distanceOneHole",((pi*WheelDiameter)/WheelEncoderHoles));
+
 %loc=apGet(apRobot,"location")
 %locprob=apGet(apRobot,"locationProb")
 

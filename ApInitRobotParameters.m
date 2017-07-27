@@ -6,7 +6,7 @@ function [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);
  printf(mfilename); 
 if (robot.runningStatus<=0)
 	rc=-1
-  printf(" unable to download paramters inside robot ");
+  printf(" unable to download parameters inside robot ");
   printf(ctime(time()));
 	return
 endif
