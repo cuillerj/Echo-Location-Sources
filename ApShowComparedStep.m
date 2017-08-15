@@ -16,15 +16,17 @@ title (head);
 load carto1img;
 img=carto1img;
 [a,b]=size(img);
+c=max(a,b);
 hold on;
 imshow(img,[])
-%axis([1-shitfCartoX,b,-1-shitfCartoY,a],"on","xy");
-%axis([1,b,1,a],"square","on","xy");
-axis("image","square","on","xy");
+axis([1-shitfCartoX,b,-1-shitfCartoY,a],"on","xy");
+axis([1,c,1,c],"square","on","xy");
+
 ylab=strcat("y position + ",num2str(shitfCartoY)),
 ylabel(ylab);
 xlab=strcat("X position + ",num2str(shitfCartoX)),
 xlabel(xlab);
+%axis("image","square","on","xy");
 %plot(currentL(1)+shitfCartoX,currentL(2)+shitfCartoY,"k:x")
 i=0;
 for i=1:size(step1,1)
@@ -54,6 +56,7 @@ for i=1:size(step2,1)
  	  plot(step2(i,1)+shitfCartoX,step2(i,2)+shitfCartoY,"markersize",10,"r:*") 
   endif
 endfor
+
 grid minor;
 hold off
 %{

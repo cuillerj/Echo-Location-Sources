@@ -1,11 +1,28 @@
-function [apRobot,robot,closestPathPoint,closestIdx] = ApFindClosestPathLocation(apRobot,robot,location)
+function [apRobot,robot,closestPathPoint,closestIdx,forward] = ApFindClosestPathLocation(apRobot,robot,location)
 %{ 
  find the closest points located on the optimal path
 %}
   closePathDistance=apGet(apRobot,"closePathDistance");
   farPointDistance=apGet(apRobot,"farPointDistance");
   pathStep=apGet(apRobot,"pathStep");
-  [apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,location,apGet(apRobot,"destination"),0);
+  optimalPath=apGet(apRobot,"optimalPath");
+  forward=1;
+  [apRobot,robot,closestOptimalPoint,startIdx] = ApFindClosestOptimalLocation(apRobot,robot,apGet(apRobot,"location"));
+  [apRobot,robot,closestOptimalPoint,endIdx] = ApFindClosestOptimalLocation(apRobot,robot,apGet(apRobot,"destination"));
+  newInstruction=false;
+  for idx=startIdx:endIdx-1
+    if (optimalPath(idx,4)!=optimalPath(idx+1,4))  % is there a new path instruction to apply between current and target position
+      newInstruction=true;
+      printf(mfilename);
+      printf(" path instruction to proceed *** ")
+ 	    printf(ctime(time())); 
+      idx=endIdx;
+     endif
+  end
+  possible=false;
+  if (!newInstruction)
+    [apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,location,apGet(apRobot,"destination"),0);
+  endif
   if (possible && distance <= farPointDistance)  % is it possible to go straigt to the target
       closestPathPoint=[pathStep(size(pathStep,1),1),pathStep(size(pathStep,1),2)];
       closestIdx=size(pathStep,1);
@@ -41,7 +58,8 @@ function [apRobot,robot,closestPathPoint,closestIdx] = ApFindClosestPathLocation
           endif
         endif
         closestPathPoint=[pathStep(closestIdx,1),pathStep(closestIdx,2)];
-        printf(" *** closest step is: X:%d Y:%d idx:%d *** ", closestPathPoint(1),closestPathPoint(2),closestIdx);
+        forward=pathStep(closestIdx,4);
+        printf(" *** closest step is: X:%d Y:%d idx:%d forward:%d*** ", closestPathPoint(1),closestPathPoint(2),closestIdx,forward);
        else 
          closestPathPoint=[,];
          closestIdx=-1;

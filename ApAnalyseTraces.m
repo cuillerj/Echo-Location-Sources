@@ -1,9 +1,14 @@
+function ApAnalyseTraces()
 cd C:\Users\jean\Documents\Donnees\octave\robot
+
 load traceMove.mat
 load traceNext
 load traceDet
 load traceRobot
 load traceEcho
+printf(mfilename);    
+printf(" creating traceDetails.csv *** ");
+printf(ctime(time()))
 traceTime=sort([traceNext(:,1);traceMove(:,1);traceRobot(:,1);traceDet(:,1);traceEcho(:,1)]);
 traceDetails=zeros(size(traceTime,1),size(traceNext,2)+size(traceMove,2)+size(traceDet,2)+size(traceRobot,2)-5);
 traceDetails(:,1)=traceTime;
@@ -17,21 +22,21 @@ for (i=1:size(traceMove,1))
 	idx=find(traceTime==traceMove(i,1));
   for (j=1:size(idx,1))
 	    traceDetails(idx(j),2)=traceMove(i,2);
-	    traceDetails(idx(j),5:6)=traceMove(i,3:4);
+	    traceDetails(idx(j),5:7)=traceMove(i,3:5);
   end
 endfor
 for (i=1:size(traceDet,1))
 	idx=find(traceTime==traceDet(i,1));
   for (j=1:size(idx,1))
 	  traceDetails(idx(j),2)=traceDet(i,2);
-	  traceDetails(idx(j),7:9)=traceDet(i,3:5);
+	  traceDetails(idx(j),8:10)=traceDet(i,3:5);
   endfor
 endfor
 for (i=1:size(traceRobot,1))
 	idx=find(traceTime==traceRobot(i,1));
   for (j=1:size(idx,1))
 	    traceDetails(idx(j),2)=traceRobot(i,2);
-	    traceDetails(idx(j),10:15)=traceRobot(i,3:8);
+	    traceDetails(idx(j),11:21)=traceRobot(i,3:13);
   endfor
 endfor
 %{
@@ -56,3 +61,4 @@ endfor
 csvwrite("traceDetails.csv",traceDetails);
 %csvwrite("traceEcho.csv",traceEcho);
 %save ("-text","traceDetails.csv","traceDetails");
+endfunction

@@ -4,6 +4,6 @@ function [robot] = LoopPingFB(robot,count)
     endif
   for i=0:count
     robot.PingEchoFrontBack();
-    pause(10);
+    pause(5);
   end
 endfunction

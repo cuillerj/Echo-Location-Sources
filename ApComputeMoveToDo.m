@@ -1,7 +1,11 @@
 function [apRobot,robot,rotationToDo,lenToDo] = ApComputeMoveToDo(apRobot,robot,next,forward)
 %{
 compute the rotation and move to do taking into account physical charateristics
+forward 0 means no direction constraint
+forward 1 means must move forward
+forward -1 means must move backward
 %}
+
 nextX=next(1);
 nextY=next(2);
 location=apGet(apRobot,"location");
@@ -60,7 +64,19 @@ lenToDo=sqrt(((nextX-rotationCenterX)^2+(nextY-rotationCenterY)^2))-shiftEchoVsR
 printf(mfilename);
 printf(" Computed Move Robot rotCenterX:%d rotCenterY:%d rotation:%d dist:%d. *** ",rotationCenterX,rotationCenterY,rotationToDo,lenToDo);
 printf(ctime(time()));
-[rotationToDo,lenToDo,forward] = ApOptimizeMoveToDo(rotationToDo,lenToDo,forward,shiftEchoVsRotationCenter);
+if forward==0     % no direction constraint
+  forward=1;
+  while (abs(rotationToDo)>90)
+    [rotationToDo,lenToDo,forward] = ApOptimizeMoveToDo(rotationToDo,lenToDo,forward,shiftEchoVsRotationCenter)
+  end
+ else
+  if (rotationToDo>180)
+    rotationToDo=rotationToDo-360;
+  endif
+  if (rotationToDo<-180)
+     rotationToDo=rotationToDo+360;
+  endif
+endif
 rotationToDo=round(rotationToDo);
 lenToDo=round(lenToDo)*forward;
 printf(mfilename);

@@ -15,7 +15,8 @@
               % compute locations   
  %             apGet(apRobot,"gyroLocation")
   %            apGet(apRobot,"lastRotation")
-          gyroBasedH=mod(apGet(apRobot,"gyroLocation")(3)+apGet(apRobot,"lastRotation"),360);
+  %        gyroBasedH=mod(apGet(apRobot,"gyroLocation")(3)+apGet(apRobot,"lastRotation"),360);
+          gyroBasedH=mod(robot.BNOLocHeading,360);        
           gyroBasedX=round(apGet(apRobot,"gyroLocation")(1)+apGet(apRobot,"lastMove")*cos(gyroBasedH*pi()/180)+shiftEchoVsRotationCenter*cos(gyroBasedH*pi()/180));
           gyroBasedY=round(apGet(apRobot,"gyroLocation")(2)+apGet(apRobot,"lastMove")*sin(gyroBasedH*pi()/180)+shiftEchoVsRotationCenter*sin(gyroBasedH*pi()/180));
           gyroBasedX=gyroBasedX-shiftEchoVsRotationCenter*cos(gyroBasedH*pi()/180); % set position to rotation center

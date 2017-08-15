@@ -5,6 +5,11 @@ function [apRobot,robot,next,direct,forward] = ApComputeNextStepToTarget(apRobot
   this is a new target use astar search to find a path and store this path
   look for the closest next stored step
   determine forward or backard
+      forward -9 no step found
+      forward 0 no move constraint
+      forward 1 need to go forward
+      forward -1 need to go backward
+
 %}
 currentL=apGet(apRobot,"location");
 targetL=apGet(apRobot,"destLocation");
@@ -82,6 +87,7 @@ else
 	if (closest!=0)
 		nextX=AStarStep(min(size(AStarStep,1),closest+1),1);
 		nextY=AStarStep(min(size(AStarStep,1),closest+1),2);
+    instruction=AStarStep(min(size(AStarStep,1),closest+1),4)
 	else
 	 [apRobot,robot,AStarPath,AStarStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,[RoundTo(targetX,5),RoundTo(targetY,5),0],plotOn);
   	if (cost<0)   % no path found
@@ -99,10 +105,13 @@ direction=[nextX-currentX,nextY-currentY];
 currentHeadingGrad=currentHeading*pi()/180;
 vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
 projectionHeading=direction*vectHeading';
+%{
 if (projectionHeading >=0)
 	forward=1;
 else
 	forward=-1;
 endif
+%}
 next=[nextX,nextY];
+forward=instruction
 endfunction

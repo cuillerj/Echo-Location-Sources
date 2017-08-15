@@ -12,14 +12,16 @@ The aim of this function is to provide a weight for each position (x,y)
 Compare echos with theoretical distances to determine the weight
 In simulation mode the echoes are simulated based on theoritical distances and noised added
 The higher is the weight the most likely is the position
-	Query the cartography obstacle distances (QueryCartoEchosProjection) 
+	Query the cartography obstacle distances 
 	Align the servo motor with th X axis 
 	Ping front and back to get distances
 	Align the servo motor with th Y axis 
 	Ping front and back to get distances
 	Compute and return the weight
+  
+  can be improved by taking into account the mesures standard deviation to focus and the most reliable mesurments
 %}
-%WaitInfo=robot.robotInfoUpdated; 
+
 heading=mod(heading*pi()/180,2*pi());
 carto=apGet(apRobot,"carto");
 tileSize=apGet(apRobot,"tileSize1")/10;
@@ -59,7 +61,7 @@ countRefX=zeros(size(posX));
 		Yoriented=-1;
 	endif
 for (i=1:size(posX,2))
-	distBeetwenPosReference=robot.GetClosestReferenceEcho(posX(i),posY(i),tileSize,0);
+	distBeetwenPosReference=robot.GetClosestReferenceEcho(posX(i),posY(i),0,tileSize);
 	if (robot.echoClosestCount!=0)        % check we find an echo reference
 		countPos(i)++;
 	endif
@@ -68,7 +70,7 @@ for (i=1:size(posX,2))
 		stdRefFrontY(i)=robot.echoClosestStdFront;
 		stdRefBackY(i)=robot.echoClosestStdBack;
 		countRefY(i)=robot.echoClosestCount;
-		distBeetwenPosReference=robot.GetClosestReferenceEcho(posX(i),posY(i),tileSize,90);
+		distBeetwenPosReference=robot.GetClosestReferenceEcho(posX(i),posY(i),90,tileSize);
 	if (robot.echoClosestCount!=0)        % check we find an echo reference
 		countPos(i)++;
 	endif

@@ -1,11 +1,24 @@
 % lambda and maxIter wiil be used by oneVsAll()
-function [] = ApLearnScanRobotFlat(lambdamin,lambdamax,maxIter)
+function [] = ApLearnScanRobotFlat(lambdamin,lambdamax,maxIter,nbTry)
+  %{
+  lambdamin and lambdamax define the range of lambda to be tried
+  maxIter define the maximum number of iterations of the logistic regression
+  nbTry define the number of tries inside le lambda range - if lambdamin=lambdamax force to 1
+  
+  %}
 %% Initialization
 %% Setup the parameters 
+  printf(mfilename);
+                  printf(ctime(time()));
+delta=lambdamax-lambdamin
+if (delta==0)
+  nbTry=1;
+  delta=1;
+endif
 input_layer_size  = 360;  % 
 load 'scanResult.txt'
 num_labels = max(scanResult(:,5))          %  look in the data to find the features number
-delta=lambdamax-lambdamin
+
 % Load Training Data
 
 load('trainMatFlat.mat'); % load the training data
@@ -41,10 +54,10 @@ while (lambda<=lambdamax)
 	fprintf('\nTraining Set accuracyFlat: %f\n', mean(double(predTrain == Yv4)) * 100);
 	% test
 	[coeff,foundFirst,notFound,nbrec] = ApEvaluateLearningResultsFlat()
-	testFlatResult=[testFlatResult;[lambda,accuracyFlat(i,2),coeff,foundFirst,notFound,nbrec]];
+	testFlatResult=[testFlatResult;[lambda,accuracyFlat(i,2),coeff,foundFirst,notFound,nbrec,maxIter,m,num_labels]];
 	save  ("-mat4-binary","testFlatResult.mat","testFlatResult")
 	%
-	lambda=lambda+round(delta/5);
+	lambda=lambda+round(delta/nbTry);
 	i=i+1;
 end
 

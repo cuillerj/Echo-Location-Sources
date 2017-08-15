@@ -15,7 +15,9 @@ while (retCode==99 && robot.runningStatus >=0 )
 		printf(ctime(time()));
 	endif
 	idx++;
-  printf("+");
+  if (mod(idx,5)==1)
+    printf("+");
+  endif
 	pause(1);
 end
 printf("\n")

@@ -1,4 +1,4 @@
-function [apRobot,robot,AStarPath,AStarStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,targetL,plotOn)
+function [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,currentL,targetL,plotOn)
 %{ 
  AStarPath will return the ordered list of actions to go from current to target position
  AStarStep will return the list of positions touched to go from current to target position(ordered from target position to  current)
@@ -20,7 +20,7 @@ function [apRobot,robot,AStarPath,AStarStep,cost,forward] = ApAStarSearch(apRobo
  currentHeadingGrad=currentHeading*pi()/180;
  vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
  projectionHeading=direction*vectHeading';
- forward=0;
+ %forward=0;
 
  weightCarto=20;     % weight used to balance way depending on cartography weight and action cost
   targetHeadingGrad=targetHeading*pi()/180;
@@ -107,11 +107,13 @@ while (size(openSet,1)!=0 || found==true)
 			ApAStarShowStep(apRobot,AStarStep,"AStar search result");
 			hold off
 		endif
+    %{
 		if (projectionHeading>=0)
 			forward=1;
 		else
 			forward=-1;
 		endif
+    %}
 		printf(mfilename);
 		printf(" *** cpu search:%f . ",cputime()-cpu1);
 		printf(ctime(time()))

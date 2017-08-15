@@ -15,10 +15,11 @@
     plotOff=false;               % non graphic
     printf(ctime(time()))
     particlesNumber=1000;        % define number of particles use with particules filter
+    limitForTestLocationEchoConsistancy=15*15  % square of distance cm between the farest estimated points over that try to choose with the sonar
    % noise parameters for simulator
     noiseLevel=0.00;                 % coefficent (float) of noise of simualtion mode 0 no noise
     noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
-    noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen
+    noiseRetValue=11;               % range of noised retcode in wich a random retcode is choosen
     startingState=true;
     validate=true;
     loopCount=0;
@@ -55,8 +56,6 @@
        plotValue=1;
     endif
     simulationMode=!realMode;
-    apRobot = setfield(apRobot,"simulationMode",simulationMode);
-    apRobot = setfield(apRobot,"realMode",realMode);
     printf(mfilename);
     printf(" starting mode flatLogRegMode: %d currentInputMode:%d destInputMode:%d realMode:%d plotValue:%d \n",flatLogRegMode,currentInputMode,destInputMode,realMode,plotValue);
   % init context octave and java objects
@@ -64,6 +63,8 @@
        robot=true;
     endif
     [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode);
+    apRobot = setfield(apRobot,"simulationMode",simulationMode);
+    apRobot = setfield(apRobot,"realMode",realMode);
     %locationProbThresholdHigh=apGet(apRobot,"locProbThresholdHigh") 
     carto=apGet(apRobot,"carto");
     img=apGet(apRobot,"img");
@@ -84,7 +85,7 @@
       printf(" Simulation noiseLevel:%f noiseRetCode:%d noiseRetValue:%d *** ",robot.noiseLevel,robot.noiseRetCode,robot.noiseRetValue);
       printf(ctime(time()));
     else
-       echoBalance=[1,1,1,1.15,1.1];  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right      
+       echoBalance=[1,1,1,1.15,1.15];  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right      
     endif
     % set destination
     noMoreDestination=false;
@@ -156,15 +157,16 @@
  %   [apRobot,robot,next,direct,forward] = ApComputeNextStepToTarget(apRobot,robot,plotOn);
     while(!ApTargetReached(apRobot,robot) && robot.runningStatus>=0)
         if (apGet(apRobot,"newTarget"))
-          [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,apGet(apRobot,"destination"),plotOn);
+          [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,apGet(apRobot,"destination"),plotOn);
         endif
-        [apRobot,robot,next,closestIdx] = ApFindClosestPathLocation(apRobot,robot,apGet(apRobot,"location"));
+        [apRobot,robot,next,closestIdx,forward] = ApFindClosestPathLocation(apRobot,robot,apGet(apRobot,"location"));
         if (closestIdx>0)   % found close enough point
           apRobot = setfield(apRobot,"nextLocation",next);
          else
-           [apRobot,robot,next,forward] = ApComputeOptimalPath(apRobot,robot,apGet(apRobot,"destination"),plotOn);
+           [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,apGet(apRobot,"destination"),plotOn);
+           [apRobot,robot,next,closestIdx,forward] = ApFindClosestPathLocation(apRobot,robot,apGet(apRobot,"location"));
         endif
-        if (forward==0)
+        if (forward==-9)
           % temporarly end program - need to call automatic localisation
            printf(mfilename);
            printf(" end no path found. *** ")
@@ -181,10 +183,10 @@
          apRobot = setfield(apRobot,"saveLocation",apGet(apRobot,"location"));
          targetHeading=mod(apGet(apRobot,"location")(3)+rotationToDo,360);
          traceNext=[traceNext;[time,loopCount,next(1),next(2)]];     
-         traceMove=[traceMove;[time,loopCount,rotationToDo,lenToDo]];
          printf(mfilename);
          printf(" rotation:%d *** ",rotationToDo);
          printf(ctime(time()));
+         traceMove=[traceMove;[time,loopCount,rotationToDo,lenToDo,forward]];
          if (plotValue>=2)
              plotOn=true;
            else
@@ -193,6 +195,10 @@
          if (rotationToDo!=0)     
               robot.Horn(2);  % horn x seconds
               pause(5);
+              if (robot.actionRetcode!=0)
+                robot.ResetRobotStatus();
+                pause(1);
+              endif
               [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,plotOff);
                if (action=="retry.")
                  printf(mfilename);
@@ -206,7 +212,7 @@
                  apRobot = setfield(apRobot,"lastMove",0);
                  apRobot = setfield(apRobot,"particles",apGet(apRobot,"lastParticles"));  % restaure particles
               endif
-              traceRobot=[traceRobot;[time,loopCount,1,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),retCode]];
+              traceRobot=[traceRobot;[time,loopCount,1,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),apGet(apRobot,"subsytemLeft")(1),apGet(apRobot,"subsytemLeft")(2),apGet(apRobot,"subsytemLeft")(3),apGet(apRobot,"subsytemRight")(1),apGet(apRobot,"subsytemRight")(2),apGet(apRobot,"subsytemRight")(3),robot.actionRetcode]];
               if (action=="stop..")
                  printf(mfilename);
                  printf(" stop due to pb rotation *** ");
@@ -223,8 +229,12 @@
          pause(5);
          retCode=0;       
          if (lenToDo!=0)
+               if (robot.actionRetcode!=0)
+                robot.ResetRobotStatus();
+                pause(1);
+              endif
             [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,forward,plotOff);
-            traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),retCode]];
+            traceRobot=[traceRobot;[time,loopCount,2,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),apGet(apRobot,"subsytemLeft")(1),apGet(apRobot,"subsytemLeft")(2),apGet(apRobot,"subsytemLeft")(3),apGet(apRobot,"subsytemRight")(1),apGet(apRobot,"subsytemRight")(2),apGet(apRobot,"subsytemRight")(3),robot.actionRetcode]];
          else
             apRobot = setfield(apRobot,"lastMove",0);   
          endif
@@ -238,7 +248,7 @@
                                      printf("debug -3\n");
                 [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,plotOn);
                                     printf("debug -2\n");
-                 traceRobot=[traceRobot;[time,loopCount,3,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),retCode]];
+                 traceRobot=[traceRobot;[time,loopCount,3,robot.GetHardPosX(),robot.GetHardPosY(),robot.GetHardHeading(),robot.GetGyroHeading(),apGet(apRobot,"subsytemLeft")(1),apGet(apRobot,"subsytemLeft")(2),apGet(apRobot,"subsytemLeft")(3),apGet(apRobot,"subsytemRight")(1),apGet(apRobot,"subsytemRight")(2),apGet(apRobot,"subsytemRight")(3),robot.actionRetcode]];
                  printf("debug -1\n");
                  gyroLenToDo=lenToDo; 
                  printf("debug -1.1\n");
@@ -306,35 +316,45 @@
                printf(mfilename); 
                printf (" Heading hard H:%d  NO:%d Theoretical H:%d  SpaceNO:%d RobotNO:%d Gyro:%d*** ",robot.GetHardHeading(),northOrientation,targetHeading,headingNO,robot.northOrientation,robot.GetGyroHeading());
                printf(ctime(time()))
-               [apRobot,robot,weightEcho,retValue,echo,quality] = ApTestLocationEchoConsistancyVsDB(apRobot,robot,newX,newY,newH);
-               if (retValue==0)
-                   traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
+               % if greatest distance between 2 points is over 15cm
+               %    try to select the best location with sonar
+               %
+               if ((range(newX)^2+range(newY)^2) > limitForTestLocationEchoConsistancy)         % ecart entre les points les + extremes >15cm
+                  printf(mfilename); 
+                  printf (" distance between points are too high:%d > try to determine the best with sonar *** ",sqrt(range(newX)^2+range(newY)^2));
+                  printf(ctime(time()))
+                 [apRobot,robot,weightEcho,retValue,echo,quality] = ApTestLocationEchoConsistancyVsDB(apRobot,robot,newX,newY,newH);
+                 if (retValue==0)
+                     traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
+                 else
+                     printf(mfilename); 
+                     printf(" no echo consistancy data *** ");
+                     printf(ctime(time()));
+                     for i=1:size(newX,2)	
+                         weightEcho(i)=1;
+                     endfor;	                
+                  endif
+                  [nbRow,nbCol]=size(weightEcho);
+                  printf(mfilename);    
+                  printf(" best quality (0: one is perfect):%f ***",quality);
+                  printf(ctime(time()));
+                  weightEcho=weightEcho.*echoBalance;   %
                else
-                   printf(mfilename); 
-                   printf(" no echo consistancy data *** ");
-                   printf(ctime(time()));
-                   for i=1:size(newX,2)	
-                       weightEcho(i)=1;
-                   endfor;	                
-                endif
-                [nbRow,nbCol]=size(weightEcho);
-                printf(mfilename);    
-                printf(" best quality (0: one is perfect):%f ***",quality);
-                printf(ctime(time()));
-                weightEcho=weightEcho.*echoBalance;   %
-                printf(mfilename);
-                printf(" positions list: ");
-                for i=1:size(newX,2)
-                  printf(" (%d,%d) ",newX(i),newY(i));
-                end  
-                printf("\n");
+               printf(mfilename);
+               printf(" positions list: ");
+               for i=1:size(newX,2)
+                   printf(" (%d,%d) ",newX(i),newY(i));
+               end  
+               printf("\n");
+               weightEcho=echoBalance;
+               endif
                 for i=1:size(newX,2)
                  [available,retCode]=ApQueryCartoAvailability(apRobot,[newX(i),newY(i),newH],degreUnit,debugOn);
                  if (!available)
                     printf(mfilename);
                     printf(" positions problem: (%d,%d) ",newX(i),newY(i));
                     printf(ctime(time()));
-                   weightEcho(i)=weightEcho(i)/2;
+                   weightEcho(i)=weightEcho(i)/10;
                  endif
                 end  
 
@@ -391,7 +411,8 @@
            save ("-mat4-binary","traceNext.mat","traceNext");
            save ("-mat4-binary","traceRobot.mat","traceRobot");
            save ("-mat4-binary","traceEcho.mat","traceEcho");
-           ApShowStep(apRobot,apGet(apRobot,"trajectory"),"Actual Trajectory");
+           ApShowStep(apRobot,apGet(apRobot,"trajectory"),"Determined Trajectory");
+ %          ApAnalyseTraces();
            return;
     endfunction
   endfunction
