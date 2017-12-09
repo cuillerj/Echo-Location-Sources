@@ -1,8 +1,8 @@
 function [apRobot,robot] = testMoveAcrossNarrowPath(apRobot,robot,pathDistance,reqMove);
  width=78;
  length=80;
- echoToGet=100;
- northHeading=49;
+ echoToGet=200;
+ northHeading=74;
  startToEntryDistance=80;
  robotStatus=robot.runningStatus;
  debugOn=1;
