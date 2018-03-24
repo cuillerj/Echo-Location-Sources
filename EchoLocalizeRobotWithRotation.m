@@ -1,4 +1,4 @@
-function [posX,posY,posAngle,posProb,retCode] = EchoLocalizeRobotWithRotation(robot,nbPred,orientation)
+function [posX,posY,posAngle,posProb,retCode] = ApEchoLocalizeRobotWithRotation(robot,nbPred,orientation)
 % probability defined according to 28 tests
 % first is right: =60% (17/28)
 % second is right: =18% 5/28

@@ -1,7 +1,6 @@
 function [apRobot,robot] = ApInitApRobot(flat,realMode);
-more off
-printf(mfilename);
 cd C:\Users\jean\Documents\Donnees\octave\robot
+javaaddpath ('C:\Program Files\Java\jdk1.7.0_45\jre\lib\ext\mysql-connector-java-5.1.30-bin.jar');
 javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
 if (!exist("flat"))  % flat or rotated IA echo location 
      flat=true;
@@ -19,15 +18,19 @@ load "optimalPath.txt";    % load optimal path for routing
 scanRefPoints=zonesXY;
 printf(mfilename);
 if (exist("apRobot"))
+    printf(mfilename);
     printf(" octave object already exist *** \n")
  else
+    printf(mfilename);
     printf(" create octave object *** \n")
     apRobot=apRobot();  % create the octave robot object
  endif
  printf(mfilename);
  if (exist("robot"))
+    printf(mfilename);
     printf(" java object already exist *** \n")
  else
+    printf(mfilename);
     printf(" create java object *** \n")
     robot=robotJava();            % create the java robot object  
  endif
@@ -35,7 +38,7 @@ setupPath;					% define paths
 %cd C:\Users\jean\Documents\Donnees\octave
 %apRobotPath
 robot.SetTraceFileOn(1);    % route console to trace file
-
+robot.InitRobotValues();
 if (flat==true)
 	load all_thetaFlat;             % load the trained logistic regression matrix
 	all_theta=all_thetaFlat;
@@ -43,6 +46,7 @@ else
 	load all_theta;             % load the trained logistic regression matrix
 endif
 [apRobot] = InitApRobotParametersList(apRobot,robot);
+load 'scanResult.txt';
 %[parametersNameList,parametersValueList] = InitParametersList(robot,flat);
 %[param,value,number]=GetParametersValueByName(robot,"currentNorthOrientationReference",parametersNameList);
 %shiftNorthXOrientation=value;
@@ -63,6 +67,7 @@ apRobot = setfield(apRobot,"all_theta",all_theta);                     % logisti
 apRobot = setfield(apRobot,"saveLocation",apGet(apRobot,"location"));  % location copy before moving (rotation, move)
 apRobot = setfield(apRobot,"hardLocation",apGet(apRobot,"location"));  % location based on robot calculation
 apRobot = setfield(apRobot,"gyroLocation",apGet(apRobot,"location"));   % location based on gyroscope calculation
+apRobot = setfield(apRobot,"saveGyroLocation",apGet(apRobot,"gyroLocation"));  % location copy before moving (rotation, move)
 apRobot = setfield(apRobot,"subsytemLeft",apGet(apRobot,"location"));   % location provided by BNO subsystem left wheel
 apRobot = setfield(apRobot,"subsytemRight",apGet(apRobot,"location")); % location provided by BNO subsystem right wheel
 apRobot = setfield(apRobot,"nextLocation",apGet(apRobot,"location"));  % next step location
@@ -70,13 +75,19 @@ apRobot = setfield(apRobot,"trajectory",[]);                           % traject
 apRobot = setfield(apRobot,"pathStep",[]);                             % computed path from origin to target
 apRobot = setfield(apRobot,"lastRotation",0);                          % last rotation (firstly rotation to be done eventualy rotation review after robot event)
 apRobot = setfield(apRobot,"lastMove",0);                              % last move (firstly rotation to be done eventualy move review after robot event (ex obstacle detected)
+apRobot = setfield(apRobot,"forward",1);                               % default move forward
+apRobot = setfield(apRobot,"all_theta",all_theta);                     % logistic regression matrix
+apRobot = setfield(apRobot,"scanResult",scanResult);                   % logistic regression matrix
+apRobot = setfield(apRobot,"automatonState",[1,1,1]);                    % set automaton initial state
+apRobot = setfield(apRobot,"automatonStateList",[]);
+apRobot = setfield(apRobot,"automatonRC",0);    
 RobotWidth=apGet(apRobot,"iRobotWidth");
 % below computed values
 WheelDiameter=apGet(apRobot,"iLeftWheelDiameter");
 WheelEncoderHoles=apGet(apRobot,"leftWheelEncoderHoles");
 apRobot = setfield(apRobot,"angleOneHole",((pi*WheelDiameter)/WheelEncoderHoles)/(pi*RobotWidth)*360);
 apRobot = setfield(apRobot,"distanceOneHole",((pi*WheelDiameter)/WheelEncoderHoles));
-
+apRobot = setfield(apRobot,"realMode",realMode);
 %loc=apGet(apRobot,"location")
 %locprob=apGet(apRobot,"locationProb")
 

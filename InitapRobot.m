@@ -1,5 +1,5 @@
 function [apRobot,robot] = InitapRobot(flat);
-more off
+more on
 cd C:\Users\jean\Documents\Donnees\octave\robot
 javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
 if (!exist("flat"))  % flat or rotated IA echo location 

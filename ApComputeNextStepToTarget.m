@@ -9,10 +9,9 @@ function [apRobot,robot,next,direct,forward] = ApComputeNextStepToTarget(apRobot
       forward 0 no move constraint
       forward 1 need to go forward
       forward -1 need to go backward
-
 %}
 currentL=apGet(apRobot,"location");
-targetL=apGet(apRobot,"destLocation");
+targetL=apGet(apRobot,"destination");
 newTarget=apGet(apRobot,"newTarget");      % true first request for this new target
 apRobot = setfield(apRobot,"newTarget",false);  %
 stepSize=apGet(apRobot,"stepSize");
@@ -63,15 +62,17 @@ if (newTarget==true)
 	nextX=AStarStep(2,1);
 	nextY=AStarStep(2,2);
 else
-	load("AStarStep.mat");
-	prevDist=inf;
+%	load("AStarStep.mat");
+  %load(AStarStepSmooth.mat);
+  AStarStep=apGet(apRobot,"pathStep");
+	prevDist=Inf;
 	closest=0;
 	for i=1:size(AStarStep,1)
 		dist=sqrt((AStarStep(i,1)-currentX)^2+(AStarStep(i,2)-currentY)^2);
 		if (dist<=prevDist)
-			[rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,[AStarStep(i,1),AStarStep(i,2),0]);
+			[apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,[AStarStep(i,1),AStarStep(i,2),0]);
 			if (possible==1)
-					[rotation2,distance2,possible2] = ApCheckStraightMovePossibility(apRobot,currentL,[AStarStep(i+1,1),AStarStep(i+1,2),0]);
+					[apRobot,rotation2,distance2,possible2] = ApCheckStraightMovePossibility(apRobot,currentL,[AStarStep(i+1,1),AStarStep(i+1,2),0]);
 					if (possible2==1)
 						closest=i+1;
 					else
@@ -85,20 +86,20 @@ else
 	printf(" *** closest step is:%d . *** ",closest);
 	printf(ctime(time()));
 	if (closest!=0)
-		nextX=AStarStep(min(size(AStarStep,1),closest+1),1);
-		nextY=AStarStep(min(size(AStarStep,1),closest+1),2);
-    instruction=AStarStep(min(size(AStarStep,1),closest+1),4)
+		nextX=AStarStep(min(size(AStarStep,1),closest),1);
+		nextY=AStarStep(min(size(AStarStep,1),closest),2);
+    instruction=AStarStep(min(size(AStarStep,1),closest),4);
 	else
 	 [apRobot,robot,AStarPath,AStarStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,[RoundTo(targetX,5),RoundTo(targetY,5),0],plotOn);
   	if (cost<0)   % no path found
-		forward=0;
-    next=[nextX,nextY];
-		return
-	endif
-	[apRobot,AStarStep,forward] = ApSmoothPath(apRobot,AStarPath,AStarStep,forward,plotOn);
-	save ("-mat4-binary","AStarStep.mat","AStarStep");
-	nextX=AStarStep(2,1);
-	nextY=AStarStep(2,2);
+		  forward=0;
+      next=[nextX,nextY];
+		  return
+	  endif
+	  [apRobot,AStarStep,forward] = ApSmoothPath(apRobot,AStarPath,AStarStep,forward,plotOn);
+	  save ("-mat4-binary","AStarStep.mat","AStarStep");
+	  nextX=AStarStep(2,1);
+	  nextY=AStarStep(2,2);
 	endif
 endif
 direction=[nextX-currentX,nextY-currentY];
@@ -113,5 +114,5 @@ else
 endif
 %}
 next=[nextX,nextY];
-forward=instruction
+forward=instruction;
 endfunction

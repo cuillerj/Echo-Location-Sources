@@ -80,8 +80,8 @@ function [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,targetL,pl
        retCode=0;      
        apRobot = setfield(apRobot,"pathStep",pathStep);
        if (plotOn)
-          ApShowStep(apRobot,pathStep(:,1:2),"optimal path");
+          ApShowStep(apRobot,pathStep(:,1:2),"optimal path",1);
        endif
-       pathStep
+ %      pathStep
   endfunction
   

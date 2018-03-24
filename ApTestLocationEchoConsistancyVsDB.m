@@ -83,6 +83,7 @@ endfor
 	if (sum(countPos)==0)           % no available echo reference
 		weight=[];
 		retValue=-1;
+    quality=9999;
 		echo=[];
 		return;
 	endif

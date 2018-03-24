@@ -18,8 +18,8 @@ for i=1:x
 	endif
   currentH=particles(i,3)*pi/180;
 	newH=currentH+rot*pi/180;
-	particles(i,1)=particles(i,1)+dist*cos(newH)+shiftEchoVsRotationCenter*cos(newH)-shiftEchoVsRotationCenter*cos(currentH);  
-	particles(i,2)=particles(i,2)+dist*sin(newH)+shiftEchoVsRotationCenter*sin(newH)-shiftEchoVsRotationCenter*sin(currentH);
+	particles(i,1)=particles(i,1)+(dist+shiftEchoVsRotationCenter)*cos(newH)-shiftEchoVsRotationCenter*cos(currentH);  
+	particles(i,2)=particles(i,2)+(dist+shiftEchoVsRotationCenter)*sin(newH)-shiftEchoVsRotationCenter*sin(currentH);
 	particles(i,3)=mod(newH*180/pi,360);
 endfor
   apRobot = setfield(apRobot,"particles",particles);

@@ -6,11 +6,12 @@ function [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);
  printf(mfilename); 
 if (robot.runningStatus<=0)
 	rc=-1
+   printf(mfilename); 
   printf(" unable to download parameters inside robot ");
   printf(ctime(time()));
 	return
 endif
-printf(" downloading paramters inside robot ");
+printf(" downloading parameters inside robot ");
 printf(ctime(time()));
 rc=0;
 robot.SetPWMMotor(1,apGet(apRobot,"leftMotorPWM"));

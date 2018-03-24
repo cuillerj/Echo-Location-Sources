@@ -1,7 +1,7 @@
  function [] = TestEchoLocalization(simulationMode)
 % stepLen=20;
 %{
-main steps
+  main steps
 	create particles everywhere oriented as during the learning phase 
 	align robot as during the learning phase based on compas
 	scan 360 and use logistic regresion to guess weighted possible locations 

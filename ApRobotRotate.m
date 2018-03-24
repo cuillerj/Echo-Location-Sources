@@ -6,7 +6,9 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
  %               WaitNorthAlign=robot.northAlignEnd;
                 debugOn=1;
                 apRobot = setfield(apRobot,"lastRotation",rotationToDo);
-                apRobot = setfield(apRobot,"saveLocation",apGet(apRobot,"location")); 
+                apRobot = setfield(apRobot,"saveLocation",apGet(apRobot,"location"));
+                apRobot = setfield(apRobot,"saveGyroLocation",apGet(apRobot,"gyroLocation"));
+                apRobot = setfield(apRobot,"currentMove","rotate");
                 callFrom=apGet(apRobot,"callFrom");
                 if (rotationType==1)
                   saveNO=robot.northOrientation;
@@ -32,10 +34,11 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                   robot.Move(round(rotationToDo),0);    % rotation based on wheels encoders
                   apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
                 endif
-                [apRobot,robot]=ApMoveParticles(apRobot,robot,rotationToDo,0,plotOn);       
+                [apRobot,robot]=ApMoveParticles(apRobot,robot,round(rotationToDo),0,plotOn);       
                 [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot,debugOn);
                 if (retCode==-99)
                      action="stop..";
+
                      return;                 
                 endif
                 if (retCode==0)
@@ -47,7 +50,8 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                           printf(ctime(time()));
                           apRobot = setfield(apRobot,"lastRotation",0);
                           apRobot = setfield(apRobot,"particles",lastParticles);  % restaure particles
-                          apRobot = setfield(apRobot,"location",apGet(apRobot,"saveLocation")); 
+                          apRobot = setfield(apRobot,"location",apGet(apRobot,"saveLocation"));
+                          apRobot = setfield(apRobot,"gyroLocation",apGet(apRobot,"saveGyroLocation"));
                           action="retry.";
                      else
                           [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
@@ -60,10 +64,12 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
                 retry=0;
                 robot.ValidHardPosition(); 
+               apRobot = setfield(apRobot,"gyroLocation",[apGet(apRobot,"gyroLocation")(1),apGet(apRobot,"gyroLocation")(2),robot.GetGyroHeading()]);
                while (robot.BNOLocFlag!=0 && retry<=3)
                    pause(1);
                    retry=retry+1;
                    robot.ValidHardPosition();          % the new hard heading will be taken into account by java code
+                   apRobot = setfield(apRobot,"gyroLocation",[apGet(apRobot,"gyroLocation")(1),apGet(apRobot,"gyroLocation")(2),robot.GetGyroHeading()]);
                end
 %{               
               if (rotationType==1 && aligned==true)

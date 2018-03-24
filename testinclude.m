@@ -1,0 +1,2 @@
+automatonDefines
+test=2

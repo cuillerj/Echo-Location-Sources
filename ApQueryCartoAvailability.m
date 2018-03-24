@@ -1,4 +1,5 @@
-function [available,retCode] = ApQueryCartoAvailability(apRobot,location,radian,debugOn)
+function [available,retCode] = ApQueryCartoAvailability(apRobot,location,radian,debugOn,fast)
+% fast mode check only one point
 % if radian false then heading expressed in degres
 % take into account the robot physical characteristics (by checking 10 points) to determine if it can be at a place
 %{  
@@ -29,6 +30,9 @@ function [available,retCode] = ApQueryCartoAvailability(apRobot,location,radian,
 	(x8,y8) = (x - B*cosH - (iRobotWidth/2)*sinH , y - B*sins=H + (iRobotWidth/2)*cosH)
 		
 %}
+ if (!exist("fast"))  % fast mode
+      fast=false;
+ endif
 shitfCartoX=apGet(apRobot,"shitfCartoX");
 shitfCartoY=apGet(apRobot,"shitfCartoY");
 xIn=location(1)+shitfCartoX;
@@ -52,12 +56,12 @@ cosH=cos(heading);
 sinH=sin(heading);
 xIn=round(xIn);
 yIn=round(yIn);
-
 [cartoX,cartoY]=size(carto);
 available=true;
 x=xIn;
 y=yIn;
 retCode=0;
+
 if (x <= 0 || x > cartoX)
 	available=false;
   if(debugOn)
@@ -87,6 +91,9 @@ try
       printf(ctime(time()))
       endif
       retCode=3;
+      return
+    endif
+    if (fast)
       return
     endif
     % check availability between 0 and x

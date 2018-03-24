@@ -6,9 +6,15 @@
                 printf(mfilename);
                 printf(" move: %d  *** ",lenToDo);
                 printf(ctime(time()));
+                apRobot = setfield(apRobot,"currentMove","straig");
                 robot.Move(0,lenToDo); 		 % len sent in cm
                 lastParticles=apGet(apRobot,"particles");          % to be able to recover in case of move failure   
                 saveLocation=apGet(apRobot,"saveLocation");
+                if (lenToDo>=0)
+                apRobot = setfield(apRobot,"forward",true); 
+                 else
+                apRobot = setfield(apRobot,"forward",false); 
+                endif
                 apRobot = setfield(apRobot,"lastMove",lenToDo);      
                 [apRobot,robot]=ApMoveParticles(apRobot,robot,0,lenToDo,plotOn);
                 apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
@@ -31,24 +37,32 @@
                   printf(mfilename);
                   printf(" incompleted moveKoDueToWheelStopped expected: %d actual:%d %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY);
                   printf(ctime(time()));
+                  reseted=false;
+                  while(!reseted)
+                    robot.ResetRobotStatus();
+                    pause(2);
+                    if(RobotMainServer.actionRetcode==0)
+                      reseted=true;
+                    endif
+                  endwhile                   
                   robot.Move(0,-sign(lenToDo)*apGet(apRobot,"backMoveWhenCollision")); 		 % len sent in cm
                   apRobot = setfield(apRobot,"particles",lastParticles);
                   newLenToDo=newLenToDo-sign(lenToDo)*apGet(apRobot,"backMoveWhenCollision");
                   apRobot = setfield(apRobot,"lastMove",newLenToDo);   
                   [apRobot,robot]=ApMoveParticles(apRobot,robot,0,newLenToDo,plotOn);
-                   apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
+                  apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
                   [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
-                if (retCodeMove>=99)  
-                  [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCodeMove);
-                  if action=="stop.."
-                    return
-                  endif
-                  if action=="break."
-                    break
-                  endif
-                  if action=="resume"
+                  if (retCodeMove>=99)  
+                    [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCodeMove);
+                    if action=="stop.."
+                      return
                     endif
-                endif  
+                    if action=="break."
+                      break
+                    endif
+                    if action=="resume"
+                    endif
+                  endif  
                   probExpectedMoveOk=25;
  %                 gyroLenToDo=newLenToDo;
                 endif	

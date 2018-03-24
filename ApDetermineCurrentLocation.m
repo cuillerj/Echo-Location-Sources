@@ -1,7 +1,7 @@
 function [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robot,manualMode);
   locationProbThresholdHigh=apGet(apRobot,"locProbThresholdHigh");  % limit over wich location quality is reliable
   locationProbThresholdLow=apGet(apRobot,"locProbThresholdLow");  % limit under wich location quality is not reliable
-  realMode=apGet(apRobot,"realMode")
+  realMode=apGet(apRobot,"realMode");
   stopRequested=false;
   if (!exist("manualMode"))  % automatic location discovery is default mode 
      manualMode=true;
@@ -33,6 +33,7 @@ function [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robo
       end
     apRobot = setfield(apRobot,"location",initialLocation);
     apRobot = setfield(apRobot,"gyroLocation",initialLocation);
+    robot.gyroHeading=initialLocation(3);
     apRobot = setfield(apRobot,"locationProb",initialProb);
     if (realMode)  % real mode running
          robotStatus=robot.runningStatus;

@@ -2,13 +2,15 @@ function [apRobot,robot,issue,action] = ApAnalyseRetcode(apRobot,robot,retCode)
 currentAction=apGet(apRobot,"waitFor");
 callFrom=apGet(apRobot,"callFrom");	
 issue=false;
-if (retCode==-99)
+action="resume";
+if (retCode==-99 && !robot.simulation)
       printf(mfilename);
 			printf("Robot no longer communicate *** ");
 			printf(ctime(time()));
       issue=true;
       action="stop..";
-  endif
+      return;
+ endif
 if retCode==-1
 	printf("timeout action: %d  called from: %d *** ",currentAction,callFrom);
 	printf(ctime(time()));
@@ -39,12 +41,12 @@ else
 	if (currentAction == testedValue)
 		if (retCode == 90)
       printf(mfilename);
-			printf("Simulation function:%d *** ",currentAction);
+			printf(" Simulation function:%d *** ",currentAction);
 			printf(ctime(time()));
 			retCode=0;    % force RC=0
+      return;
 		endif
 	endif
-
 	action="resume";
 endif
 return

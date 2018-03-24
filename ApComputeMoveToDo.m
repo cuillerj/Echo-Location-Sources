@@ -67,7 +67,7 @@ printf(ctime(time()));
 if forward==0     % no direction constraint
   forward=1;
   while (abs(rotationToDo)>90)
-    [rotationToDo,lenToDo,forward] = ApOptimizeMoveToDo(rotationToDo,lenToDo,forward,shiftEchoVsRotationCenter)
+    [rotationToDo,lenToDo,forward] = ApOptimizeMoveToDo(rotationToDo,lenToDo,forward,shiftEchoVsRotationCenter);
   end
  else
   if (rotationToDo>180)
