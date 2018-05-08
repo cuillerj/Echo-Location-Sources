@@ -81,10 +81,9 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
                    ];   %(stateIdx,alphabetIdx,newStateIdx)
     
   statesListT=[[initial,localized,atRest]]; 
-  statesListK=[[locked,notLocalized,atRest];[locked,notLocalized,scanned];[locked,notLocalized,moving];[localizing,notLocalized,atRest];[lost,notLocalized,atRest]]; 
-  transitionsListK=[[5,3,2];[5,6,2];
-                    [5,10,2];[5,13,2];
-                    [5,17,10];[5,20,10]];
+  statesListK=[[locked,notLocalized,atRest];[locked,notLocalized,scanned];[locked,notLocalized,moving];
+               [localizing,notLocalized,atRest];[lost,notLocalized,atRest];[localizing,notLocalized,moving]];
+  transitionsListK=[[1,22,2];[1,23,5];[2,8,6];[2,9,5]];
   
   
   automatonState=apGet(apRobot,"automatonState");  

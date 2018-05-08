@@ -174,7 +174,7 @@
 
           case([lost,notLocalized,atRest])
             printf(mfilename);
-            printf(" locked state:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
+            printf(" lost state:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
             printf(ctime(time()));     
             count=maxRetry;
             break    
@@ -189,9 +189,9 @@
               [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,currentNorthOrientationReference,alignParticles,plotReq); 
 
           case([localizing,notLocalized,NOrient])  
-              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithRotation(apRobot,robot,nbPred,0,plotOff);
-              
-           case([localizing,notLocalized,scanned])
+              %[apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithRotation(apRobot,robot,nbPred,0,plotOff);
+              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot);             
+          case([localizing,notLocalized,scanned])
       
               [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithParticlesGaussian(apRobot,robot,posX,posY,posProb,plotReq,newFigure);
               if (realMode)
@@ -212,8 +212,11 @@
                    [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,!determined],1);          
                endif
               count++;       
-          case([localizing,determining,scanned])     
-                [apRobot,robot,rotationToDo,lenToDo] = ApEchoLocationDetermineNextMoveToScan(apRobot,robot,plotOff,randomChoice);
+          case{[localizing,determining,scanned],[locked,notLocalized,scanned]}     
+                [apRobot,robot,rotationToDo,lenToDo] = ApEchoLocationDetermineNextMoveToScan(apRobot,robot,plotOff,!randomChoice);
+                if (abs(lenToDo)>50)
+                  lenToDo=50*(lenToDo/abs(lenToDo));
+                endif
                 if (abs(lenToDo)< apGet(apRobot,"minDistToBeDone"))
                       printf(mfilename);
                       printf(" no significative possible move:(%d,%d)",rotationToDo,lenToDo);
@@ -223,7 +226,7 @@
    
           case([localizing,notLocalized,moving])  
                   [apRobot,robot,retCodeMove]=ApRobotMoveStraight(apRobot,robot,lenToDo,forward,plotOff);
-                  if (retCode!=robot.moveKoDueToNotEnoughSpace) 
+                  if (retCodeMove!=robot.moveKoDueToNotEnoughSpace && retCodeMove!=robot.moveUnderLimitation)
                     if (realMode)
                       newTheoriticalPositions=round([robot.GetHardPosX(),robot.GetHardPosY()]);
                       printf(mfilename);
@@ -243,7 +246,8 @@
                   printf(" locked state:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
                   printf(ctime(time())); 
                   [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn);                    
-     
+    
+   
           case([targeting,localized,NOrient])  
           
             located=true;
@@ -253,14 +257,15 @@
                   printf(mfilename);
                   printf(" unsuported state:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
                   printf(ctime(time())); 
-                  EchoLoc(1)=lost;
+                  apRobot = setfield(apRobot,"automatonState",[lost,automatonState(2),automatonState(3)]);   
                   count=maxRetry;
           endswitch
          else
                  printf(mfilename);
                  printf(" unsuported move for:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
                  printf(ctime(time())); 
-                 EchoLoc(1)=lost;
+                 automatonState=apGet(apRobot,"automatonState");
+                 apRobot = setfield(apRobot,"automatonState",[lost,automatonState(2),automatonState(3)]);        
                  count=maxRetry;        
          endif
       endwhile

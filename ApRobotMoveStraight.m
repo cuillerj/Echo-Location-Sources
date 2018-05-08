@@ -41,7 +41,7 @@
                   while(!reseted)
                     robot.ResetRobotStatus();
                     pause(2);
-                    if(RobotMainServer.actionRetcode==0)
+                    if(robot.motorDiag==0 && robot.robotDiag==0)
                       reseted=true;
                     endif
                   endwhile                   
