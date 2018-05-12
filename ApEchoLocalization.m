@@ -193,7 +193,7 @@
               [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot);             
           case([localizing,notLocalized,scanned])
       
-              [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithParticlesGaussian(apRobot,robot,posX,posY,posProb,plotReq,newFigure);
+              [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithTfAndParticlesGaussian(apRobot,robot,posX,posY,posProb,plotReq,newFigure);
               if (realMode)
                  [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,[detX,detY,detH],0);
                  if (retCode==-99)

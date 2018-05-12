@@ -42,6 +42,7 @@ function [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,NorthHea
   NO=robot.RefreshNorthOrientation();
   apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
   [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
+  
   NO=robot.northOrientation;
   printf(mfilename);
   printf(" New NO: %d  *** ",robot.northOrientation);
