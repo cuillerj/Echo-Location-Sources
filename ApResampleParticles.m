@@ -1,6 +1,7 @@
 function [apRobot,robot] = ApResampleParticles(apRobot,robot,plotOn,newFigure,checkLocationAvaibility)
 %load particles
-fast=true;
+  plotRatio=5; # 1/plotRatio point will be plotted
+  fast=true;
   if (!exist("newFigure"))  % simulation is default mode 
       newFigure=false;
   endif
@@ -80,8 +81,8 @@ fast=true;
   %	imshow(img,[])
   %	[a,b]=size(img);
   %	axis([1,b,1,a],"on","xy");
-    for i=1:x
-      plot(particles(i,1)+shitfCartoX,particles(i,2)+shitfCartoY)
+    for i=1:(round(x/plotRatio)-1)
+      plot(particles(plotRatio*i,1)+shitfCartoX,particles(plotRatio*i,2)+shitfCartoY)
     end
     hold off;
   endif

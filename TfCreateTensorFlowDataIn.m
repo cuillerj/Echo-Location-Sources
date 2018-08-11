@@ -1,12 +1,15 @@
 % create a matrix for one scan rotated by "rotation" degres
 function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreateTensorFlowDataIn(apRobot,robot,rotation,plotOn)
+  if (!exist("plotOn"))
+    plotOn=false;
+  endif
   printf(mfilename);
   printf("  ***  ");
   printf(ctime(time()))
   nbMesurementByTrain=getNbStepsRotation();
   sensorDistanceLimit=getSensorDistanceLimit();  # will replace 0 value mesurment
-  incrementValue=get360StepSizeDegre()  # nb of ° incrementation by step 
-  stepSize=round(180/(nbMesurementByTrain-1))
+  incrementValue=get360StepSizeDegre();  # nb of ° incrementation by step 
+  stepSize=round(180/(nbMesurementByTrain-1));
   %load ('scanToAnalyse.txt');
   scanToAnalyse=zeros(nbMesurementByTrain,3);
   j=1;
@@ -45,7 +48,7 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
   #newScan=tensorFlowDataIn(1,:);
   [tensorFlowDataIn] = ExtendScanForOneStep(tensorFlowDataIn,nbMesurementByTrain);
   tensorFlowDataIn(:,:)=tensorFlowDataIn(:,:)+(tensorFlowDataIn(:,:)==0)*sensorDistanceLimit;
-  [dl,dc]=size(tensorFlowDataIn)
+  [dl,dc]=size(tensorFlowDataIn);
   avgDist=sensorDistanceLimit()/2;
   tensorFlowDataIn=tensorFlowDataIn-avgDist;   # to center mesurments to 0
   csvwrite ("tensorFlow/tensorFlowDataIn.csv", tensorFlowDataIn);

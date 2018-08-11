@@ -40,6 +40,7 @@
     debugOn=true;
     debugOff=false;
     issue=false;
+    pingFB=6;
    %
 
     if (!exist("flatLogRegMode"))  % flat logistic regression is default mode 
@@ -364,6 +365,7 @@
                   printf (" distance between points are too high:%d > try to determine the best with sonar *** ",sqrt(range(newX)^2+range(newY)^2));
                   printf(ctime(time()))
                  [apRobot,robot,weightEcho,retValue,echo,quality] = ApTestLocationEchoConsistancyVsDB(apRobot,robot,newX,newY,newH);
+                 [apRobot,robot,newState,retValue] = ApAutomaton(apRobot,robot,[pingFB,retCode],1);
                  if (retValue==0)
                      traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
                  else

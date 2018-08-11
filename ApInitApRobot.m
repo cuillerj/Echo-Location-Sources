@@ -80,7 +80,9 @@ apRobot = setfield(apRobot,"all_theta",all_theta);                     % logisti
 apRobot = setfield(apRobot,"scanResult",scanResult);                   % logistic regression matrix
 apRobot = setfield(apRobot,"automatonState",[1,1,1]);                    % set automaton initial state
 apRobot = setfield(apRobot,"automatonStateList",[]);
-apRobot = setfield(apRobot,"automatonRC",0);    
+apRobot = setfield(apRobot,"automatonRC",0);
+apRobot = setfield(apRobot,"shitfCartoX",0); 
+apRobot = setfield(apRobot,"shitfCartoY",50);     
 RobotWidth=apGet(apRobot,"iRobotWidth");
 % below computed values
 WheelDiameter=apGet(apRobot,"iLeftWheelDiameter");

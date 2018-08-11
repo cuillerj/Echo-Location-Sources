@@ -1,7 +1,12 @@
-function [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithTfAndParticlesGaussian(apRobot,robot,inX,inY,inProb,plotOn,newFigure)
+
+function [apRobot,robot,detX,detY,detH,prob] = ApDetermineRobotLocationWithTfAndParticlesGaussian(apRobot,robot,inX,inY,inProb,plotOn,newFigure)
+   printf(mfilename);
+   printf(" ***  ");
+   printf(ctime(time()));	
 	img=apGet(apRobot,"img");
+  plotRatio=5; # 1/plotRatio point will be plotted
 	particles=apGet(apRobot,"particles");
-	sigma=[20];  
+	sigma=[40];  
 	inProb=inProb/sum(inProb); % normalyze 
 	[x,y]=size(particles);
 	z=size(inX,2);
@@ -25,19 +30,19 @@ function [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithTfAndParti
       density=0;
       for j=1:z
            dist=sqrt((particles(i,1)-inX(j))^2+(particles(i,2)-inY(j))^2);
-           density=density+normpdf(dist,0,sigma);
+           density=density+normpdf(dist,0,sigma)*inProb(j);
       endfor
       particles(i,4)=particles(i,4)*density;
   endfor  
 	particles(:,4)=particles(:,4)/sum(particles(:,4));  % normalyze the weight to get probability
-	[w,idx]=max(particles(:,4));
+	[prob,idx]=max(particles(:,4));
 	detX=round(particles(idx,1));
 	detY=round(particles(idx,2));
 	detH=round(mod(particles(idx,3),360));
   detHG=detH*pi()/180;
+  forward=apGet(apRobot,"forward");
   shitfCartoX=apGet(apRobot,"shitfCartoX");
   shitfCartoY=apGet(apRobot,"shitfCartoY");
-  forward=apGet(apRobot,"forward");
   orig=[detX+shitfCartoX,detY+shitfCartoY];
   if (forward)
     tip=[orig-[15*cos(detHG),15*sin(detHG)]];
@@ -50,6 +55,7 @@ function [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithTfAndParti
   determine=5;
   [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,0],1);
  if (plotOn)
+
   figure(1);
   hold on;
   drawArrowJC (arrows, 5, 1, 0.5, 1);
@@ -70,10 +76,10 @@ function [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithTfAndParti
       figure(2);
     endif
 		hold on;
-		for i=1:x
-			plot(particles(i,1)+shitfCartoX,particles(i,2)+shitfCartoY)
+		for i=1:(round(x/plotRatio)-1)
+			plot(particles(plotRatio*i,1)+shitfCartoX,particles(plotRatio*i,2)+shitfCartoY)
 		end
-			plot(detX+shitfCartoX,detY+shitfCartoY,"color","k","+","markersize",15)
+			plot(detX+shitfCartoX,detY+shitfCartoY,"color","g","+","markersize",20)
 		for j=1:z
 			if (j==1)
 				plot(inX(j)+shitfCartoX,inY(j)+shitfCartoY,"color","k","o","markersize",15)

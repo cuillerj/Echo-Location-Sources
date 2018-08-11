@@ -3,9 +3,6 @@ function [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,NorthHea
   if (!exist("alignParticles"))
     alignParticles=false;
   endif
-  printf(mfilename);
-  printf(" align particles:%d *** ",alignParticles)
-  printf(ctime(time()))
   currentShiftNorthOrientation=apGet(apRobot,"currentShiftNorthOrientation");
   currentNorthOrientationReference=apGet(apRobot,"currentNorthOrientationReference");
   aligned=false;
@@ -31,8 +28,15 @@ function [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,NorthHea
         action="stop..";
         return;                 
   endif
+  if (retCode==-1) % timeout
+       robot.NorthAlign(NorthHeading+currentShiftNorthOrientation);  % retry once
+       [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot,debugOn);
+  endif
   if (retCode==0)
          aligned=true;
+     elseif (retCode==robot.moveKoDueToNotEnoughSpace)
+          apRobot = setfield(apRobot,"particles",lastParticles);
+          [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn);
      else
          [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
          if (action=="stop..")
@@ -42,9 +46,34 @@ function [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,NorthHea
   NO=robot.RefreshNorthOrientation();
   apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
   [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
-  
-  NO=robot.northOrientation;
+  while(NO==-1 || NO==999)
+    NO=robot.RefreshNorthOrientation();
+#    apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
+    [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
+    pause(1)
+  endwhile
   printf(mfilename);
-  printf(" New NO: %d  *** ",robot.northOrientation);
+  printf(" New North orientation: %d  *** ",NO);
   printf(ctime(time()));	
+  
+  # for debug
+  #{
+  validate=false;
+  while (validate==false)
+    printf(mfilename);
+    printf("   Is robot north aligned ? else do it manually ***");
+    validate=yes_or_no("yes or no");
+    apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
+    [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
+    while(NO==-1)
+      NO=robot.RefreshNorthOrientation();
+  #    apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
+      [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
+      pause(1)
+    endwhile
+    #}
+    printf(mfilename);
+    printf(" New North orientation: %d  *** ",NO);
+    printf(ctime(time()));
+   #end
   endfunction

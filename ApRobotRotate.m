@@ -38,7 +38,6 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                 [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot,debugOn);
                 if (retCode==-99)
                      action="stop..";
-
                      return;                 
                 endif
                 if (retCode==0)
@@ -58,7 +57,18 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                           if (action=="stop..")
                             return;
                           endif
+                          if (action=="inMove")
+                            return;
+                          endif
                      endif
+                     reseted=false;
+                     while(!reseted)
+                        robot.ResetRobotStatus();
+                        pause(2);
+                        if(robot.motorDiag==0 && robot.robotDiag==0)
+                          reseted=true;
+                        endif
+                      endwhile    
                 endif
                apRobot = setfield(apRobot,"waitFor",robot.robotUpdatedEnd);
                [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot

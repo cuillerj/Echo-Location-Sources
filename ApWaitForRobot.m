@@ -4,7 +4,7 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
   endif
   
   typeWaitString={"robotInfoUpdated";"robotUpdatedEnd";"scanning";"moving";"scanEnd";"moveEnd";"northAlignEnd";"servoAlignEnd";"pingFBEnd";"moveAcrossPassEnded";"requestBNOEnd";"robotNOUpdated"};
-  typeWaitMapping=[[1,1];[3,2];[102,3];[104,4];[103,5];[105,6];[107,7];[108,8];[109,9];[112,10];[118,11];[123,12]];
+  typeWaitMapping=[[1,1];[8,2];[102,3];[104,4];[103,5];[105,6];[107,7];[108,8];[109,9];[112,10];[118,11];[123,12]];
 
   idx=1;
   retCode=99;
@@ -28,14 +28,18 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
       twchar=char(typeWaitString(find(typeWaitMapping(:,1)==typeWait)));
       printf(" typeWait:(%d:%s) source:%d  dest:%d retcode:%d. *** ",typeWait,twchar,source,dest,retCode);
       printf(ctime(time()));
+      if(typeWait==107)
+            printf(" BNO mode:%d  CalStat:%d SysStat:%d SysError:%d *** ",robot.BNOMode,robot.BNOCalStat,robot.BNOSysStat,robot.BNOSysError);
+            printf(ctime(time()));
+      endif
     endif
     idx++;
-    if (mod(idx,5)==1)
+    if (mod(idx,10)==1)
       printf("+");
     endif
     pause(1);
   end
-  if (idx>5)
+  if (idx>10)
     printf("\n")
   endif
   if (typeWait==robot.northAlignEnd)

@@ -6,6 +6,9 @@ function [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,targetL,pl
     add steps from the starting point to the ending point
     pathStep for each step = (posX , posY, 0 (step not reached), step intruction)
   %}
+   if (!exist("plotOn"))
+    plotOn=false;
+  endif
   retCode=-1; 
 
   cost=0;
@@ -65,7 +68,7 @@ function [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,targetL,pl
        printf(mfilename);
        printf(" call astar search to leave the optimal path *** ");
  	     printf(ctime(time()));      
-      [apRobot,robot,AStarPath,pathStep,cost,forward] = ApAStarSearch(apRobot,robot,closestEndOptimalPoint,targetL,plotOn);
+      [apRobot,robot,AStarPath,pathStep,cost] = ApAStarSearch(apRobot,robot,closestEndOptimalPoint,targetL,plotOn);
      endif     
        printf(mfilename);
        printf("  path= ");

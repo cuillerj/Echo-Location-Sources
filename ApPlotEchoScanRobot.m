@@ -16,10 +16,10 @@ for (i=1:nbPingByScan)
 	DB=robot.GetScanDistBack(i-1);
 	X=DF.*cos(angleR);
 	Y=DF.*sin(angleR);
-	plot (X,Y,col(1));
+	plot (X,Y,col(1),"markersize",15);
 	X=-DB.*cos(angleR);
 	Y=-DB.*sin(angleR);
-	plot (X,Y,col(3));
+	plot (X,Y,col(3),"markersize",15);
 end
 
 	hold off;

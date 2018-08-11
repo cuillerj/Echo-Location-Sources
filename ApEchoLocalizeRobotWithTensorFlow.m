@@ -1,16 +1,14 @@
-function [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot)
-% probability defined according to 28 tests
-% first is right: =60% (17/28)
-% second is right: =18% 5/28
-% third is rignt: =4% 1/28
-% fourth is right: = 8% 2/28
-% fifth is right: =8% 2/28
-% not found in first five =4% 1/28
-%probRef=[60,18,06,06,06,04];
+%{
+ this function launch  an echo scan and submit the scan result to tensorflow for determination and return list of position x y
+%}
+function [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotOn)
+ if (!exist("plotOn"))
+    plotOn=false;
+  endif
   printf(mfilename);
   printf("  ***  ");
   printf(ctime(time()))
-  [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot);
+  [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot,plotOn);
   [result] = ApConvertTfPredictionForParticlesFilter(result);
   posX=result(:,1);
   posX=reshape(posX,1,size(posX,1));

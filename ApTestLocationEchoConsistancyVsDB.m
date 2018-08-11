@@ -36,6 +36,10 @@ xBackEchoRef=zeros(size(posX));
 stdRefFrontX=zeros(size(posX));
 stdRefBackX=zeros(size(posX));
 countRefX=zeros(size(posX));
+quality=0;
+echo=[];
+retValue=-1;
+weight=0;
 	if (heading>=0 && heading <=(pi()/2))
 		a2=pi()/2-heading;
 		a1=pi()-heading;
@@ -85,6 +89,7 @@ endfor
 		retValue=-1;
     quality=9999;
 		echo=[];
+
 		return;
 	endif
 	heading=mod(heading,2*pi());

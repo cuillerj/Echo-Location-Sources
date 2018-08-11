@@ -1,5 +1,4 @@
 function [tensorFlowDataIn] = ExtendScanForOneStep(tensorFlowDataIn,nbMesurementByTrain)
-  nbMesurementByTrain
   j=2;
   while (j<=nbMesurementByTrain)
     tensorFlowDataIn(2,j)=tensorFlowDataIn(1,j-1);

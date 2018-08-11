@@ -1,5 +1,11 @@
- function [apRobot,robot] = ApRobotMain(flatLogRegMode,realMode,autoLocalization,plotValue)
-   
+ function [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(flatLogRegMode,realMode,autoLocalization,plotValue)
+
+     if (!exist("flatLogRegMode") && !exist("realMode") && !exist("autoLocalization") && !exist("plotValue"))  % flat logistic regression is default mode 
+
+        printf("parameters are: (flatLogRegMode,realMode,autoLocalization,plotValue)")
+        printf(ctime(time()))
+        return
+      endif
      %{
   main status
   %}
@@ -42,7 +48,7 @@
   %}
 
    EchoLoc=[-1,-1,-1];
-   maxRetry=50;
+   target=[385,250,0]
    more off;
    determine=5;
    determined=1;
@@ -70,21 +76,25 @@
    % particlesNumber=2000;
     plotOn=true;                 % if true graphics will be provided (reduces performance)
     plotOff=false;               % no graphic
-    noiseLevel=0.3;                 % coefficent (float) of noise of simualtion mode 0 no noise
+    noiseLevel=0.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
     noiseRetCode=1;                 % boolean (0 move 100% completed 1 move can be incompleted)
+    scanNoiseLevel=0.5;
     noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen
     [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode);
     apRobot = setfield(apRobot,"simulationMode",simulationMode);
     apRobot = setfield(apRobot,"realMode",realMode);
+    apRobot = setfield(apRobot,"destination",target);     
      
      
-     
-       if (realMode)
+    if (realMode)
         robot.LaunchBatch();        % call java method to start all batchs
       else
         robot.LaunchSimu();        % call java method to start only simulator
+        robot.noiseLevel=noiseLevel;         
+        robot.scanNoiseLevel=scanNoiseLevel;          	
+        robot.noiseRetCode=noiseRetCode;  
+        robot.noiseRetValue=noiseRetValue;   
     endif
-
 
     if (realMode)
            robotStatus=robot.runningStatus;
@@ -99,9 +109,12 @@
             printf(".");
           end
           pause(2);
-           [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);  % download parameters inside the robot
+          [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);  % download parameters inside the robot
+          robot.ResetRobotStatus();
     endif
     stopRequest=false;
+    robot.ResetRobotStatus();
+    loopId=1;
     while(!stopRequest)
      automatonState=apGet(apRobot,"automatonState");
         if (automatonState(1)==lost)
@@ -109,35 +122,59 @@
              printf(" robot lost timeout *** ");
              printf(ctime(time()))
              stopRequest=true;
-            break;  
+             return;  
         endif       
         switch(automatonState(2))
           case{1,3}
-            automatonState=apGet(apRobot,"automatonState");
-            apRobot = setfield(apRobot,"automatonState",[1,automatonState(2),automatonState(3)]); 
-            [apRobot,robot,EchoLoc,automatonStateList] = ApEchoLocalization(apRobot,robot,flatLogRegMode,realMode,plotValue)
-      
-             otherwise
-                    switch(automatonState(1))
+              automatonState=apGet(apRobot,"automatonState");
+              apRobot = setfield(apRobot,"automatonState",[initial,automatonState(2),automatonState(3)]); 
+              [apRobot,robot,EchoLoc,traceLoc] = ApEchoLocalization(apRobot,robot,flatLogRegMode,realMode,plotValue,loopId);
+              apRobot = setfield(apRobot,"location",EchoLoc); 
+          case(2)
+              printf(mfilename);
+              printf(" robot localised *** ");
+              printf(ctime(time()))
+              apRobot = setfield(apRobot,"locationProb",100);     
+              [apRobot,robot,EchoLoc] = ApGotoDestination(apRobot,robot,flatLogRegMode,plotValue)
+              automatonState=apGet(apRobot,"automatonState");
+              if (automatonState(1)==gotTarget)
+                    printf(mfilename);
+                    printf(" robot got the target *** ");
+                    printf(ctime(time()))       
+                return;
+              else
+                    printf(mfilename);
+                    printf(" robot locked or lost during the traject to the target *** ");
+                    printf(ctime(time()))   
+                    apRobot = setfield(apRobot,"automatonState",[automatonState(1),notLocalized,atRest]);              
+              endif
+              
+           otherwise
+               switch(automatonState(1))
                       case{initial,localizing,locked}
                               printf(mfilename);
-                              printf(" enter localization phase *** ");
+                              printf(" enter new localization phase *** ");
                               printf(ctime(time()))
-                              stopRequest=true;
-                              break;                              
+                              apRobot = setfield(apRobot,"automatonState",[initial,notLocalized,atRest]); 
+                              stopRequest=false;
+                              loopId++;
+                              pause(5);
+      #                        break;                              
                       case{targeting}
                               printf(mfilename);
                               printf(" enter going to the target phase *** ");
                               printf(ctime(time()))
-                              stopRequest=true; 
-                              break;                             
+                              %stopRequest=true;
+                              pause(1) 
+   #                           break;                             
                       case{gotTarget}
                               printf(mfilename);
                               printf(" robot got the target *** ");
                               printf(ctime(time()))        
-                              stopRequest=true;          
-                              break;  
-                    endswitch
+                              return;          
+
+                endswitch
+   #             break;
           endswitch
      
      endwhile

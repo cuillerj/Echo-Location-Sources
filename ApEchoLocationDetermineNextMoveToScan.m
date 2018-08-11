@@ -50,7 +50,13 @@ function [apRobot,robot,rotation,moveDist] = ApEchoLocationDetermineNextMoveToSc
         echo0=robot.GetScanDistBack(i-1);
     endif
     echo1=robot.GetScanDistBack(i);
+    if (echo1==0)
+      echo1=getSensorDistanceLimit();
+    endif
     echo2=robot.GetScanDistBack(i+1);
+    if (echo2==0)
+      echo2=getSensorDistanceLimit();
+    endif
  %   if ((echo0>=minDistance) & (echo1>=minDistance) & (echo2>=minDistance))
     validMoveList(i+1,4)=echo1+echo0+echo2;
     validMoveList(i+1,5)=min([echo0-securityLenght,echo1*coefEcho1,echo1-securityLenght,echo2-securityLenght]);

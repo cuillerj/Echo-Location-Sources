@@ -25,32 +25,36 @@ currentHeading=mod(currentL(3)+360,360);
 targetX=RoundTo(targetL(1),5);
 targetY=RoundTo(targetL(2),5);
 forward=0;
-[apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,targetL);
-if (possible==true)
-	direct=true;
-	printf(mfilename);
-	printf(" *** go straight possible . *** ");
-	printf(ctime(time()))
-	direction=[targetX-currentX,targetY-currentY];
-	currentHeadingGrad=currentHeading*pi()/180;
-	vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
-	projectionHeading=direction*vectHeading';
-	if (projectionHeading >=0)
-		forward=1;
-	else
-		forward=-1;
-	endif
-  next=[nextX,nextY];
-	return
-else
-	direct=false;
-	printf(mfilename);
-	printf(" *** need to compute path . *** ");
-	printf(ctime(time()))
+instruction=[];
+if (newTarget==false) 
+  [apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,targetL);
+  if (possible==true)
+    direct=true;
+    printf(mfilename);
+    printf(" *** go straight possible . *** ");
+    printf(ctime(time()))
+    direction=[targetX-currentX,targetY-currentY];
+    currentHeadingGrad=currentHeading*pi()/180;
+    vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
+    projectionHeading=direction*vectHeading';
+    if (projectionHeading >=0)
+      forward=1;
+    else
+      forward=-1;
+    endif
+    next=[nextX,nextY];
+    return
+  else
+    direct=false;
+    printf(mfilename);
+    printf(" *** need to compute path . *** ");
+    printf(ctime(time()))
+  endif
 endif
 % in case direct acces not possible determine path
 if (newTarget==true)
  % [apRobot,robot,AStarStep,cost,forward] = ApComputeOptimalPath(apRobot,robot,targetL,plotOn)
+ %{
 	[apRobot,robot,AStarPath,AStarStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,targetL,plotOn);
 	if (cost<0)   % no path found
 		forward=0;
@@ -61,6 +65,7 @@ if (newTarget==true)
 	save ("-mat4-binary","AStarStep.mat","AStarStep");
 	nextX=AStarStep(2,1);
 	nextY=AStarStep(2,2);
+  %}
 else
 %	load("AStarStep.mat");
   %load(AStarStepSmooth.mat);
@@ -86,9 +91,15 @@ else
 	printf(" *** closest step is:%d . *** ",closest);
 	printf(ctime(time()));
 	if (closest!=0)
-		nextX=AStarStep(min(size(AStarStep,1),closest),1);
-		nextY=AStarStep(min(size(AStarStep,1),closest),2);
-    instruction=AStarStep(min(size(AStarStep,1),closest),4);
+    if (newTarget==false)
+		  nextX=AStarStep(min(size(AStarStep,1),closest),1);
+		  nextY=AStarStep(min(size(AStarStep,1),closest),2);
+      instruction=AStarStep(min(size(AStarStep,1),closest),4);
+    else
+    	nextX=AStarStep(1,1);
+		  nextY=AStarStep(1,2);
+      instruction=AStarStep(1,4);
+    endif
 	else
 	 [apRobot,robot,AStarPath,AStarStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,[RoundTo(targetX,5),RoundTo(targetY,5),0],plotOn);
   	if (cost<0)   % no path found
@@ -96,7 +107,9 @@ else
       next=[nextX,nextY];
 		  return
 	  endif
-	  [apRobot,AStarStep,forward] = ApSmoothPath(apRobot,AStarPath,AStarStep,forward,plotOn);
+    if (newTarget==false) 
+	    [apRobot,AStarStep,forward] = ApSmoothPath(apRobot,AStarPath,AStarStep,forward,plotOn);
+    endif
 	  save ("-mat4-binary","AStarStep.mat","AStarStep");
 	  nextX=AStarStep(2,1);
 	  nextY=AStarStep(2,2);

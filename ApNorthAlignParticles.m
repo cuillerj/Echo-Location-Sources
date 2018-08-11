@@ -1,6 +1,6 @@
-function [apRobot,robot] = ApNorthAlignParticles(apRobot,robot,NorthHeading,plotOn)
+function [apRobot,robot] = ApNorthAlignParticles(apRobot,robot,Heading,plotOn)
   printf(mfilename);
-  printf(" align particles: %d  *** ",NorthHeading)
+  printf(" align particles > x_orientation: %d  *** ",Heading)
   printf(ctime(time()));		
   particles=apGet(apRobot,"particles");      
   apRobot = setfield(apRobot,"lastParticles",particles); 
@@ -8,7 +8,7 @@ function [apRobot,robot] = ApNorthAlignParticles(apRobot,robot,NorthHeading,plot
   img=apGet(apRobot,"img"); 
   [x,y]=size(particles);
   sigmaHeading=3;
-  heading=mod(NorthHeading,360);
+  heading=mod(Heading,360);
   for i=1:x
     particles(i,3)= normrnd(heading,sigmaHeading);
   endfor

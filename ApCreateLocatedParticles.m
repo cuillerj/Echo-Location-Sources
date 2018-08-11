@@ -1,4 +1,4 @@
-function [apRobot] = ApCreateLocatedParticles(apRobot,particlesNumber,plotOn)
+function [apRobot] = ApCreateLocatedParticles(apRobot,particlesNumber,plotOn,sigmaPos,sigmaHeading)
 %{
 create particles n=(prob/particlesNumber) located at (posX,posY,heading) with x y h precision
 create particles n=(particlesNumber - n) located anywhere inide carto
@@ -7,6 +7,12 @@ if heading <0 particles are created in any orientation
 if prob > 0 some particles are created according to posX posY and heading 
 if posX and posY <0 and heading > 0 prob will not be used
 %}
+ if (!exist("sigmaPos"))
+   sigmaPos=2;
+ endif
+  if (!exist("sigmaHeading"))
+   sigmaHeading=3;
+ endif
   degreUnit=0;
   radianUnit=1;
   debugOn=1;
@@ -19,13 +25,13 @@ if posX and posY <0 and heading > 0 prob will not be used
   heading=loc(3);
   prob=apGet(apRobot,"locationProb");
   pw=1/particlesNumber;
-  xPrecision=10;
-  yPrecision=10;
-  hPrecision=10;
-  sigmaDist=2;  %2
+ % xPrecision=precision;
+  %yPrecision=precision;
+  %hPrecision=precision;
+  sigmaDist=sigmaPos;  %2
   onlyNO=false;
-  if ((posX=-1) && (prob=100))      % means robot is only north oriented
-    sigmaHeading=3; 
+  if ((posX==-1) && (prob==100))      % means robot is only north oriented
+  %  sigmaHeading=sigmaHeading; 
     onlyNO=true;
   else
     sigmaHeading=0.5;

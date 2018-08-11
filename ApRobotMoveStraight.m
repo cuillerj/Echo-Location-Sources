@@ -48,8 +48,9 @@
                   robot.Move(0,-sign(lenToDo)*apGet(apRobot,"backMoveWhenCollision")); 		 % len sent in cm
                   apRobot = setfield(apRobot,"particles",lastParticles);
                   newLenToDo=newLenToDo-sign(lenToDo)*apGet(apRobot,"backMoveWhenCollision");
-                  apRobot = setfield(apRobot,"lastMove",newLenToDo);   
-                  [apRobot,robot]=ApMoveParticles(apRobot,robot,0,newLenToDo,plotOn);
+                  apRobot = setfield(apRobot,"lastMove",newLenToDo); 
+                  apRobot = setfield(apRobot,"particles",lastParticles);
+                  [apRobot,robot]=ApMoveParticles(apRobot,robot,0,newLenToDo-sign(lenToDo)*apGet(apRobot,"backMoveWhenCollision"),plotOn);
                   apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
                   [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
                   if (retCodeMove>=99)  
@@ -95,6 +96,12 @@
                   apRobot = setfield(apRobot,"particles",lastParticles);
                   apRobot = setfield(apRobot,"lastMove",0);
                   apRobot = setfield(apRobot,"location",apGet(apRobot,"saveLocation"));
+                  probExpectedMoveOk=1;
+                endif
+                 if (retCodeMove==robot.moveWheelSpeedInconsistancy)
+                  printf(mfilename);
+                  printf(" pb move moveWheelSpeedInconsistancy  *** ");
+                  printf(ctime(time()));
                   probExpectedMoveOk=1;
                 endif
                apRobot = setfield(apRobot,"waitFor",robot.robotInfoUpdated);

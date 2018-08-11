@@ -2,7 +2,7 @@ function [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,location,p
   robot.SetPosX(location(1));
   robot.SetPosY(location(2));
   robot.SetHeading(location(3));
-  robot.SetCurrentLocProb(prob);
+  robot.SetCurrentLocProb(round(100*prob));
   retCode=0;
   while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || mod(robot.GetHeading(),360)!=mod(robot.GetHardHeading(),360))
      robot.UpdateHardRobotLocation();
@@ -24,7 +24,8 @@ function [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,location,p
      endif
    end
    apRobot = setfield(apRobot,"location",location);
+   apRobot = setfield(apRobot,"locationProb",100*prob);   
    printf(mfilename);
-   printf(" hardPosX:%d hardPosY:%d prob:%d *** ",robot.GetHardPosX(),robot.GetHardPosY(),robot.GetCurrentLocProb());
+   printf(" hardPosX:%d hardPosY:%d prob:%f *** ",robot.GetHardPosX(),robot.GetHardPosY(),robot.GetCurrentLocProb());
    printf(ctime(time()))
  endfunction

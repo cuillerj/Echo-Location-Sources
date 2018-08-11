@@ -1,4 +1,11 @@
 function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,debugOn)
+  %{
+  x diffent stateList are used corresponding to different major phases (localizing, targeting..)
+  robot state is [mainStatus,LocalizationStatus,movingStatus]
+  alphabet is [action, retCode] 
+  transition (robotState, alphabet) => new robotState
+  %}
+
   if (!exist("debugOn"))
     debugOn=false;
   endif
@@ -12,6 +19,7 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   gotTarget=4;
   locked=5;
   lost=6;
+
   mStatus=["initial";"localizing";"targeting";"gotTarget";"locked";"lost"];
    %{
   localization status
@@ -24,6 +32,7 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   %{
   action status
   %}
+
   atRest=1;
   NOrient=2;
   moving=3;
@@ -38,7 +47,8 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   scan360=4;
   determine=5;
   pingFB=6;
-  actionList=["moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB"];
+  checkTarget=7;
+  actionList=["moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB";"checkTarget"];
     %{
   return code list
   %}
@@ -51,52 +61,75 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   obstacle=robot.moveKoDueToObstacle;
   underLimitation=robot.moveUnderLimitation;
   speedInconstistency=robot.moveWheelSpeedInconsistancy;
-  if (action(2)==speedInconstistency)
-    action(2)=wheelStopped;
-  endif
-  alphabet=[[moveStraight,normal];[moveStraight,timeout];[moveStraight,notEnoughSpace];[moveStraight,wheelStopped];[moveStraight,obstacle];[moveStraight,underLimitation];[moveStraight,pending] %1-7
-            [rotate,normal];[rotate,timeout];[rotate,notEnoughSpace];[rotate,wheelStopped];[rotate,obstacle];[rotate,underLimitation];[rotate,pending]; %8-14
-            [northAlign,normal];[northAlign,timeout];[northAlign,notEnoughSpace];[northAlign,wheelStopped];[northAlign,obstacle];[northAlign,underLimitation];[northAlign,pending]; %15-21
-            [scan360,normal];[scan360,timeout];[scan360,pending];  %22-24
-            [pingFB,normal];[pingFB,timeout];  %25-26
-            [determine,determined];[determine,!determined]   %27-28
+  
+ 
+  
+%  if (action(1)==moveStraight && action(2)==speedInconstistency)
+ %   action(2)=wheelStopped;
+ % endif
+
+  alphabet=[[moveStraight,normal];[moveStraight,timeout];[moveStraight,notEnoughSpace];[moveStraight,wheelStopped];[moveStraight,obstacle];[moveStraight,underLimitation];[moveStraight,pending];[moveStraight,speedInconstistency] %1-8
+            [rotate,normal];[rotate,timeout];[rotate,notEnoughSpace];[rotate,wheelStopped];[rotate,obstacle];[rotate,underLimitation];[rotate,pending]; %9-15
+            [northAlign,normal];[northAlign,timeout];[northAlign,notEnoughSpace];[northAlign,wheelStopped];[northAlign,obstacle];[northAlign,underLimitation];[northAlign,pending]; %16-22
+            [scan360,normal];[scan360,timeout];[scan360,pending];  %23-25
+            [pingFB,normal];[pingFB,timeout];  %26-27
+            [determine,determined];[determine,0];   %28-29
+			      [checkTarget,false];[checkTarget,true]   %30-31
             ];
+
   statesListL=[[initial,notLocalized,atRest];  %1
             [localizing,notLocalized,atRest];[localizing,notLocalized,NOrient];[localizing,notLocalized,moving];[localizing,notLocalized,scanned]; %2-5
             [locked,notLocalized,atRest];[locked,notLocalized,scanned];[locked,notLocalized,moving]; %6-8
             [targeting,localized,atRest];[lost,notLocalized,atRest]; %9-10
-            [localizing,determining,scanned];  %11
+            [localizing,determining,scanned]  %11
             ];  
-
             
-
-  transitionsListL=[[4,1,2];[4,2,10];[4,3,6];[4,4,4];[4,5,2];[4,6,2];[4,7,4];  %  1-7 move straight
-                    [11,8,4];[11,9,10];[11,10,6];[11,11,4];[11,12,4];[11,13,4];[11,14,5];  % 8-14 rotate
-                    [1,15,3];[1,16,10];[1,17,6];[1,18,3];[1,19,3];[1,20,3];[1,21,2];  % 15-21 -northAlign                    
-                    [2,15,3];[2,16,10];[2,17,6];[2,18,3];[2,19,3];[2,20,3];[2,21,2];  % 22-28 -northAlign
-                    [3,22,5];[3,23,6];[3,24,3];           % 29-31 scan360
-                    [5,27,9];[5,28,11];          % 32-33 determine
-                    [8,4,11];
-                    [11,27,9];[11,28,11]
+  transitionsListL=[[4,1,2];[4,2,10];[4,3,6];[4,4,8];[4,5,2];[4,6,2];[4,7,4];[4,8,8];  %  1-8 move straight
+                    [11,9,4];[11,10,10];[11,11,6];[11,12,6];[11,13,4];[11,14,4];[11,15,5];  % 9-15 rotate
+                    [1,16,3];[1,17,10];[1,18,11];[1,19,11];[1,20,11];[1,21,3];[1,22,2];  % 16-22 -northAlign                    
+                    [2,16,3];[2,17,10];[2,18,6];[2,19,6];[2,20,6];[2,21,3];[2,22,2];  % 23-29 -northAlign
+                    [3,23,5];[3,24,10];[3,25,3];[6,23,11];[6,24,10];[6,25,11];           % 30-32 scan360
+                    [5,28,9];[5,29,11];          % 33-34 determine
+                    [8,4,1];
+                    [11,23,5];[11,24,10];[11,28,9];[11,29,11]
                    ];   %(stateIdx,alphabetIdx,newStateIdx)
-    
-  statesListT=[[initial,localized,atRest]]; 
-  statesListK=[[locked,notLocalized,atRest];[locked,notLocalized,scanned];[locked,notLocalized,moving];
+
+  statesListT=[[targeting,localized,atRest];[targeting,localized,moving];[targeting,localized,scanned]; % 1-3
+				[targeting,notLocalized,scanned];[lost,notLocalized,atRest]; 							% 4-5
+				[targeting,determining,scanned];  														% 6
+				[gotTarget,localized,atRest]  															% 7
+			];
+  transitionsListT=[[1,1,2];[1,2,5];[1,3,2];[1,4,2];[1,5,2];[1,6,2];[1,7,5];[1,7,2];[1,8,2];  %  1-8 move straight
+					[1,9,2];[1,10,2];[1,11,2];[1,12,2];[1,13,2];[1,14,2];[1,15,2]; 			% 9-15 rotate
+					[2,1,2];[2,2,5];[2,3,2];[2,4,2];[2,5,2];[2,6,2];[2,7,5];[2,7,2];[2,8,2];  %  16-23 move straight
+					[2,9,2];[2,10,2];[2,11,2];[2,12,2];[2,13,2];[2,14,2];[2,15,2]; 			% 24-31 rotate
+					[2,26,3];[2,26,2];														% 32-33  ping
+					[3,28,6];[3,29,2];														% 34-35 determine
+					[2,30,2];[2,31,7]														% 36-37 check target
+					];    
+				
+  statesListK=[[locked,notLocalized,atRest];[locked,notLocalized,moving];[localizing,notLocalized,scanned];
                [localizing,notLocalized,atRest];[lost,notLocalized,atRest];[localizing,notLocalized,moving]];
-  transitionsListK=[[1,22,2];[1,23,5];[2,8,6];[2,9,5]];
+  transitionsListK=[[1,23,3];[1,24,5]; % scan
+                    [2,1,1];[2,2,5];[2,3,1];[2,4,1];[2,5,1];[2,6,1];[2,7,1];[2,8,1];
+                    [2,8,6];[2,9,5]];
   
-  
-  automatonState=apGet(apRobot,"automatonState");  
+  automatonState=apGet(apRobot,"automatonState");
   newState=[mStatus(automatonState(1),:);lStatus(automatonState(2),:);aStatus(automatonState(3),:)];
   if ((automatonState(1)==localizing) || (automatonState(1)==initial && automatonState(2)==notLocalized))
       statesList=statesListL;
       statesListNumber=size(statesList,1);
       transitionsList=transitionsListL;
   endif
-  if ((automatonState(1)==locked))
+  if ((automatonState(1)==locked || automatonState(1)==lost))
       statesList=statesListK;
       statesListNumber=size(statesList,1);
       transitionsList=transitionsListK;
+  endif
+  if ((automatonState(1)==targeting))
+      statesList=statesListT;
+      statesListNumber=size(statesList,1);
+      transitionsList=transitionsListT;
   endif
   statesListNumber=size(statesList,1);
   alphabetNumber=size(alphabet,1);

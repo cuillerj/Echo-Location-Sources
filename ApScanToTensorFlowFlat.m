@@ -1,4 +1,4 @@
-function [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot)
+function [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot,plotOn)
   %{
   robot.Scan360();
   apRobot = setfield(apRobot,"waitFor",robot.scanEnd);   
@@ -31,6 +31,9 @@ function [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot)
         return;                 
    endif
    %}
+ if (!exist("plotOn"))
+    plotOn=false;
+  endif
   retCode=9;
   [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,0);
     if (retCode==0)
@@ -38,9 +41,9 @@ function [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot)
     printf("  scan ended  ***  ")
     printf(ctime(time()))
     robot.SetRunningStatus(0);
-    [apRobot,robot,tensorFlowDataIn,newScan] = TfCreateTensorFlowDataIn(apRobot,robot,0,1);
+    [apRobot,robot,tensorFlowDataIn,newScan] = TfCreateTensorFlowDataIn(apRobot,robot,0,plotOn);
 %    [X,Y,Angle,Cost]=ApAnalyseLastScanRotation(robot,false,nbPred,heading,plotOn);
   endif
 
-  [result] = TfGetTensorFlowResult()
+  [result] = TfGetTensorFlowResult();
 endfunction
