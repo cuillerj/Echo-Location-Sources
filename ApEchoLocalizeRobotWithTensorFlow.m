@@ -1,14 +1,17 @@
 %{
  this function launch  an echo scan and submit the scan result to tensorflow for determination and return list of position x y
 %}
-function [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotOn)
+function [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotOn,scanId)
  if (!exist("plotOn"))
     plotOn=false;
   endif
+ if (!exist("scanId"))
+    scanId=0;
+ endif 
   printf(mfilename);
   printf("  ***  ");
   printf(ctime(time()))
-  [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot,plotOn);
+  [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot,plotOn,scanId);
   [result] = ApConvertTfPredictionForParticlesFilter(result);
   posX=result(:,1);
   posX=reshape(posX,1,size(posX,1));

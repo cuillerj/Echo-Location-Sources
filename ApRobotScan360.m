@@ -1,4 +1,4 @@
-function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn)
+function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn,scanId)
   %{
   send scan resquest to the robot and wait for completion
   %}
@@ -6,10 +6,13 @@ function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn)
   if (!exist("plotOn"))
     plotOn=false;
   endif
+  if (!exist("scanId"))
+    scanId=0;
+  endif
   printf(mfilename);
   printf(" Scan 360 requested  *** ")
   printf(ctime(time()));									
-  robot.Scan360();
+  robot.Scan360Id(scanId);
   apRobot = setfield(apRobot,"waitFor",robot.scanEnd);     
   [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot,0);
   if (retCode==-99)
@@ -17,11 +20,20 @@ function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn)
         return;                 
    endif
    if (retCode==0)
-         aligned=true;
+     if(robot.scanReceiveCount!=apGet(apRobot,"nbPulse"))
+      retCode=robot.scanReceiveCount;
+      [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
+      if (action=="stop..")
+               return;
+       endif
+     endif
      else
+      action="stop..";
+      %{
          [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
          if (action=="stop..")
                return;
          endif
+         %}
     endif
   endfunction

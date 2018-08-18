@@ -47,6 +47,25 @@ else
       return;
 		endif
 	endif
+ 	testedValue=robot.scanEnd;
+	if (currentAction == testedValue)
+    printf(mfilename);
+		printf(" scanReceiveCount:%d *** ",robot.scanReceiveCount);
+		printf(ctime(time()));
+		if (robot.scanReceiveCount >13)
+      printf(mfilename);
+			printf(" action retry *** ");
+			printf(ctime(time()));
+			action="retry.";
+    else
+    	issue=true;
+      printf(mfilename);
+			printf(" action stop *** ");
+			printf(ctime(time()));     
+      action="stop..";    
+      return;
+		endif
+	endif
 	action="resume";
 endif
 return

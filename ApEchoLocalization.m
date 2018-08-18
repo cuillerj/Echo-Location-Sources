@@ -95,7 +95,9 @@
  % traceDet=[];
   traceMove=[];
   histDeltaDist=[0];
-  traceLoc=[];
+  if (loopId==1)
+    traceLoc=[];
+  endif
   forward=true;
   randomChoice=false;    
   newTheoriticalPositions=[184,184];  % set to the north oriented reference point
