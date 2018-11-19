@@ -1,7 +1,10 @@
 % create a matrix for one scan rotated by "rotation" degres
-function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreateTensorFlowDataIn(apRobot,robot,rotation,plotOn)
+function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreateTensorFlowDataIn(apRobot,robot,rotation,plotOn,head)
   if (!exist("plotOn"))
     plotOn=false;
+  endif
+    if (!exist("head"))
+    head='scan plot';
   endif
   printf(mfilename);
   printf("  ***  ");
@@ -55,14 +58,13 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
     # add extraplotated data
   extrapolatedTensorFlowDataIn = ExtrapolateScan(tensorFlowDataIn,incrementValue);
   csvwrite ("rotatedTensorFlow/tensorFlow360DataIn.csv", extrapolatedTensorFlowDataIn);
-
-    j=1;
-    while (j<=nbMesurementByTrain)
+  j=1;
+  while (j<=nbMesurementByTrain)
       scanToAnalyse(j,1)=robot.GetScanAngle(j-1);
       scanToAnalyse(j,2)=robot.GetScanDistFront(j-1);
       scanToAnalyse(j,3)=robot.GetScanDistBack(j-1);
       j=j+1;
-    end
+  end
   csvwrite ("tensorFlow/newRequest.txt",time)
   csvwrite ("rotatedTensorFlow/newRequest.txt",time)
   if (plotOn) 
@@ -113,7 +115,7 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
          if plotOn==true
           col=['r','g','b','m','c']; % graph color 
           figure();
-          title (0);
+          title (head);
           hold on;
         endif
          Z=reshape(analyseMatRotated(1,:),2,181);  % reshape matrix (1 362) > (2 181)
@@ -123,7 +125,7 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
           X=dX.*cos(angleR);
           Y=dX.*sin(angleR);
         if plotOn==true
-          plot (X,Y,col(3));
+          plot (X,Y,col(1));
         endif
           X=-dY.*cos(angleR);
           Y=-dY.*sin(angleR);

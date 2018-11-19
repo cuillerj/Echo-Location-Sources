@@ -1,7 +1,8 @@
 function [quality] = ToolQualifyComputeQuality(data)
+ % compute score of a prediction versus actual position
  %     result=[result;[scanId,scanRef,posX,posY,posH,posProb,robot.GetScanNOOrientation(),retCode]];
     % NO comparaison
-     NOQuality=ToolAngleDiff(data(4),data(size(data,2)-1));
+    NOQuality=ToolAngleDiff(data(4),data(size(data,2)-1));
     % location comparaison
     len=(size(data,2)-7)/3;
     posX=data(5:len+4);
@@ -18,5 +19,5 @@ function [quality] = ToolQualifyComputeQuality(data)
     else
       printf("closest:(%d,%d) distance:%d idx:%d \n",posX(idx),posY(idx),min,idx)
     endif
-    quality=[data(1),foundPosition,NOQuality,posX(idx),posY(idx),delta(idx)];
+    quality=[data(1),foundPosition,NOQuality,posX(idx),posY(idx),round(delta(idx))];
 endfunction

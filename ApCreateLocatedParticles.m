@@ -20,6 +20,7 @@ if posX and posY <0 and heading > 0 prob will not be used
   carto=apGet(apRobot,"carto");
   img=apGet(apRobot,"img");
   loc=apGet(apRobot,"location");
+  plotRatio=apGet(apRobot,"plotRatio");
   posX=loc(1);
   posY=loc(2);
   heading=loc(3);
@@ -71,7 +72,7 @@ if posX and posY <0 and heading > 0 prob will not be used
     lim=(particlesNumber-lim)-1;
   endif
     printf(mfilename);
-    printf(" Created north only oriented only particles:%d *** ",i);
+    printf(" Created oriented only particles:%d *** ",i);
     printf(ctime(time()));
   while (i<=lim)        % create some particles anywhere in any direction
     px=randi(x);
@@ -85,7 +86,14 @@ if posX and posY <0 and heading > 0 prob will not be used
   apRobot = setfield(apRobot,"particles",particles);
   apRobot = setfield(apRobot,"lastParticles",particles);
 %  save ("-mat4-binary","particles.mat","particles")
+
+
   if (plotOn)
+    [apRobot,figureNumber] = ApPlotParticles(apRobot,plotRatio,"created particles >");
+    printf(mfilename);
+    printf(" figure :%d ***  ",figureNumber);
+    printf(ctime(time()));	
+    %{
     figure();
     shitfCartoX=apGet(apRobot,"shitfCartoX");
     shitfCartoY=apGet(apRobot,"shitfCartoY");
@@ -98,6 +106,7 @@ if posX and posY <0 and heading > 0 prob will not be used
       plot(particles(i,1)+shitfCartoX,particles(i,2)+shitfCartoY)
     end
     hold off;
+    %}
   endif
   return
 endfunction

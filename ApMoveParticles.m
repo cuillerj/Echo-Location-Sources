@@ -24,7 +24,14 @@ for i=1:x
 endfor
   apRobot = setfield(apRobot,"particles",particles);
 %save ("-mat4-binary","particles.mat","particles")
+  plotRatio=apGet(apRobot,"plotRatio");
 if (plotOn)
+  %figureNumber=get (0, "currentfigure");
+  [apRobot,figureNumber] = ApPlotParticles(apRobot,plotRatio,"moved particles >");
+   printf(mfilename);
+   printf(" figure :%d ***  ",figureNumber);
+   printf(ctime(time()));	
+  %{
   shitfCartoX=apGet(apRobot,"shitfCartoX");
   shitfCartoY=apGet(apRobot,"shitfCartoY");
 	figure();
@@ -37,5 +44,6 @@ if (plotOn)
 		plot(particles(i,1)+shitfCartoX,particles(i,2)+shitfCartoY)
 	end
 	hold off;
+  %}
 endif
 endfunction

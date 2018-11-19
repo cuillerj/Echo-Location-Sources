@@ -1,6 +1,6 @@
 function [apRobot,robot] = ApResampleParticles(apRobot,robot,plotOn,newFigure,checkLocationAvaibility)
 %load particles
-  plotRatio=5; # 1/plotRatio point will be plotted
+  plotRatio=3; # 1/plotRatio point will be plotted
   fast=true;
   if (!exist("newFigure"))  % simulation is default mode 
       newFigure=false;
@@ -17,23 +17,21 @@ function [apRobot,robot] = ApResampleParticles(apRobot,robot,plotOn,newFigure,ch
   cartoMaxAvailableValue=apGet(apRobot,"cartoMaxAvailableValue");  
   img=apGet(apRobot,"img");    
   [nbPart,y]=size(particles);
+  shitfCartoX=apGet(apRobot,"shitfCartoX");
+  shitfCartoY=apGet(apRobot,"shitfCartoY");
   radianUnit=1;
   debugOff=0;
   if (checkLocationAvaibility)
-
     for i=1:nbPart
-      
-    %      if (ApQueryCartoAvailability(apRobot,[particles(i,1),particles(i,2),particles(i,3)*pi()/180],radianUnit,debugOff,!fast)==0)
-     %     i=i+1;
-       x=round(particles(i,1));
-       y=round(particles(i,2));
+       x=round(particles(i,1))+shitfCartoX;
+       y=round(particles(i,2))+shitfCartoY;
        if (x <= 0 || x > cartoX)
            particles(i,4)=0;
-       endif
-       if (y <= 0 || y > cartoY)
+       elseif
+        (y <= 0 || y > cartoY)
            particles(i,4)=0;
-       endif
-       if (particles(i,4)!=0 && carto(x,y)>cartoMaxAvailableValue) 
+       elseif
+       (carto(x,y)>cartoMaxAvailableValue) 
            particles(i,4)=0;
        endif
     end
@@ -64,8 +62,6 @@ function [apRobot,robot] = ApResampleParticles(apRobot,robot,plotOn,newFigure,ch
   %save ("-mat4-binary","particles.mat","particles");
   x=nbPart;
   if (plotOn)
-    shitfCartoX=apGet(apRobot,"shitfCartoX");
-    shitfCartoY=apGet(apRobot,"shitfCartoY");
     if (newFigure)
       figure()
       hold on;
@@ -76,15 +72,24 @@ function [apRobot,robot] = ApResampleParticles(apRobot,robot,plotOn,newFigure,ch
      else
       figure(3);
     endif
+   figureNumber=get (0, "currentfigure");
+   [apRobot,figureNumber] = ApPlotParticles(apRobot,plotRatio,"resampled particles >",figureNumber);
+    hold off;
+    printf(mfilename);
+    printf(" figure :%d ***  ",figureNumber);
+    printf(ctime(time()));	
+   %{
     title ("resampled particles ");
     hold on;
   %	imshow(img,[])
   %	[a,b]=size(img);
   %	axis([1,b,1,a],"on","xy");
+
     for i=1:(round(x/plotRatio)-1)
       plot(particles(plotRatio*i,1)+shitfCartoX,particles(plotRatio*i,2)+shitfCartoY)
     end
     hold off;
+    %}
   endif
 endfunction
 

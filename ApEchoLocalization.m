@@ -55,13 +55,17 @@
   endif
   if (!exist("realMode"))  % simulation is default mode 
       realMode=0;
+
   endif
   if (!exist("plotValue"))  % real is default mode 
       plotValue=1;
   endif
  %simulationMode=1;  % to set simulation 1 on 0 off
-
-
+  if(!realMode)
+      printf(mfilename);
+      printf(" simulation move noise:%d  scan noise:%d  retcode noise:%d retcode value;%d *** ",robot.noiseLevel,robot.scanNoiseLevel,robot.noiseRetCode,robot.noiseRetValue);
+      printf(ctime(time()))
+  endif
   simulationMode=!realMode;
   printf(mfilename);
   printf(" real mode :%d *** ",realMode)
@@ -87,20 +91,28 @@
   currentNorthOrientationReference=apGet(apRobot,"currentNorthOrientationReference");
   nbPred=10;                    % define the number of predictions that will be compute for each 360° scan
   located=false;
+  consistant=true;
   alignParticles=true;
   newFigure=true;
   plotOn=true;
   checkLocationAvaibility=true;
-  newFigure=true;
  % traceDet=[];
   traceMove=[];
   histDeltaDist=[0];
-  if (loopId==1)
+  if (!exist("traceLoc"))
     traceLoc=[];
   endif
   forward=true;
-  randomChoice=false;    
-  newTheoriticalPositions=[184,184];  % set to the north oriented reference point
+  randomChoice=false;
+  if(apGet(apRobot,"simulationMode"))         
+    randomPosition = ApGetRadomPosition(apRobot);
+    newTheoriticalPositions=randomPosition(1:2);
+    printf(mfilename);
+    printf(" randomly choosen location: (%d,%d) *** ",newTheoriticalPositions(1),newTheoriticalPositions(2))
+    printf(ctime(time()))
+  else
+    newTheoriticalPositions=[184,184];  % 
+  endif
    if (plotValue>=1) % 
       figure(1);      % figure 1 fixed for moves
 		  title ("moves");
@@ -116,10 +128,8 @@
     else
       plotReq=false;
    endif
-
-
-  load ('spreadedParticles.mat');
-  apRobot = setfield(apRobot,"particles",particles);
+   load ('5000particlesSpreadedXoriented.mat');
+   apRobot = setfield(apRobot,"particles",particles);
     pointLib=["theori:";"encoder:";"gyroTheo:";"BNOleft:";"BNORight:"];
     printf(mfilename);
     printf("align robot:%d  ",shiftEchoVsRotationCenter)
@@ -151,14 +161,27 @@
             printf(ctime(time()));     
             count=maxRetry;
             break    
-          case {[localizing,notLocalized,atRest],[initial,notLocalized,atRest]}    
-              [apRobot,robot,scanRef,distance] = ApGetClosestScanReference(apRobot,robot,newTheoriticalPositions);
-              robot.simulatedHardX=scanRef(1);
-              robot.simulatedHardY=scanRef(2);
-              currentNorthOrientationReference=scanRef(3);
+          case {[localizing,notLocalized,atRest],[initial,notLocalized,atRest]}
+            if (count==1)
+              [pRobot,robot,scanRef,distance] = ApGetClosestScanReference(apRobot,robot,apGet(apRobot,"northOrientationReferencePoint"));   
+              currentNorthOrientationReference=scanRef(3);   
+              if(apGet(apRobot,"simulationMode"))          
+                robot.simulatedHardX=newTheoriticalPositions(1);
+                robot.simulatedHardY=newTheoriticalPositions(2); 
+              else           
+                robot.simulatedHardX=scanRef(1);
+                robot.simulatedHardY=scanRef(2);      
+              endif
+            else
+                [pRobot,robot,scanRef,distance] = ApGetClosestScanReference(apRobot,robot,newTheoriticalPositions);             
+                robot.simulatedHardX=scanRef(1);
+                robot.simulatedHardY=scanRef(2);
+                currentNorthOrientationReference=scanRef(3);  
+            endif
+  
               printf(mfilename);
               printf(" Scan reference location :(%d,%d) NO:%d *** ",robot.simulatedHardX,robot.simulatedHardY,currentNorthOrientationReference);
-              printf(ctime(time()));
+              printf(ctime(time()));             
               [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,currentNorthOrientationReference,alignParticles,(plotValue>=2)); 
               if (action=="inMove" || action=="stop..")
                   printf(mfilename);
@@ -169,22 +192,22 @@
               endif
           case([localizing,notLocalized,NOrient])  
               %[apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithRotation(apRobot,robot,nbPred,0,plotOff);
-              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotReqL2);             
+              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotReqL2,0);             
           case([localizing,notLocalized,scanned])
               traceLoc=[traceLoc;[zeros(1,20)]];
               traceLoc(size(traceLoc)(1),1:2)=[loopId,countDet];    
-              [apRobot,robot,detX,detY,detH,prob] = ApDetermineRobotLocationWithTfAndParticlesGaussian(apRobot,robot,posX,posY,posProb,(plotValue>=1),newFigure);
+              [apRobot,robot,detX,detY,detH,prob,figureNumber] = ApDetermineRobotLocationWithTfAndParticlesGaussian(apRobot,robot,posX,posY,posProb,(plotValue>=1),newFigure);
+              if((apGet(apRobot,"realMode") && plotValue>=1 && count>1) || (apGet(apRobot,"simulationMode") && plotValue>=1) )
+                figure(figureNumber);
+                plot(newTheoriticalPositions(1)+shitfCartoX,newTheoriticalPositions(2)+shitfCartoY,"color","r","+","markersize",15)
+                hold off;
+              endif
+              probCum = ApComputeCenteredParticlesProbability(apGet(apRobot,"particles"),[detX,detY,detH],apGet(apRobot,"distanceMargin"),apGet(apRobot,"headingMargin"));
               printf(mfilename);
-              printf(" determined location (%d,%d):(%d,%d,%d) prob:%f (%d,%d) *** ",loopId,count,detX,detY,detH,prob,loopId,count);
-              printf(ctime(time()));
-              %traceDet(count,:)=[detX,detY,detH,prob];  
-              traceLoc(size(traceLoc)(1),3:6)=[detX,detY,detH,prob];
-   %           detX=(3*detX+newTheoriticalPositions(1))/4;  % mitigate values
-    %          detY=(3*detY+newTheoriticalPositions(2))/4;  % mitigate values
-  %            printf(mfilename);
-   %           printf(" updated location (%d,%d):(%d,%d,%d) prob:%f (%d,%d) *** ",loopId,count,detX,detY,detH,prob,loopId,count);
-    %          printf(ctime(time()));
-   %           traceLoc(size(traceLoc)(1),7:8)=[detX,detY];
+              printf(" determined location (%d,%d):particles (%d,%d,%d %.1f%%) TensorFlow(%d,%d %.1f%%) *** ",loopId,count,detX,detY,detH,probCum*100,posX(1),posY(1),posProb(1)*100);
+              printf(ctime(time())); 
+              traceLoc(size(traceLoc)(1),3:6)=[detX,detY,detH,probCum];
+              traceLoc(size(traceLoc)(1),12:14)=[posX(1),posY(1),posProb(1)];
               countDet++;
               if (realMode)
                  [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,[detX,detY,detH],prob);
@@ -207,17 +230,26 @@
                 traceLoc(size(traceLoc)(1),9:11)=[newTheoriticalPositions(1),newTheoriticalPositions(2),deltaDist];
               endif
         #      if(count>0 && lastMesurmentReliable && deltaDist<determinedDistanceThreshold && prevDeltaDist < determinedDistanceThreshold*2)
+              [located,consistant]= ApDetermineRobotLocatedOrNot(apRobot,traceLoc);
+              if (located)
+                   EchoLoc=[detX,detY,detH];
+                  [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,localizationFound],1);           
+              %{
               if(count>2 && (mod(detH,360)<=15 || mod(detH,360)>=345) && lastMesurmentReliable && histDeltaDist(countDet)<determinedDistanceThreshold && histDeltaDist(countDet-1)<determinedDistanceThreshold*2 )
                   located=true;
                   EchoLoc=[detX,detY,detH];
                   [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,localizationFound],1);
+                  %}
                else
                    [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,!localizationFound],1);
                    [apRobot,robot] = ApResampleParticles(apRobot,robot,plotReq,newFigure,checkLocationAvaibility);
+                 %  probCum = ApComputeCenteredParticlesProbability(apGet(apRobot,"particles"),[detX,detY,detH],apGet(apRobot,"distanceMargin"),apGet(apRobot,"headingMargin"))
                     prevDeltaDist=deltaDist;               
                endif
               if(count>4 && mean(histDeltaDist)>determinedDistanceThreshold*3);
                 count=maxRetry;
+              elseif (!consistant)
+                count=maxRetry;                
               else
                 count++;
               endif       
@@ -306,14 +338,14 @@
                  printf(ctime(time()));
                  %traceDet
                  %histDeltaDist
-                 traceLoc
+                 %traceLoc
         if (realMode)
           if (EchoLoc(1)==-1)
-            robot.Horn(5);  % horn x seconds
+            robot.Horn(3);  % horn x seconds
             else
               for i=1:3
                   robot.Horn(1);  % horn x seconds
-                  pause(1);
+                  pause(2);
               end
           endif       
       endif

@@ -82,15 +82,25 @@ apRobot = setfield(apRobot,"automatonState",[1,1,1]);                    % set a
 apRobot = setfield(apRobot,"automatonStateList",[]);
 apRobot = setfield(apRobot,"automatonRC",0);
 apRobot = setfield(apRobot,"shitfCartoX",0); 
-apRobot = setfield(apRobot,"shitfCartoY",50);     
+apRobot = setfield(apRobot,"shitfCartoY",50);
+apRobot = setfield(apRobot,"plotRatio",4);                              % 1/potRatio to be printed
+apRobot = setfield(apRobot,"headingMargin",20);
+apRobot = setfield(apRobot,"distanceMargin",30); 
+apRobot = setfield(apRobot,"northOrientationReferencePoint",[184,184]); 
+%{
+   (DetTheoDistanceMaxi,DetTfDistanceRef,DetTfDistanceMaxi,ParticlesProbMin,ParticlesProbRef,TfHighLevel,TfHighestLevel,ParticlesProbMini,TfLowLevel)
+%}
+apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.1,0.3,0.8,0.98,0.04,0.015]);        
 RobotWidth=apGet(apRobot,"iRobotWidth");
+
 % below computed values
 WheelDiameter=apGet(apRobot,"iLeftWheelDiameter");
 WheelEncoderHoles=apGet(apRobot,"leftWheelEncoderHoles");
 apRobot = setfield(apRobot,"angleOneHole",((pi*WheelDiameter)/WheelEncoderHoles)/(pi*RobotWidth)*360);
 apRobot = setfield(apRobot,"distanceOneHole",((pi*WheelDiameter)/WheelEncoderHoles));
 apRobot = setfield(apRobot,"realMode",realMode);
+
 %loc=apGet(apRobot,"location")
 %locprob=apGet(apRobot,"locationProb")
-
+ robot.StartTensorFlowPrediction();
 endfunction

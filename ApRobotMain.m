@@ -48,7 +48,7 @@
   %}
 
    EchoLoc=[-1,-1,-1];
-   target=[385,250,0]
+
    more off;
    determine=5;
    determined=1;
@@ -62,28 +62,25 @@
     if (!exist("plotValue"))  % real is default mode 
         plotValue=1;
     endif
-      if (!exist("autoLocalization"))  % autoLocalization is default mode 
+    if (!exist("autoLocalization"))  % autoLocalization is default mode 
         autoLocalization=1;
     endif
 
    %simulationMode=1;  % to set simulation 1 on 0 off
-
-
     simulationMode=!realMode;
-    printf(mfilename);
-    printf(" real mode :%d *** ",realMode)
+
     printf(ctime(time()))
    % particlesNumber=2000;
     plotOn=true;                 % if true graphics will be provided (reduces performance)
     plotOff=false;               % no graphic
     noiseLevel=0.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
-    noiseRetCode=1;                 % boolean (0 move 100% completed 1 move can be incompleted)
-    scanNoiseLevel=0.5;
-    noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen
+    noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
+    scanNoiseLevel=0.9;             % 0.0 0.5
+    noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen 
     [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode);
     apRobot = setfield(apRobot,"simulationMode",simulationMode);
     apRobot = setfield(apRobot,"realMode",realMode);
-    apRobot = setfield(apRobot,"destination",target);     
+
      
      
     if (realMode)
@@ -112,9 +109,21 @@
           [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);  % download parameters inside the robot
           robot.ResetRobotStatus();
     endif
+    printf(mfilename);
+    if (realMode)     
+      target=[385,250,0];
+      printf(" real mode destination (%d,%d) *** ",target(1),target(2))
+    else
+      target = ApGetRadomPosition(apRobot);
+      printf(" simulation mode random destination (%d,%d) *** ",target(1),target(2))  
+    endif
+    apRobot = setfield(apRobot,"destination",target);     
     stopRequest=false;
     robot.ResetRobotStatus();
     loopId=1;
+    if (!autoLocalization)
+      return;
+    endif
     while(!stopRequest)
      automatonState=apGet(apRobot,"automatonState");
         if (automatonState(1)==lost)

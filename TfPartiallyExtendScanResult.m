@@ -5,6 +5,9 @@ function [extScanResult] = TfPartiallyExtendScanResult()
   %{
     "partiallyExtendedScanResult.csv"  rows: 1:scanid  2:posX 3:posY 4:scanAngle 5:distFront  6:distBack  7:virtualRotation (mulitple of steps rotated)
   %}
+  printf(mfilename);
+  printf(" start ")
+  printf(ctime(time()))
   nbPasRotation=getNbStepsRotation()  % number of steps for a 180° rotation
 	#load ('scanFlatResult.csv'); % the original mesurments that contains IdScan, Angle, Front distance, Back distance and location
   load('learningScanFlatData.mat');

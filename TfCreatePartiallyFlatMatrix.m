@@ -5,14 +5,19 @@
  trainAndTestLabelsData.csv contains the corresponding (labelId,posX,posY,shiftIndex)
 #}
 function [pixelFront,pixelBack,pixelFB,zonesList] = TfCreatePartiallyFlatMatrix()
+
   incrementValue=get360StepSizeDegre()  # nb of ° incrementation by step 
   nbMesurementByTrain=getNbStepsRotation(); % get the number of steps to add between 2 mesurments (in °)
   load ('partiallyExtendedScanResult.csv');
   extScanResult=partiallyExtendedScanResult;
-  nbTrain=size(extScanResult,1)
+  nbTrain=size(extScanResult,1);
+  printf(mfilename);
+  printf(" start nbTrain:%d ",nbTrain)
+  printf(ctime(time()))
   ratioTrainTest=15 % 1/x%
   ratioTestValidation=10 % 1/x%
-  trainResult=zeros((nbTrain/nbMesurementByTrain)+1,5);  trainNumber=2;
+  trainResult=zeros((nbTrain/nbMesurementByTrain)+1,5);
+  trainNumber=2;
   pixelFB=[];
   nbPasRotation=getNbStepsRotation();  % number of steps for a 180Â° rotation
   j=1;
@@ -32,7 +37,7 @@ function [pixelFront,pixelBack,pixelFB,zonesList] = TfCreatePartiallyFlatMatrix(
       pixelFB=[pixelFB;[pixelFront,pixelBack,trainNumber-3]];
       pixelIdx=1;
    end
-    [l,c]=size(pixelFB)
+    [l,c]=size(pixelFB);
     
     # create a new list of zones (idx,posX,posY,shift)
     zone=-1;
@@ -81,7 +86,7 @@ function [pixelFront,pixelBack,pixelFB,zonesList] = TfCreatePartiallyFlatMatrix(
     endfor
     
     idxValidation=[];
-    l1=size(testVTensorFlow,1)
+    l1=size(testVTensorFlow,1);
     while (size(idxValidation,1)<l1/ratioTestValidation)
       x=randi(round(l1));
       if (sum(idxValidation==x)==0)
@@ -119,9 +124,9 @@ function [pixelFront,pixelBack,pixelFB,zonesList] = TfCreatePartiallyFlatMatrix(
     validationTensorFlowZeroCentered(:,1:size(trainTensorFlowZeroCentered,2)-1)=(validationTensorFlow(:,1:size(trainTensorFlowZeroCentered,2)-1)-avgDist);
     validationTensorFlow=[header;validationTensorFlow];
     validationTensorFlowZeroCentered=[header;validationTensorFlowZeroCentered];
-    size(trainTensorFlow)
-    size(testTensorFlow)
-    size(validationTensorFlowZeroCentered)
+    printf(mfilename);
+    printf(" size train:%d, testSize:%d, validation:%d  ",size(trainTensorFlowZeroCentered,1),size(testTensorFlowZeroCentered,1), size(validationTensorFlowZeroCentered,1))
+    printf(ctime(time()))
     csvwrite ("tensorFlow/trainAndTestFeaturesData.csv", newPixelFB);
     csvwrite ("tensorFlow/trainFeaturesData.csv", trainTensorFlow);
     csvwrite ("tensorFlow/testFeaturesData.csv", testTensorFlow);

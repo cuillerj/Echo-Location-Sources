@@ -3,6 +3,6 @@
     pause(1)
   endwhile
   delete("tensorFlow/newResponse.txt")
-  pause(1)
+  pause(2)
   result=csvread ("tensorFlow/result.csv");
 endfunction

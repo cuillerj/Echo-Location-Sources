@@ -11,6 +11,8 @@ if (robot.runningStatus<=0)
   printf(ctime(time()));
 	return
 endif
+robot.RequestVersion();
+pause(2);
 printf(" downloading parameters inside robot ");
 printf(ctime(time()));
 rc=0;

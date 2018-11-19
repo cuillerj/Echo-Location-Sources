@@ -1,14 +1,18 @@
 % create a flat° matrix trainMatFlat 
 % the original data are extrapolated to provide distances for each degree
 % 
-function [trainTensorFlow,testTensorFlow,tensorFlow,idxTest] = TfCreateMatrixTrainingTensorFlow()
+function [trainTensorFlow,testTensorFlow,tensorFlow,idxTest] = TfCreateMatrixTrainingTensorFlow(batchNumber)
+  batch=num2str(batchNumber);
+  printf("batch:%d \n",batch);
   ratioTrainTest=10 % 1/x%
   nbMesurementByTrain=getNbStepsRotation(); % get the number of steps for a 180 rotation
   #load ('scanResult.txt');
-  scanResult=load ('tensorFlow/extScanResult.csv');
+  fileIn=strcat("tensorFlow/extScanResultB",batch,".csv")
+  scanResult=load(fileIn);
   nbTrain=size(scanResult,1);
   printf("training records number:%d,number of mesurment by train:%d scan nuùber:%d \n",nbTrain,nbMesurementByTrain,nbTrain/nbMesurementByTrain)
   tensorFlow=[];
+  pause
   for i=0:nbTrain/nbMesurementByTrain-1
     scanResult(i*nbMesurementByTrain+1:i*nbMesurementByTrain+15,3:4);
     tensorFlow=[tensorFlow;[reshape(scanResult(i*nbMesurementByTrain+1:i*nbMesurementByTrain+15,3:4),1,30)]];
@@ -36,7 +40,9 @@ function [trainTensorFlow,testTensorFlow,tensorFlow,idxTest] = TfCreateMatrixTra
     endif
   endfor
   printf("train matrix size:(%d,%d)--test matrix size:(%d,%d)  total:%d \n", size(trainTensorFlow,1), size(trainTensorFlow,2), size(testTensorFlow,1), size(testTensorFlow,2),size(trainTensorFlow,1)+size(testTensorFlow,1))
-  csvwrite ("tensorFlow/trainTensorFlow.csv", trainTensorFlow);
-  csvwrite ("tensorFlow/testTensorFlow.csv", testTensorFlow);
+  fileOut1=strcat("tensorFlow/trainTensorFlowB",batch,".csv")
+  fileOut2=strcat("tensorFlow/testTensorFlowB",batch,".csv")
+  csvwrite (fileOut1, trainTensorFlow);
+  csvwrite (fileOut2, testTensorFlow);
  # save  ("-text","tensorFlow/trainTensorFlow.csv","trainTensorFlow")
 endfunction

@@ -37,4 +37,6 @@
      endif
    endfor
    outResult(:,3)=outResult(:,3)/sum(outResult(:,3));
+   outResult=sortrows(outResult,3);
+   outResult=flipud(outResult);
  endfunction
