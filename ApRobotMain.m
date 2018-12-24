@@ -1,8 +1,8 @@
- function [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(flatLogRegMode,realMode,autoLocalization,plotValue)
+ function [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(flatLogRegMode,realMode,autoLocalization,plotValue,apRobot,robot)
 
      if (!exist("flatLogRegMode") && !exist("realMode") && !exist("autoLocalization") && !exist("plotValue"))  % flat logistic regression is default mode 
-
-        printf("parameters are: (flatLogRegMode,realMode,autoLocalization,plotValue)")
+        printf(mfilename);
+        printf(" parameters are: (flatLogRegMode,realMode,autoLocalization,plotValue)")
         printf(ctime(time()))
         return
       endif
@@ -69,30 +69,34 @@
    %simulationMode=1;  % to set simulation 1 on 0 off
     simulationMode=!realMode;
 
-    printf(ctime(time()))
+   % printf(ctime(time()))
    % particlesNumber=2000;
     plotOn=true;                 % if true graphics will be provided (reduces performance)
     plotOff=false;               % no graphic
     noiseLevel=0.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
     noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
-    scanNoiseLevel=0.9;             % 0.0 0.5
+    scanNoiseLevel=0.7;             % 0.0 0.5
     noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen 
-    [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode);
+    [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode,apRobot,robot);
     apRobot = setfield(apRobot,"simulationMode",simulationMode);
     apRobot = setfield(apRobot,"realMode",realMode);
 
      
-     
     if (realMode)
-        robot.LaunchBatch();        % call java method to start all batchs
+        rcBatch=robot.LaunchBatch();        % call java method to start all batchs
       else
-        robot.LaunchSimu();        % call java method to start only simulator
+        rcBatch=robot.LaunchSimu();        % call java method to start only simulator
         robot.noiseLevel=noiseLevel;         
         robot.scanNoiseLevel=scanNoiseLevel;          	
         robot.noiseRetCode=noiseRetCode;  
         robot.noiseRetValue=noiseRetValue;   
     endif
-
+    if (rcBatch!=0)
+        printf(mfilename);
+        printf(" java batch launch issue:%d - Need to restart Octave *** ",rcBatch);
+        printf(ctime(time()));
+        return
+    endif
     if (realMode)
            robotStatus=robot.runningStatus;
            if (robotStatus<=0)
@@ -114,9 +118,11 @@
       target=[385,250,0];
       printf(" real mode destination (%d,%d) *** ",target(1),target(2))
     else
-      target = ApGetRadomPosition(apRobot);
+   %   target = ApGetRadomPosition(apRobot);
+      [apRobot,robot,target] = ApGetRandomLocation(apRobot,robot)
       printf(" simulation mode random destination (%d,%d) *** ",target(1),target(2))  
     endif
+    printf(ctime(time()));
     apRobot = setfield(apRobot,"destination",target);     
     stopRequest=false;
     robot.ResetRobotStatus();
@@ -126,20 +132,23 @@
     endif
     while(!stopRequest)
      automatonState=apGet(apRobot,"automatonState");
-        if (automatonState(1)==lost)
+        if (automatonState(1)==locked)
              printf(mfilename);
-             printf(" robot lost timeout *** ");
+             printf(" robot locked *** ");
              printf(ctime(time()))
              stopRequest=true;
              return;  
         endif       
-        switch(automatonState(2))
-          case{1,3}
+        switch(automatonState(2)) % localization status
+          case{notLocalized,localisationLost}
               automatonState=apGet(apRobot,"automatonState");
               apRobot = setfield(apRobot,"automatonState",[initial,automatonState(2),automatonState(3)]); 
-              [apRobot,robot,EchoLoc,traceLoc] = ApEchoLocalization(apRobot,robot,flatLogRegMode,realMode,plotValue,loopId);
+              [apRobot,robot,EchoLoc,traceLoc,locRetCode] = ApEchoLocalization(apRobot,robot,flatLogRegMode,realMode,plotValue,loopId);
               apRobot = setfield(apRobot,"location",EchoLoc); 
-          case(2)
+              if (locRetCode==-1)
+                return
+              endif
+          case(localized)
               printf(mfilename);
               printf(" robot localised *** ");
               printf(ctime(time()))
@@ -159,8 +168,8 @@
               endif
               
            otherwise
-               switch(automatonState(1))
-                      case{initial,localizing,locked}
+               switch(automatonState(1)) %   main status
+                      case{initial,localizing,lost}
                               printf(mfilename);
                               printf(" enter new localization phase *** ");
                               printf(ctime(time()))
@@ -181,7 +190,12 @@
                               printf(" robot got the target *** ");
                               printf(ctime(time()))        
                               return;          
-
+                      case{locked}
+                              printf(mfilename);
+                              printf(" robot locked *** ");
+                              printf(ctime(time())) 
+                              stopRequest=true;       
+                              return;  
                 endswitch
    #             break;
           endswitch

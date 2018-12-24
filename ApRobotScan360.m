@@ -36,8 +36,8 @@ function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn,scan
            endif
            if (retCode==0)
              if(robot.scanReceiveCount!=apGet(apRobot,"nbPulse"))
-                retCode=robot.scanReceiveCount;
-                action="retry.";
+                retCode=-1;
+                action="stop..";
                 return;
               endif
            endif

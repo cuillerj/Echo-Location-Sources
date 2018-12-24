@@ -65,6 +65,7 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
       scanToAnalyse(j,3)=robot.GetScanDistBack(j-1);
       j=j+1;
   end
+  pause(1);
   csvwrite ("tensorFlow/newRequest.txt",time)
   csvwrite ("rotatedTensorFlow/newRequest.txt",time)
   if (plotOn) 

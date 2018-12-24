@@ -29,19 +29,28 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
       printf(" typeWait:(%d:%s) source:%d  dest:%d retcode:%d. *** ",typeWait,twchar,source,dest,retCode);
       printf(ctime(time()));
       if(typeWait==107)
+            printf(mfilename);
             printf(" BNO mode:%d  CalStat:%d SysStat:%d SysError:%d *** ",robot.BNOMode,robot.BNOCalStat,robot.BNOSysStat,robot.BNOSysError);
             printf(ctime(time()));
       endif
     endif
     idx++;
     if (mod(idx,10)==1)
-      printf("+");
+      if (typeWait==robot.scanEnd)
+        printf("+%d",robot.scanReceiveCount);
+      else
+         printf("+");
+      endif
     endif
     pause(1);
   end
   if (idx>10)
     printf("\n")
   endif
+  printf(mfilename);
+  twchar=char(typeWaitString(find(typeWaitMapping(:,1)==typeWait)));
+  printf(" got event:(%d:%s) source:%d  dest:%d retcode:%d. *** ",typeWait,twchar,source,dest,retCode);
+  printf(ctime(time()));
   if (typeWait==robot.northAlignEnd)
       [apRobot,robot,newState,rc] = ApAutomaton(apRobot,robot,[northAlign,retCode],1);
   endif

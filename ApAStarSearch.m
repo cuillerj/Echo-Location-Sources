@@ -5,37 +5,42 @@ function [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,
 		step will be ploted if plotOn is true
  cost will return cost to go from current to target position
 
-  printf("astar search\n")
  %}
+ printf(mfilename);
+ printf("search from (%d,%d,%d) to [%d,%d,%d) *** ",currentL(1),currentL(2),currentL(3),targetL(1),targetL(2),targetL(3))
+ printf(ctime(time()))
  cpu1=cputime();
  iterCount=0;
  print=false;   % set true for debug
  debug=false;
  carto=apGet(apRobot,"carto");
+ shitfCartoX=apGet(apRobot,"shitfCartoX");
+ shitfCartoY=apGet(apRobot,"shitfCartoY");
+
  targetX=targetL(1);
  targetY=targetL(2);
  targetHeading=targetL(3);
  currentHeading=mod(currentL(3)+360,360);
- direction=[targetX-currentL(1),targetY-currentL(2)];
+ direction=[targetX-currentL(1),targetY-currentL(2)]
  currentHeadingGrad=currentHeading*pi()/180;
  vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
  projectionHeading=direction*vectHeading';
  %forward=0;
-
+% cartoMaxAvailableValue=apGet("cartoMaxAvailableValue")
  weightCarto=20;     % weight used to balance way depending on cartography weight and action cost
   targetHeadingGrad=targetHeading*pi()/180;
   AStarPath=[];
   AStarStep=[];
   stepSize=apGet(apRobot,"stepSize");
-  currentX=stepSize*(floor(currentL(1)/stepSize))+floor(stepSize/2); % adjust position to center of square carto
-  currentY=stepSize*(floor(currentL(2)/stepSize))+floor(stepSize/2);
-  targetX=stepSize*(floor(targetX/stepSize))+floor(stepSize/2);
-  targetY=stepSize*(floor(targetY/stepSize))+floor(stepSize/2);
+  currentX=stepSize*(floor(currentL(1)/stepSize))+floor(stepSize/2) % adjust position to center of square carto
+  currentY=stepSize*(floor(currentL(2)/stepSize))+floor(stepSize/2)
+  targetX=stepSize*(floor(targetX/stepSize))+floor(stepSize/2)
+  targetY=stepSize*(floor(targetY/stepSize))+floor(stepSize/2)
   angleOneHole=apGet(apRobot,"angleOneHole");
   distanceOneHole=apGet(apRobot,"distanceOneHole");
 
 [nbX,nbY]=size(carto); % a nb of X positions b nb of Y positions
-initPos=[currentL(1),currentL(2)];
+initPos=[currentX,currentY];
 pos=initPos;
 targetPos=[targetX,targetY];
 %maxCartoWeight=20; % threshold over that means space (x,y) is not available

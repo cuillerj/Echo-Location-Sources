@@ -1,4 +1,4 @@
-function [apRobot] = InitApRobotParametersList(apRobot,robot);
+function [apRobot,robot] = InitApRobotParametersList(apRobot,robot);
   %{
   this function read all the parameters from the database (using Java driver) and create corresponding apRobot fields
   %}

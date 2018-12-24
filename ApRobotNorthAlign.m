@@ -36,7 +36,7 @@ function [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,NorthHea
          aligned=true;
      elseif (retCode==robot.moveKoDueToNotEnoughSpace)
           apRobot = setfield(apRobot,"particles",lastParticles);
-          [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn);
+          %[apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn);
      else
          [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
          if (action=="stop..")
@@ -72,8 +72,6 @@ function [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,NorthHea
       pause(1)
     endwhile
     #}
-    printf(mfilename);
-    printf(" New North orientation: %d  *** ",NO);
-    printf(ctime(time()));
+
    #end
   endfunction

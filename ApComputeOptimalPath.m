@@ -39,7 +39,7 @@ function [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,targetL,pl
        printf(mfilename);
        printf(" call astar search to reach the optimal path *** ");
  	     printf(ctime(time())); 
-       [apRobot,robot,AStarPath,pathStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,closestStartOptimalPoint,plotOn);
+       [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,currentL,closestStartOptimalPoint,plotOn);
      endif
   endif
   lastStep=[closestStartOptimalPoint(1),closestStartOptimalPoint(2),0,closestStartOptimalPoint(4)];

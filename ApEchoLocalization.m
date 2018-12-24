@@ -1,7 +1,7 @@
- function [apRobot,robot,EchoLoc,traceLoc] = ApEchoLocalization(apRobot,robot,flatLogRegMode,realMode,plotValue,loopId)
+ function [apRobot,robot,EchoLoc,traceLoc,locRetCode] = ApEchoLocalization(apRobot,robot,flatLogRegMode,realMode,plotValue,loopId)
 ##
 #
-
+  locRetCode=0;  % -1 main issue, else lstatus
   %{
   main status
   %}
@@ -44,7 +44,7 @@
 %}
 
  EchoLoc=[-1,-1,-1];
- maxRetry=8;
+ maxRetry=5;
  determinedDistanceThreshold=30;    # expressed in cm
  more off;
  determine=5;
@@ -131,9 +131,6 @@
    load ('5000particlesSpreadedXoriented.mat');
    apRobot = setfield(apRobot,"particles",particles);
     pointLib=["theori:";"encoder:";"gyroTheo:";"BNOleft:";"BNORight:"];
-    printf(mfilename);
-    printf("align robot:%d  ",shiftEchoVsRotationCenter)
-    printf(ctime(time()))
     if (plotValue>=1)
       plotReq=true;
      else
@@ -149,7 +146,7 @@
 
     countDet=1;
     lastMesurmentReliable=false; 
-  while (count<maxRetry && located==false) 
+  while (count<maxRetry && located==false && locRetCode==0) 
       automatonState=apGet(apRobot,"automatonState");
       automatonStateList=[apGet(apRobot,"automatonStateList");[automatonState]];
       apRobot = setfield(apRobot,"automatonStateList",automatonStateList);                    
@@ -215,6 +212,9 @@
                     printf(mfilename);
                     printf(" robot no longer communicate ");
                     printf(ctime(time())); 
+                    save ("-mat4-binary","traceLoc.mat","traceLoc");
+                    ApPlotLocalizationSearch(apRobot,traceLoc);
+                    locRetCode=-1;
                     return;                
                  endif
               else
@@ -309,12 +309,22 @@
                   printf(" locked state:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
                   printf(ctime(time())); 
                   randomChoice=true;
-                  [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,(plotValue>=1));                    
-                  apRobot = setfield(apRobot,"automatonState",[localizing,determining,scanned]);  % force to skip determination step     
+    %              [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,(plotValue>=1)); 
+                  [apRobot,robot,unlocked,retCode] = ApUnlockRobot(apRobot,robot);
+                if (unlocked==true)
+                 apRobot = setfield(apRobot,"automatonState",[localizing,notLocalized,atRest]);  % 
+                else
+                  apRobot = setfield(apRobot,"automatonState",[locked,automatonState(2),automatonState(3)]);
+                  locRetCode=-1;
+                  return
+                endif    
    
           case([targeting,localized,NOrient])  
           
             located=true;
+            save ("-mat4-binary","traceLoc.mat","traceLoc");
+            ApPlotLocalizationSearch(apRobot,traceLoc);
+            locRetCode=automatonState(2);
             return          
    
           otherwise
@@ -349,5 +359,8 @@
               end
           endif       
       endif
+      save ("-mat4-binary","traceLoc.mat","traceLoc");
+      ApPlotLocalizationSearch(apRobot,traceLoc);
+      locRetCode=automatonState(2);
       return;
 endfunction

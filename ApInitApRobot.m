@@ -1,7 +1,7 @@
-function [apRobot,robot] = ApInitApRobot(flat,realMode);
+function [apRobot,robot] = ApInitApRobot(flat,realMode,apRobot,robot);
 cd C:\Users\jean\Documents\Donnees\octave\robot
-javaaddpath ('C:\Program Files\Java\jdk1.7.0_45\jre\lib\ext\mysql-connector-java-5.1.30-bin.jar');
-javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
+%javaaddpath ('C:\Program Files\Java\jdk1.7.0_45\jre\lib\ext\mysql-connector-java-5.1.30-bin.jar');
+%javaaddpath ('C:\Users\jean\Documents\Donnees\eclipse\RobotServer\bin\robot.jar');
 if (!exist("flat"))  % flat or rotated IA echo location 
      flat=true;
 endif
@@ -18,22 +18,20 @@ load "optimalPath.txt";    % load optimal path for routing
 scanRefPoints=zonesXY;
 printf(mfilename);
 if (exist("apRobot"))
-    printf(mfilename);
     printf(" octave object already exist *** \n")
  else
-    printf(mfilename);
     printf(" create octave object *** \n")
     apRobot=apRobot();  % create the octave robot object
  endif
+ printf(ctime(time()))
  printf(mfilename);
  if (exist("robot"))
-    printf(mfilename);
     printf(" java object already exist *** \n")
  else
-    printf(mfilename);
     printf(" create java object *** \n")
     robot=robotJava();            % create the java robot object  
  endif
+ printf(ctime(time()))
 setupPath;					% define paths
 %cd C:\Users\jean\Documents\Donnees\octave
 %apRobotPath
@@ -45,7 +43,7 @@ if (flat==true)
 else
 	load all_theta;             % load the trained logistic regression matrix
 endif
-[apRobot] = InitApRobotParametersList(apRobot,robot);
+[apRobot,robot] = InitApRobotParametersList(apRobot,robot);
 load 'scanResult.txt';
 %[parametersNameList,parametersValueList] = InitParametersList(robot,flat);
 %[param,value,number]=GetParametersValueByName(robot,"currentNorthOrientationReference",parametersNameList);
@@ -90,14 +88,14 @@ apRobot = setfield(apRobot,"northOrientationReferencePoint",[184,184]);
 %{
    (DetTheoDistanceMaxi,DetTfDistanceRef,DetTfDistanceMaxi,ParticlesProbMin,ParticlesProbRef,TfHighLevel,TfHighestLevel,ParticlesProbMini,TfLowLevel)
 %}
-apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.1,0.3,0.8,0.98,0.04,0.015]);        
+apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.03,0.3,0.85,0.98,0.05,0.50]);        
 RobotWidth=apGet(apRobot,"iRobotWidth");
 
 % below computed values
 WheelDiameter=apGet(apRobot,"iLeftWheelDiameter");
 WheelEncoderHoles=apGet(apRobot,"leftWheelEncoderHoles");
-apRobot = setfield(apRobot,"angleOneHole",((pi*WheelDiameter)/WheelEncoderHoles)/(pi*RobotWidth)*360);
-apRobot = setfield(apRobot,"distanceOneHole",((pi*WheelDiameter)/WheelEncoderHoles));
+apRobot = setfield(apRobot,"angleOneHole",((pi*WheelDiameter/100)/WheelEncoderHoles)/(pi*RobotWidth)*360);
+apRobot = setfield(apRobot,"distanceOneHole",((pi*WheelDiameter/100)/WheelEncoderHoles));
 apRobot = setfield(apRobot,"realMode",realMode);
 
 %loc=apGet(apRobot,"location")

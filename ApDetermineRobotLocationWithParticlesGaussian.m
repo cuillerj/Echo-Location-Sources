@@ -46,7 +46,7 @@ function [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithParticlesG
 	plot(detX+shitfCartoX,detY+shitfCartoY,"color","b","+","markersize",15);
  endif
 	if (plotOn)
-    if(newFigure)
+  %  if(newFigure)
       carto=apGet(apRobot,"carto");
       img=apGet(apRobot,"img");
       figure();    % f
@@ -56,9 +56,9 @@ function [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithParticlesG
       [a,b]=size(img);
       c=max(a,b);
       axis([1,b,1,a],"on","xy");
-    else
-      figure(2);
-    endif
+%    else
+%      figure(2);
+  %  endif
 		hold on;
 		for i=1:x
 			plot(particles(i,1)+shitfCartoX,particles(i,2)+shitfCartoY)

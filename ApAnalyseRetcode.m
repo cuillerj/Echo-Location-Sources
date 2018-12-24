@@ -57,6 +57,7 @@ else
 			printf(" action retry *** ");
 			printf(ctime(time()));
 			action="retry.";
+      return;
     else
     	issue=true;
       printf(mfilename);

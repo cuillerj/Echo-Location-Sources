@@ -8,6 +8,9 @@
       scanRefPoints=apGet(apRobot,"scanRefPoints");
       [nbPoints,width]=size(scanRefPoints);
       available=false;
+      carto=apGet(apRobot,"carto");
+      shitfCartoX=apGet(apRobot,"shitfCartoX");
+      shitfCartoY=apGet(apRobot,"shitfCartoY");
       while (!available)
         randomIdx=randi(nbPoints);
         px=round(normrnd(scanRefPoints(randomIdx,1),sigmaDist));
@@ -15,6 +18,9 @@
         ph=round(randi(361)-1);
         randomLocation=[px,py,ph];
         [available,retCode] = ApQueryCartoAvailability(apRobot,randomLocation,0,0);
+        if (carto(px+shitfCartoX,py+shitfCartoY)!=0)
+          available=false;
+        endif
       end
       robot.simulatedHardX=scanRefPoints(randomIdx,1);  % set simulated hard position to guess 
       robot.simulatedHardY=scanRefPoints(randomIdx,2);  % used by java simulator to generate an echo scan

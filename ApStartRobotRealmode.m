@@ -1,4 +1,4 @@
- function [apRobot,robot] = ApStartRobotRealmode(flatLogRegMode,plotValue)
+ function [apRobot,robot] = ApStartRobotRealmode(flatLogRegMode,plotValue,apRobot,robot)
   printf(mfilename);
   printf("   ***   ");
   printf(ctime(time()))
@@ -13,7 +13,7 @@
   if (!exist("plotValue"))  % real is default mode 
       plotValue=1;
   endif
-  [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode);
+  [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode,apRobot,robot);
   apRobot = setfield(apRobot,"simulationMode",simulationMode);
   apRobot = setfield(apRobot,"realMode",realMode);
   carto=apGet(apRobot,"carto");

@@ -62,9 +62,9 @@
   
   shiftNO=apGet(apRobot,"currentShiftNorthOrientation");
   simulationMode=apGet(apRobot,"simulationMode");
-  realMode=apGet(apRobot,"realMode");
+  realMode=apGet(apRobot,"realMode"); 
    if (simulationMode==0)
-    echoBalance=[1,0.95,1.05,1.1,1.1];  % theoritical , encoder , gyroscope theo , BNO Left, BNO Right
+    echoBalance=[1,0.95,1.1,1.1];  % theoritical , encoder  , BNO Left, BNO Right
   else
     echoBalance=[1,0.95,1.05];  % theoritical , encoder , gyroscope
   endif
@@ -261,6 +261,7 @@
                 if (lenToDo!=0&&retCode==0)
   %                retCode=robotMoveStraight(lenToDo);
                   [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,forward,(plotValue>=1));
+                  traceRobot=[traceRobot;[time,loopCount,1,robot.GetHardPosX(),robot.GetHardPosY(),+robot.GetHardHeading(),robot.GetGyroHeading()],retCode];
                 endif
                 moveRetry=0;
                 retCodeMove=retCode;
@@ -312,8 +313,10 @@
                   gyroBasedX=round(gyroBasedX+gyroLenToDo*cos(gyroBasedH)+apGet(apRobot,"shiftEchoVsRotationCenter")*cos(gyroBasedH));
                   gyroBasedY=round(gyroBasedY+gyroLenToDo*sin(gyroBasedH)+apGet(apRobot,"shiftEchoVsRotationCenter")*sin(gyroBasedH));
                   if (simulationMode==0)
-                    newX=[next(1),robot.GetHardPosX(),gyroBasedX,subsystemLeftX,subsystemRightX];
-                    newY=[next(2),robot.GetHardPosY(),gyroBasedY,subsystemLeftY,subsystemRightY];
+                    newX=[next(1),robot.GetHardPosX(),subsystemLeftX,subsystemRightX];
+                    newY=[next(2),robot.GetHardPosY(),subsystemLeftY,subsystemRightY];
+                    %newX=[next(1),robot.GetHardPosX(),gyroBasedX,subsystemLeftX,subsystemRightX];
+                    %newY=[next(2),robot.GetHardPosY(),gyroBasedY,subsystemLeftY,subsystemRightY];
                   else
                     newX=[next(1),robot.GetHardPosX(),gyroBasedX];
                     newY=[next(2),robot.GetHardPosY(),gyroBasedY];
@@ -360,26 +363,29 @@
                   printf(mfilename);
                   printf (" Heading hard H:%d  NO:%d Theoretical H:%d  Average:%f SpaceNO:%d RobotNO:%d Gyro:%d*** ",newH,headingNO,saveTargetHeading,averageH*180/pi(),spaceNO,robot.northOrientation,robot.GetGyroHeading());
                   printf(ctime(time()))
-    %							[weightEcho,retValue,echo] = TestLocationEchoConsistancy(robot,carto,newX,newY,averageH)
-                  [apRobot,robot,weightEcho,retValue,echo,quality] = ApTestLocationEchoConsistancyVsDB(apRobot,robot,newX,newY,averageH);
-                  [apRobot,robot,newState,rc] = ApAutomaton(apRobot,robot,[pingFB,retValue],1);
-                  if (retValue==0)
-                    traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
-                  else
-                      printf(mfilename);
-                      printf(" no echo consistancy data *** ");
-                      printf(ctime(time()));
-                      for i=1:col	
-                      weightEcho(i)=1;
-                      endfor;	                
-                  endif
-                [nbRow,nbCol]=size(weightEcho);
-                printf(mfilename);
-                printf(" best quality (0: one is perfect):%f",quality);
-                printf(" *** ");
-                printf(ctime(time()));
-                weightEcho=weightEcho.*echoBalance;   % 
-                [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithParticlesGaussian(apRobot,robot,newX,newY,weightEcho,(plotValue>=1));
+                  if (std(posX)>10 || std(posY)>10)
+                      [apRobot,robot,weightEcho,retValue,echo,quality] = ApTestLocationEchoConsistancyVsDB(apRobot,robot,newX,newY,averageH);
+                      [apRobot,robot,newState,rc] = ApAutomaton(apRobot,robot,[pingFB,retValue],1);
+                      if (retValue==0)
+                        traceEcho=[traceEcho;[time,loopCount,newX,newY,weightEcho,echo,quality]];
+                      else
+                          printf(mfilename);
+                          printf(" no echo consistancy data *** ");
+                          printf(ctime(time()));
+                          for i=1:col	
+                          weightEcho(i)=1;
+                          endfor;	                
+                      endif
+                    [nbRow,nbCol]=size(weightEcho);
+                    printf(mfilename);
+                    printf(" best quality (one is perfect):%f",quality);
+                    printf(" *** ");
+                    printf(ctime(time()));
+                    weightEcho=weightEcho.*echoBalance;   % 
+                 else
+                  weightEcho=echoBalance;
+                endif
+                [apRobot,robot,detX,detY,detH] = ApDetermineRobotLocationWithParticlesGaussian(apRobot,robot,newX,newY,weightEcho,(plotValue>=1),1);
                 traceDet=[traceDet;[time,loopCount,detX,detY,detH]];
                 printf(mfilename);
                 printf(" determined X: %f ",round(detX))

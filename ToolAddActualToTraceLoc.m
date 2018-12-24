@@ -4,7 +4,7 @@ function [traceLoc] = ToolAddActualToTraceLoc(traceLoc)
       while (validate==false)
         loopId=input("loopId: ");
         count=input("count: ");
-        idx=((loopId-1)*8+ count);
+        idx=((loopId-1)*maxRetry+ count);
         traceLoc(idx,:);
         printf("do you confirm this determined location: X=%d Y=%d H=%d ? ",traceLoc(idx,3),traceLoc(idx,4),traceLoc(idx,5));
         validate=yes_or_no;
