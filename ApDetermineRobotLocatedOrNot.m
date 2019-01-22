@@ -1,7 +1,4 @@
 function [located,consistant] = ApDetermineRobotLocatedOrNot(apRobot,traceLoc)
-   printf(mfilename);
-   printf(" ***  ");
-   printf(ctime(time()))
    located=false;
    consistant=true;
    step=size(traceLoc,1);
@@ -40,8 +37,13 @@ function [located,consistant] = ApDetermineRobotLocatedOrNot(apRobot,traceLoc)
           printf(" consitancy issue between particles filter and tensor flow: (%fcm,%f%%) *** ",DetTfDistance,ParticlesProb*100);
           printf(ctime(time()))
        consistant=false;
+      elseif (ParticlesProb <= ParticlesProbMin)
+          consistant=false;
      endif
    endif
+   printf(mfilename);
+   printf(" located:%d consistant:%d ***  ",located,consistant);
+   printf(ctime(time()))
    checked=false;
    determinationLocatedOrNot=[step,traceLoc(step,:),located,consistant,checked,apGet(apRobot,"realMode")];
    dlmwrite("determinationLocatedOrNot.txt",determinationLocatedOrNot,'delimiter',',','-append');

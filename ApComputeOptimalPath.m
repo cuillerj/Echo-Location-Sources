@@ -77,7 +77,11 @@ function [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,targetL,pl
        end
  	     printf(ctime(time())); 
   endif
-       pathStep=[pathStep;[targetL(1),targetL(2),0,0]];
+      if (size(pathStep(2)==4))
+        pathStep=[pathStep;[targetL(1),targetL(2),0,0]];
+       else
+         pathStep=[targetL(1),targetL(2),0,0];
+       endif
  %      next=pathStep(1,1:2);
     %   pathStep(1,3)=pathStep(1,3)+1;
        retCode=0;      

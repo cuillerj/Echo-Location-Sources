@@ -1,4 +1,4 @@
-function [targetReached] = ApTargetReached(apRobot,robot);
+function [targetReached,remainingDistance] = ApTargetReached(apRobot,robot);
   closeTargetDistance=apGet(apRobot,"closeTargetDistance");
   location=apGet(apRobot,"location");
   destination=apGet(apRobot,"destination");

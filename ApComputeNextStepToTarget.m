@@ -101,7 +101,7 @@ else
       instruction=AStarStep(1,4);
     endif
 	else
-	 [apRobot,robot,AStarPath,AStarStep,cost,forward] = ApAStarSearch(apRobot,robot,currentL,[RoundTo(targetX,5),RoundTo(targetY,5),0],plotOn);
+	 [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,currentL,[RoundTo(targetX,5),RoundTo(targetY,5),0],plotOn);
   	if (cost<0)   % no path found
 		  forward=0;
       next=[nextX,nextY];

@@ -4,6 +4,7 @@ function [apRobot,robot,unlocked,retCode] = ApUnlockRobot(apRobot,robot)
    
   %}
   printf(mfilename); 
+  printf(" starting unlock process ***");
   printf(ctime(time()));
   servoFrontHeading=90;
   forward=true;

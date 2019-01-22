@@ -11,8 +11,13 @@ function [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWit
   printf(mfilename);
   printf("  ***  ");
   printf(ctime(time()))
+  retCode=-1;
   [apRobot,robot,result,retCode]=ApScanToTensorFlowFlat (apRobot,robot,plotOn,scanId);
   if (size(result)==0)
+    posX=-1;
+    posY=-1;
+    posH=-1;
+    posProb=-1;
     retCode=-1;
     return
   endif

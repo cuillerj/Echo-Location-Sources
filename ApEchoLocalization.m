@@ -189,7 +189,11 @@
               endif
           case([localizing,notLocalized,NOrient])  
               %[apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithRotation(apRobot,robot,nbPred,0,plotOff);
-              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotReqL2,0);             
+              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotReqL2,0);  
+              if (retCode==-1)    
+                  locRetCode=-1;
+                  return;
+              endif    
           case([localizing,notLocalized,scanned])
               traceLoc=[traceLoc;[zeros(1,20)]];
               traceLoc(size(traceLoc)(1),1:2)=[loopId,countDet];    
@@ -199,13 +203,16 @@
                 plot(newTheoriticalPositions(1)+shitfCartoX,newTheoriticalPositions(2)+shitfCartoY,"color","r","+","markersize",15)
                 hold off;
               endif
-              probCum = ApComputeCenteredParticlesProbability(apGet(apRobot,"particles"),[detX,detY,detH],apGet(apRobot,"distanceMargin"),apGet(apRobot,"headingMargin"));
+              %[apRobot,robot,probCum] = ApCompareParticlesAndLocation(apRobot,robot,apGet(apRobot,"radiusMargin"),apGet(apRobot,"headingMargin"));
+              probCum = ApComputeCenteredParticlesProbability(apGet(apRobot,"particles"),[detX,detY,detH],apGet(apRobot,"radiusMargin"),apGet(apRobot,"headingMargin"));
               printf(mfilename);
               printf(" determined location (%d,%d):particles (%d,%d,%d %.1f%%) TensorFlow(%d,%d %.1f%%) *** ",loopId,count,detX,detY,detH,probCum*100,posX(1),posY(1),posProb(1)*100);
               printf(ctime(time())); 
               traceLoc(size(traceLoc)(1),3:6)=[detX,detY,detH,probCum];
               traceLoc(size(traceLoc)(1),12:14)=[posX(1),posY(1),posProb(1)];
               countDet++;
+              prob=max(probCum*100,posProb(1)*100);
+              apRobot = setfield(apRobot,"locationProb",prob);
               if (realMode)
                  [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,[detX,detY,detH],prob);
                  if (retCode==-99)
@@ -233,7 +240,10 @@
               [located,consistant]= ApDetermineRobotLocatedOrNot(apRobot,traceLoc);
               if (located)
                    EchoLoc=[detX,detY,detH];
-                  [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,localizationFound],1);           
+                   apRobot = setfield(apRobot,"location",EchoLoc);
+  %                 [apRobot,robot,probability] = ApCompareParticlesAndLocation(apRobot,robot,apGet(apRobot,"radiusMargin"),apGet(apRobot,"headingMargin"));
+                   apRobot = setfield(apRobot,"probLocation",max(apGet(apRobot,"locationProb"),apGet(apRobot,"locProbRange")(2)*1.1));
+                   [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,localizationFound],1);           
               %{
               if(count>2 && (mod(detH,360)<=15 || mod(detH,360)>=345) && lastMesurmentReliable && histDeltaDist(countDet)<determinedDistanceThreshold && histDeltaDist(countDet-1)<determinedDistanceThreshold*2 )
                   located=true;

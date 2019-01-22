@@ -7,7 +7,7 @@ function [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,
 
  %}
  printf(mfilename);
- printf("search from (%d,%d,%d) to [%d,%d,%d) *** ",currentL(1),currentL(2),currentL(3),targetL(1),targetL(2),targetL(3))
+ printf(" search from (%d,%d,%d) to [%d,%d,%d) *** ",currentL(1),currentL(2),currentL(3),targetL(1),targetL(2),targetL(3))
  printf(ctime(time()))
  cpu1=cputime();
  iterCount=0;
@@ -21,7 +21,7 @@ function [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,
  targetY=targetL(2);
  targetHeading=targetL(3);
  currentHeading=mod(currentL(3)+360,360);
- direction=[targetX-currentL(1),targetY-currentL(2)]
+ direction=[targetX-currentL(1),targetY-currentL(2)];
  currentHeadingGrad=currentHeading*pi()/180;
  vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
  projectionHeading=direction*vectHeading';
@@ -32,10 +32,10 @@ function [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,
   AStarPath=[];
   AStarStep=[];
   stepSize=apGet(apRobot,"stepSize");
-  currentX=stepSize*(floor(currentL(1)/stepSize))+floor(stepSize/2) % adjust position to center of square carto
-  currentY=stepSize*(floor(currentL(2)/stepSize))+floor(stepSize/2)
-  targetX=stepSize*(floor(targetX/stepSize))+floor(stepSize/2)
-  targetY=stepSize*(floor(targetY/stepSize))+floor(stepSize/2)
+  currentX=stepSize*(floor(currentL(1)/stepSize))+floor(stepSize/2); % adjust position to center of square carto
+  currentY=stepSize*(floor(currentL(2)/stepSize))+floor(stepSize/2);
+  targetX=stepSize*(floor(targetX/stepSize))+floor(stepSize/2);
+  targetY=stepSize*(floor(targetY/stepSize))+floor(stepSize/2);
   angleOneHole=apGet(apRobot,"angleOneHole");
   distanceOneHole=apGet(apRobot,"distanceOneHole");
 

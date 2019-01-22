@@ -2,7 +2,7 @@
 % the original data are extrapolated to provide distances for each degree
 % 
 function [] = ApCreateMatrixTrainingFlat()
-nbMesurementByTrain=getNbStepsRotation(); % get the number of steps for a 180 rotation
+nbMesurementByTrain=getNbStepsRotation(); % get the number of steps for a 180 rotation - need to be consistant with ApInitApRobot
 load ('scanResult.txt');
 nbTrain=size(scanResult,1);
 printf("training records number:%d,number of mesurment by train:%d",nbTrain,nbMesurementByTrain)

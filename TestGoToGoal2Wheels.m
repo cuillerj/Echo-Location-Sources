@@ -1,4 +1,4 @@
-function [apRobot,robot] = TestGoToGoal(apRobot,robot);
+function [apRobot,robot,easy] = TestGoToGoal2Wheels(apRobot,robot);
   %{
   
   simulation d'un go to goal robot 
@@ -13,14 +13,18 @@ function [apRobot,robot] = TestGoToGoal(apRobot,robot);
   %}
  % apRobot = setfield(apRobot,"destination",[50,50,0]);
 
-
   maxWheelRPS=apGet(apRobot,"maxWheelRPS")/100
   minWheelRPS=apGet(apRobot,"minWheelRPS")/100
-  robotRadius=apGet(apRobot,"iRobotWidth")/2;
+  avgWheelRPS=(maxWheelRPS+minWheelRPS)/2
+  leftRPS=avgWheelRPS;
+  rightRPS=avgWheelRPS;
+  iRobotWidth=apGet(apRobot,"iRobotWidth");
+  robotRadius=iRobotWidth/2;
+  robotLenght=apGet(apRobot,"frontLenght")+ apGet(apRobot,"backLenght");
   wheelDiameter=(apGet(apRobot,"iLeftWheelDiameter")+apGet(apRobot,"iLeftWheelDiameter"))/200;
   RB=(robotRadius)*(minWheelRPS+maxWheelRPS)/(maxWheelRPS-minWheelRPS)
-  robotSpeed=(minWheelRPS*pi()+maxWheelRPS*pi())*wheelDiameter/2
-  v=robotSpeed;
+  robotSpeed=avgWheelRPS*pi()*wheelDiameter;
+  v=robotSpeed
   DtR=(RB*2*pi())/robotSpeed;
   deltaT=0.1;
   oMax=(2*pi()/DtR)*deltaT;
@@ -28,9 +32,11 @@ function [apRobot,robot] = TestGoToGoal(apRobot,robot);
   reachable=true;
   goal=apGet(apRobot,"destination")
   loc=apGet(apRobot,"location");
-  reachLimit=2;
+  reachLimit=5;
   figure()
+  figNumber=get (0, "currentfigure");
   axis("square");
+  axis equal;
   hold on
   plot(goal(1),goal(2),'marker','*','markersize',15)
   h=loc(3)*pi()/180;
@@ -54,14 +60,18 @@ function [apRobot,robot] = TestGoToGoal(apRobot,robot);
   endif
   if (distGoalC1<RB-reachLimit || distGoalC2<RB-reachLimit)
     printf("not easy \n")
+    easy=false;
   else 
     printf(" easy \n")
+    easy=true;
   endif
   if (h>pi())
     h=h-2*pi();
   endif
   newDist=inf;
   t0=time;
+  [apRobot,robot,figureNumber] = ApDrawRobot(apRobot,robot,0);
+  idx=0;
   while (!gotTarget && reachable)
     %atan((goal(2)-loc(2))/(goal(1)-loc(1)))
     phi=atan2((goal(2)-loc(2)),(goal(1)-loc(1)));
@@ -79,12 +89,40 @@ function [apRobot,robot] = TestGoToGoal(apRobot,robot);
       error=oMax*sign(error);
     endif
  %   if(time-t0>timeToReachMinSpeed)
-      h=h+error;
+ %{
+   RB=(robotRadius)*(minWheelRPS+maxWheelRPS)/(maxWheelRPS-minWheelRPS)
+  DtR=(RB*2*pi())/robotSpeed;
+  RB*2*pi()=DtR*robotSpeed
+  RB=DtR*robotSpeed/(2*pi())
+  RB/robotRadius=(lowRPS+highRPS)/(highRPS-lowRPS) = 2*avgRPS/(avgRPS+deltaRPS-(avgRPS-deltaRPS)) = avgRPS/deltaRPS
+  deltaRPS=avgRPS*robotRadius/RB
+   oMax=(2*pi()/DtR)*deltaT;   oMax/deltaT= (2*pi()/DtR)   DtR=(2*pi()*deltaT)/oMax
+  %}
+   % DtR=2*pi()*deltaT/error
+    if (error!=0)
+      expectedRB=(deltaT*robotSpeed)/error;
+    else
+    expectedRB=0;
+    endif
+    if (expectedRB!=0)
+      deltaRPS=avgWheelRPS*robotRadius/expectedRB;
+    else
+      deltaRPS=0;
+    endif
+    omegaR=avgWheelRPS+deltaRPS;
+    omegaL=avgWheelRPS-deltaRPS;
+    h=h+error;
   %  endif
     if (h>pi())
       h=h-2*pi();
     endif
+    figure(figNumber);
     plot(loc(1),loc(2),'marker','+','markersize',15)
+    if(mod(idx,5)==0)
+      apRobot = setfield(apRobot,"location",[loc(1),loc(2),h*180/pi()]);
+      [apRobot,robot,figureNumber] = ApDrawRobot(apRobot,robot,0,figureNumber);
+    endif
+    idx++;
     prevDist=newDist;
     newDist=sqrt((goal(2)-loc(2))^2+(goal(1)-loc(1))^2);
     if (newDist<=reachLimit)

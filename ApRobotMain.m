@@ -6,6 +6,8 @@
         printf(ctime(time()))
         return
       endif
+      close all; % close all figures
+      clc;
      %{
   main status
   %}
@@ -73,7 +75,7 @@
    % particlesNumber=2000;
     plotOn=true;                 % if true graphics will be provided (reduces performance)
     plotOff=false;               % no graphic
-    noiseLevel=0.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
+    noiseLevel=0.2;                 % coefficent (float) of noise of simualtion mode 0 no noise
     noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
     scanNoiseLevel=0.7;             % 0.0 0.5
     noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen 
@@ -116,25 +118,33 @@
     printf(mfilename);
     if (realMode)     
       target=[385,250,0];
+      printf(mfilename);
       printf(" real mode destination (%d,%d) *** ",target(1),target(2))
+      printf(ctime(time()));
     else
    %   target = ApGetRadomPosition(apRobot);
-      [apRobot,robot,target] = ApGetRandomLocation(apRobot,robot)
-      printf(" simulation mode random destination (%d,%d) *** ",target(1),target(2))  
+      [apRobot,robot,target] = ApGetRandomLocation(apRobot,robot);
+      printf(mfilename);
+      printf(" Simulation mode random destination (%d,%d) *** ",target(1),target(2)) 
+      printf(ctime(time())); 
     endif
-    printf(ctime(time()));
     apRobot = setfield(apRobot,"destination",target);     
     stopRequest=false;
     robot.ResetRobotStatus();
     loopId=1;
     if (!autoLocalization)
-      return;
+      [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robot,1);
+      if(stopRequested)
+        return;
+      endif
+       apRobot = setfield(apRobot,"automatonState",[targeting,localized,atRest]); 
+      %return;
     endif
     while(!stopRequest)
      automatonState=apGet(apRobot,"automatonState");
-        if (automatonState(1)==locked)
+        if (automatonState(1)==lost)
              printf(mfilename);
-             printf(" robot locked *** ");
+             printf(" robot lost *** ");
              printf(ctime(time()))
              stopRequest=true;
              return;  
@@ -142,7 +152,7 @@
         switch(automatonState(2)) % localization status
           case{notLocalized,localisationLost}
               automatonState=apGet(apRobot,"automatonState");
-              apRobot = setfield(apRobot,"automatonState",[initial,automatonState(2),automatonState(3)]); 
+              apRobot = setfield(apRobot,"automatonState",[initial,notLocalized,atRest]); 
               [apRobot,robot,EchoLoc,traceLoc,locRetCode] = ApEchoLocalization(apRobot,robot,flatLogRegMode,realMode,plotValue,loopId);
               apRobot = setfield(apRobot,"location",EchoLoc); 
               if (locRetCode==-1)
@@ -152,8 +162,11 @@
               printf(mfilename);
               printf(" robot localised *** ");
               printf(ctime(time()))
-              apRobot = setfield(apRobot,"locationProb",100);     
-              [apRobot,robot,EchoLoc] = ApGotoDestination(apRobot,robot,flatLogRegMode,plotValue)
+            %  apRobot = setfield(apRobot,"locationProb",100);     
+              [apRobot,robot,EchoLoc,retCode] = ApGotoTarget(apRobot,robot,flatLogRegMode,plotValue)
+              if (retCode==-1)
+                return
+              endif
               automatonState=apGet(apRobot,"automatonState");
               if (automatonState(1)==gotTarget)
                     printf(mfilename);
@@ -169,7 +182,7 @@
               
            otherwise
                switch(automatonState(1)) %   main status
-                      case{initial,localizing,lost}
+                      case{initial,localizing,locked}
                               printf(mfilename);
                               printf(" enter new localization phase *** ");
                               printf(ctime(time()))

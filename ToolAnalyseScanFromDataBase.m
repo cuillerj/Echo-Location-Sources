@@ -1,5 +1,5 @@
-function [apRobot,robot] = ToolAnalyseScanFromDataBase(apRobot,robot,scan)
-  %{
+function [apRobot,robot] = ToolAnalyseScanFromDataBase(apRobot,robot,scan,step)
+  %{ step number of scan steps (positive rotations)
   1)
  
     ( 
@@ -24,6 +24,9 @@ function [apRobot,robot] = ToolAnalyseScanFromDataBase(apRobot,robot,scan)
   %}
   scan=scan(2:size(scan),:); % suppress fisrt 0 line
   [scanL,scanR]=size(scan);
+  if(!exist("step"))
+    step=0;   % number of positive scan shifts
+  endif
   if (scanR!=10)
     printf("scan row size must be 10 instead of:%d \n",scanR);
     return
@@ -40,7 +43,7 @@ function [apRobot,robot] = ToolAnalyseScanFromDataBase(apRobot,robot,scan)
     posX=scan(15*i+1,3);
     posY=scan(15*i+1,4);
     [apRobot,robot] = ToolLoadEchoesInsideApRobot(apRobot,robot,mesurment);
-    [apRobot,robot,tensorFlowDataIn,newScan] = TfCreateTensorFlowDataIn(apRobot,robot,0,0, strcat(num2str(i), ' actual:', '(',num2str(posX),' - ',num2str(posY),')'));
+    [apRobot,robot,tensorFlowDataIn,newScan] = TfCreateTensorFlowDataIn(apRobot,robot,step,0, strcat(num2str(i), ' actual:', '(',num2str(posX),' - ',num2str(posY),')'));
     [result] = TfGetTensorFlowResult();
     [result] = ApConvertTfPredictionForParticlesFilter(result);
     [a,b]=max(result(:,3));

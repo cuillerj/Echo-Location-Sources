@@ -1,7 +1,7 @@
 function [apRobot] = ApCreateLocatedParticles(apRobot,particlesNumber,plotOn,sigmaPos,sigmaHeading)
 %{
 create particles n=(prob/particlesNumber) located at (posX,posY,heading) with x y h precision
-create particles n=(particlesNumber - n) located anywhere inide carto
+create particles n=(particlesNumber - n) located anywhere inside carto
 if posX <0 or posY <0 particles are created anywhere
 if heading <0 particles are created in any orientation
 if prob > 0 some particles are created according to posX posY and heading 
@@ -20,6 +20,12 @@ if posX and posY <0 and heading > 0 prob will not be used
   carto=apGet(apRobot,"carto");
   img=apGet(apRobot,"img");
   loc=apGet(apRobot,"location");
+  [available,retCode] = ApQueryCartoAvailability(apRobot,loc,false,true);
+  if(!available)
+    printf(mfilename);
+    printf(" location theoriticaly impossible *** ");
+    printf(ctime(time()));
+  endif
   plotRatio=apGet(apRobot,"plotRatio");
   posX=loc(1);
   posY=loc(2);
@@ -35,7 +41,7 @@ if posX and posY <0 and heading > 0 prob will not be used
   %  sigmaHeading=sigmaHeading; 
     onlyNO=true;
   else
-    sigmaHeading=0.5;
+  %  sigmaHeading=0.5;
   endif
   particles=[];
   [x,y]=size(carto);
@@ -44,7 +50,7 @@ if posX and posY <0 and heading > 0 prob will not be used
     lim=0;
   endif
   i=0;
-  while (i<=lim && !onlyNO)             % create some particles according to posX posY and heading
+  while (i<=lim-1 && !onlyNO)             % create some particles according to posX posY and heading
     px=normrnd(posX,sigmaDist);
     py=normrnd(posY,sigmaDist);
     po=normrnd(heading,sigmaHeading);

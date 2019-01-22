@@ -5,7 +5,6 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
   
   typeWaitString={"robotInfoUpdated";"robotUpdatedEnd";"scanning";"moving";"scanEnd";"moveEnd";"northAlignEnd";"servoAlignEnd";"pingFBEnd";"moveAcrossPassEnded";"requestBNOEnd";"robotNOUpdated"};
   typeWaitMapping=[[1,1];[8,2];[102,3];[104,4];[103,5];[105,6];[107,7];[108,8];[109,9];[112,10];[118,11];[123,12]];
-
   idx=1;
   retCode=99;
   typeWait=apGet(apRobot,"waitFor");
@@ -26,7 +25,7 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
     if (mod(idx,10)==0 || (retCode!=0 && retCode!=99 ))
       printf(mfilename);
       twchar=char(typeWaitString(find(typeWaitMapping(:,1)==typeWait)));
-      printf(" typeWait:(%d:%s) source:%d  dest:%d retcode:%d. *** ",typeWait,twchar,source,dest,retCode);
+      printf(" typeWait:(%d:%s) source:%d  dest:%d retcode:%d realMode:%d. *** ",typeWait,twchar,source,dest,retCode,apGet(apRobot,"realMode"));
       printf(ctime(time()));
       if(typeWait==107)
             printf(mfilename);

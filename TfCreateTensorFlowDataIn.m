@@ -1,5 +1,5 @@
 % create a matrix for one scan rotated by "rotation" degres
-function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreateTensorFlowDataIn(apRobot,robot,rotation,plotOn,head)
+function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreateTensorFlowDataIn(apRobot,robot,step,plotOn,head)
   if (!exist("plotOn"))
     plotOn=false;
   endif
@@ -23,32 +23,17 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
    j=j+1;
   endwhile
   
+  if(step!=0)
+    tensorFlowDataIn = ApRotateMatrix(tensorFlowDataIn,step);
+  endif
+  
   j=2;
   while (j<=nbMesurementByTrain)
     tensorFlowDataIn(2,j)=tensorFlowDataIn(1,j-1);
     tensorFlowDataIn(2,j+nbMesurementByTrain)=tensorFlowDataIn(1,j+nbMesurementByTrain-1);
     j=j+1;
   endwhile
-  #{
-  #tensorFlowDataIn(2,1)=robot.GetScanDistBack(nbMesurementByTrain-1);
-  tensorFlowDataIn(2,1)=tensorFlowDataIn(1,2*nbMesurementByTrain);
-  #tensorFlowDataIn(2,nbMesurementByTrain+1)=robot.GetScanDistFront(nbMesurementByTrain-1);
-  tensorFlowDataIn(2,nbMesurementByTrain+1)=tensorFlowDataIn(1,nbMesurementByTrain);
 
-  j=1;
-  while (j<=nbMesurementByTrain-1)
-#    tensorFlowDataIn(3,j)=robot.GetScanDistFront(j);
-    tensorFlowDataIn(3,j)=tensorFlowDataIn(1,j+1);   
- #   tensorFlowDataIn(3,j+nbMesurementByTrain)=robot.GetScanDistBack(j);
-    tensorFlowDataIn(3,j+nbMesurementByTrain)=tensorFlowDataIn(1,j+nbMesurementByTrain+1);;
-    j=j+1;
-  endwhile
- # tensorFlowDataIn(3,nbMesurementByTrain)=robot.GetScanDistBack(0);
- # tensorFlowDataIn(3,2*nbMesurementByTrain)=robot.GetScanDistFront(0);
-  tensorFlowDataIn(3,nbMesurementByTrain)=tensorFlowDataIn(1,1+nbMesurementByTrain);
-  tensorFlowDataIn(3,2*nbMesurementByTrain)=tensorFlowDataIn(1,1);
-  #}
-  #newScan=tensorFlowDataIn(1,:);
   [tensorFlowDataIn] = ExtendScanForOneStep(tensorFlowDataIn,nbMesurementByTrain);
   tensorFlowDataIn(:,:)=tensorFlowDataIn(:,:)+(tensorFlowDataIn(:,:)==0)*sensorDistanceLimit;
   [dl,dc]=size(tensorFlowDataIn);
@@ -103,6 +88,7 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
     %save  ("-mat4-binary","analyseMat.mat","analyseMat")
 
           pixelBFTr=pixelBF';
+          %{
         for i=(1:rotation)
           pixelBFTr=circshift(pixelBFTr,1);
           x=pixelBFTr(1,1);
@@ -110,6 +96,7 @@ function [apRobot,robot,tensorFlowDataIn,extrapolatedTensorFlowDataIn] = TfCreat
           pixelBFTr(1,1)=y;
           pixelBFTr(1,2)=x;
         endfor
+        %}
           pixelBF=pixelBFTr';
 
          angle=linspace(1,181,181); % 

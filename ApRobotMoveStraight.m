@@ -107,5 +107,5 @@
                apRobot = setfield(apRobot,"waitFor",robot.robotInfoUpdated);
                robot.requestBNOData();
                [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot   
-
+               robot.ValidHardPosition(); 
 endfunction

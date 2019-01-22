@@ -82,13 +82,24 @@ apRobot = setfield(apRobot,"automatonRC",0);
 apRobot = setfield(apRobot,"shitfCartoX",0); 
 apRobot = setfield(apRobot,"shitfCartoY",50);
 apRobot = setfield(apRobot,"plotRatio",4);                              % 1/potRatio to be printed
-apRobot = setfield(apRobot,"headingMargin",20);
-apRobot = setfield(apRobot,"distanceMargin",30); 
+apRobot = setfield(apRobot,"headingMargin",25);                         % 
+apRobot = setfield(apRobot,"radiusMargin",20);                        %
+apRobot = setfield(apRobot,"nbMesurementByTrain",getNbStepsRotation());                 % nb of pings (fron and back) during 360° scan
+ %   radiusMargin=30; % cm
+ %   headingMargin=13; % °
 apRobot = setfield(apRobot,"northOrientationReferencePoint",[184,184]); 
-%{
-   (DetTheoDistanceMaxi,DetTfDistanceRef,DetTfDistanceMaxi,ParticlesProbMin,ParticlesProbRef,TfHighLevel,TfHighestLevel,ParticlesProbMini,TfLowLevel)
-%}
-apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.03,0.3,0.85,0.98,0.05,0.50]);        
+
+% used during localization phase
+%  (DetTheoDistanceMaxi,DetTfDistanceRef,DetTfDistanceMaxi,ParticlesProbMin,ParticlesProbRef,TfHighLevel,TfHighestLevel,ParticlesProbMini,TfLowLevel)
+%   
+   
+apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.03,0.3,0.60,0.90,0.05,0.30]);     
+  
+% use during targeting phase
+%    probability location range in wich robot is considered as located (under first value = not located, between first and second location to be checked
+%
+apRobot = setfield(apRobot,"locProbRange",[25,50,100]); 
+
 RobotWidth=apGet(apRobot,"iRobotWidth");
 
 % below computed values
@@ -97,8 +108,9 @@ WheelEncoderHoles=apGet(apRobot,"leftWheelEncoderHoles");
 apRobot = setfield(apRobot,"angleOneHole",((pi*WheelDiameter/100)/WheelEncoderHoles)/(pi*RobotWidth)*360);
 apRobot = setfield(apRobot,"distanceOneHole",((pi*WheelDiameter/100)/WheelEncoderHoles));
 apRobot = setfield(apRobot,"realMode",realMode);
-
+apRobot = setfield(apRobot,"simulationMode",!realMode);
 %loc=apGet(apRobot,"location")
 %locprob=apGet(apRobot,"locationProb")
+pkg load geometry
  robot.StartTensorFlowPrediction();
 endfunction

@@ -3,7 +3,7 @@ function [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robo
   locationProbThresholdLow=apGet(apRobot,"locProbThresholdLow");  % limit under wich location quality is not reliable
   realMode=apGet(apRobot,"realMode");
   stopRequested=false;
-  if (!exist("manualMode"))  % automatic location discovery is default mode 
+  if (!exist("manualMode"))  % manual location discovery is default mode 
      manualMode=true;
   endif
 

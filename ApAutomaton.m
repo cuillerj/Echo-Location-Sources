@@ -76,7 +76,8 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
             [determine,determined];[determine,0];   %28-29
 			      [checkTarget,false];[checkTarget,true]   %30-31
             ];
-
+            
+% states list and transitions for localisation phase
   statesListL=[[initial,notLocalized,atRest];  %1
             [localizing,notLocalized,atRest];[localizing,notLocalized,NOrient];[localizing,notLocalized,moving];[localizing,notLocalized,scanned]; %2-5
             [locked,notLocalized,atRest];[locked,notLocalized,scanned];[locked,notLocalized,moving]; %6-8
@@ -95,6 +96,7 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
                     [6,1,10];[6,2,6];[6,3,6];[6,4,6];[6,5,6];[6,6,6]                % locked move straight
                    ];   %(stateIdx,alphabetIdx,newStateIdx)
 
+ % states list and transitions for targeting phase                  
   statesListT=[[targeting,localized,atRest];[targeting,localized,moving];[targeting,localized,scanned]; % 1-3
 				[targeting,notLocalized,scanned];[lost,notLocalized,atRest]; 							% 4-5
 				[targeting,determining,scanned];  														% 6
@@ -102,20 +104,25 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
         [locked,localized,atRest];[locked,notLocalized,atRest]        % 8-9
         
 			];
-  transitionsListT=[[1,1,2];[1,2,5];[1,3,2];[1,4,2];[1,5,2];[1,6,2];[1,7,5];[1,7,2];[1,8,2];  %  1-8 move straight
-					[1,9,2];[1,10,2];[1,11,2];[1,12,2];[1,13,2];[1,14,2];[1,15,2]; 			% 9-15 rotate
-					[2,1,2];[2,2,8];[2,3,2];[2,4,8];[2,5,2];[2,6,2];[2,7,5];[2,7,2];[2,8,8];  %  16-23 move straight
-					[2,9,2];[2,10,8];[2,11,2];[2,12,8];[2,13,2];[2,14,2];[2,15,2]; 			% 24-31 rotate
+  transitionsListT=[[1,1,1];[1,2,5];[1,3,8];[1,4,8];[1,5,8];[1,6,1];[1,7,2];[1,7,8];[1,8,8];  %  1-8 move straight
+					[1,9,2];[1,10,5];[1,11,8];[1,12,8];[1,13,8];[1,14,1];[1,15,8]; 			% 9-15 rotate
+					[2,1,1];[2,2,5];[2,3,8];[2,4,8];[2,5,8];[2,6,8];[2,7,1];[2,7,2];[2,8,8];  %  16-23 move straight
+					[2,9,2];[2,10,5];[2,11,8];[2,12,8];[2,13,8];[2,14,1];[2,15,8]; 			% 24-31 rotate
 					[2,26,3];[2,26,2];														% 32-33  ping
 					[3,28,6];[3,29,2];														% 34-35 determine
 					[2,30,2];[2,31,7]														% 36-37 check target
 					];    
-				
-  statesListK=[[locked,notLocalized,atRest];[locked,notLocalized,moving];[localizing,notLocalized,scanned];
-               [localizing,notLocalized,atRest];[lost,notLocalized,atRest];[localizing,notLocalized,moving]];
-  transitionsListK=[[1,23,3];[1,24,5]; % scan
-                    [2,1,1];[2,2,5];[2,3,1];[2,4,1];[2,5,1];[2,6,1];[2,7,1];[2,8,1];
-                    [2,8,6];[2,9,5]];
+
+  % states list and transitions for locked phase
+  statesListK=[[locked,notLocalized,atRest];[locked,localized,atRest]; %1-2
+               [localizing,notLocalized,atRest];[targeting,localized,atRest] %3-4
+               [lost,notLocalized,atRest]  %5
+               [locked,notLocalized,moving];[locked,localized,moving]];  %6-7
+               
+  transitionsListK=[[1,1,3];[2,1,4]; % move ok 
+                    [1,2,5];[2,2,5];[1,3,5];[2,3,5];[1,4,5];[2,4,5];[1,5,5];[2,5,5];[1,6,5];[2,6,5];[1,7,1];[2,7,1];[1,8,5];[2,8,5];
+                    [6,2,5];[7,2,5];[6,3,5];[7,3,5];[6,4,5];[7,4,5];[6,5,5];[7,5,5];[6,6,5];[7,6,5];[6,7,1];[7,7,1];[6,8,5];[7,8,5];
+                    ];
   
   automatonState=apGet(apRobot,"automatonState");
   newState=[mStatus(automatonState(1),:);lStatus(automatonState(2),:);aStatus(automatonState(3),:)];
