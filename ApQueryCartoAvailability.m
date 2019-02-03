@@ -66,7 +66,7 @@ if (x <= 0 || x > cartoX)
 	available=false;
   if(debugOn)
     printf(mfilename);
-    printf(" *** carto not available:%d (1.1) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
+    printf(" *** carto not available:%d (1.1) X:%d Y:%d orientation deg: %f . ",carto(x,y),x,y,heading*180/pi())
     printf(ctime(time()))
   endif
 	retCode=1;
@@ -76,7 +76,7 @@ if (y <= 0 || y > cartoY)
 	available=false;
   if(debugOn)
     printf(mfilename);
-    printf(" *** carto not available:%d (1.2) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
+    printf(" *** carto not available:%d (1.2) X:%d Y:%d orientation deg: %f . ",carto(x,y),x,y,heading*180/pi())
     printf(ctime(time()))
   endif
 	retCode=2;
@@ -87,7 +87,7 @@ try
       available=false;
       if(debugOn)
       printf(mfilename);
-      printf(" *** carto not available:%d (1.3) X:%d Y:%d orientation deg: %f . ",x,y,heading*180/pi())
+      printf(" *** carto not available:%d (1.3) X:%d Y:%d orientation deg: %f . ",carto(x,y),x,y,heading*180/pi())
       printf(ctime(time()))
       endif
       retCode=3;

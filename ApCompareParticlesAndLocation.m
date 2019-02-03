@@ -9,14 +9,14 @@ particlesNumber=size(particles,1);
 probability=0;
 radius2=radius^2;
 for i=1:particlesNumber
-  if (mod(ToolAngleDiff(location(3),particles(i,3))-180,360) <= mod(deltaHeading-180,360))
+  if (abs(ToolAngleDiff(location(3),particles(i,3)) <= deltaHeading))
     if (((location(1)-particles(i,1))^2+(location(2)-particles(i,2))^2)<=radius2)
       probability=probability+particles(i,4);
     endif
   endif
 endfor
-apRobot = setfield(apRobot,"locationProb",probability*100);
+apRobot = setfield(apRobot,"locationProb",probability);
 printf(mfilename);
-printf(" Probalibity:%d%% . *** ",100*probability)
+printf(" Probalibity:%.1f%% . *** ",100*probability)
 printf(ctime(time()));
 endfunction

@@ -13,8 +13,8 @@ function [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robo
         initialLocation(1)=input("enter current location X (0 to stop): ");
         initialLocation(2)=input("enter current location Y (0 to stop): ");
         initialLocation(3)=input("enter current location heading (0 to stop): ");
-        initialProb=input("enter current location probability (0 to stop): ");
-        printf("do you confirm this location: X=%d Y=%d H=%d Prob=%d ? ",initialLocation(1),initialLocation(2),initialLocation(3),initialProb);
+        initialProb=input("enter current location probability range [0  1](0 to stop): ");
+        printf("do you confirm this location: X=%d Y=%d H=%d Prob=%.1f%% ? ",initialLocation(1),initialLocation(2),initialLocation(3),100*initialProb);
         validate=yes_or_no("yes or no");
         if (initialLocation(1)==0 && initialLocation(2)==0 &&initialLocation(3)==0 && initialProb==0)
           printf(mfilename);

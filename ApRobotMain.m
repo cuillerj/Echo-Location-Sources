@@ -50,7 +50,7 @@
   %}
 
    EchoLoc=[-1,-1,-1];
-
+   traceLoc=[];
    more off;
    determine=5;
    determined=1;
@@ -77,7 +77,7 @@
     plotOff=false;               % no graphic
     noiseLevel=0.2;                 % coefficent (float) of noise of simualtion mode 0 no noise
     noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
-    scanNoiseLevel=0.7;             % 0.0 0.5
+    scanNoiseLevel=0.5;             % 0.0 0.5
     noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen 
     [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode,apRobot,robot);
     apRobot = setfield(apRobot,"simulationMode",simulationMode);
@@ -163,9 +163,12 @@
               printf(" robot localised *** ");
               printf(ctime(time()))
             %  apRobot = setfield(apRobot,"locationProb",100);     
-              [apRobot,robot,EchoLoc,retCode] = ApGotoTarget(apRobot,robot,flatLogRegMode,plotValue)
+              [apRobot,robot,EchoLoc,retCode] = ApGotoTarget(apRobot,robot,flatLogRegMode,plotValue);
               if (retCode==-1)
-                return
+                    printf(mfilename);
+                    printf(" error ApGotoTarget retCode:%d *** ",retCode);
+                    printf(ctime(time()));
+                    return;
               endif
               automatonState=apGet(apRobot,"automatonState");
               if (automatonState(1)==gotTarget)
@@ -177,7 +180,7 @@
                     printf(mfilename);
                     printf(" robot locked or lost during the traject to the target *** ");
                     printf(ctime(time()))   
-                    apRobot = setfield(apRobot,"automatonState",[automatonState(1),notLocalized,atRest]);              
+                    apRobot = setfield(apRobot,"automatonState",[automatonState(1),localisationLost,atRest]);           
               endif
               
            otherwise

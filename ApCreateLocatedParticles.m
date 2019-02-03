@@ -20,17 +20,22 @@ if posX and posY <0 and heading > 0 prob will not be used
   carto=apGet(apRobot,"carto");
   img=apGet(apRobot,"img");
   loc=apGet(apRobot,"location");
+  prob=apGet(apRobot,"locationProb");
   [available,retCode] = ApQueryCartoAvailability(apRobot,loc,false,true);
   if(!available)
     printf(mfilename);
     printf(" location theoriticaly impossible *** ");
+    printf(ctime(time()));
+  else
+    printf(mfilename);
+    printf(" create particles (%d,%d,%d) probability: %.1f%% sigmaPos:%d  sigmaHeading:%d *** ",loc(1),loc(2),loc(3),prob,sigmaPos,sigmaHeading);
     printf(ctime(time()));
   endif
   plotRatio=apGet(apRobot,"plotRatio");
   posX=loc(1);
   posY=loc(2);
   heading=loc(3);
-  prob=apGet(apRobot,"locationProb");
+
   pw=1/particlesNumber;
  % xPrecision=precision;
   %yPrecision=precision;

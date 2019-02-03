@@ -104,7 +104,7 @@
   endif
   forward=true;
   randomChoice=false;
-  if(apGet(apRobot,"simulationMode"))         
+  if(apGet(apRobot,"simulationMode") && apGet(apRobot,"automatonState")(2) != localisationLost)         
     randomPosition = ApGetRadomPosition(apRobot);
     newTheoriticalPositions=randomPosition(1:2);
     printf(mfilename);
@@ -114,7 +114,7 @@
     newTheoriticalPositions=[184,184];  % 
   endif
    if (plotValue>=1) % 
-      figure(1);      % figure 1 fixed for moves
+      moveFigureNumber=figure();      % figure 1 fixed for moves
 		  title ("moves");
 		  hold on;
 		  imshow(img,[]);  % insert map background
@@ -128,8 +128,23 @@
     else
       plotReq=false;
    endif
-   load ('5000particlesSpreadedXoriented.mat');
-   apRobot = setfield(apRobot,"particles",particles);
+   if (apGet(apRobot,"location")==[-1,-1,-1] || apGet(apRobot,"locationProb")<=0.1 )  % completly unknown location 
+     load ('5000particlesSpreadedXoriented.mat');
+     apRobot = setfield(apRobot,"particles",particles);
+   else
+      locProbRange=apGet(apRobot,"locProbRange");  % probability location range in wich robot is considered as located (under first value = not located between first and second location to be checked
+      sigmaLocation=[10,25];  % sigma range values of the normal distribution
+      sigmaHeading=[5,25]; % sigma range values of the normal distribution
+      particlesNumber=[1000,3000]; % particles numner range
+      probRangeWidth=(locProbRange(3)-locProbRange(2));
+      locProb=apGet(apRobot,"locationProb");
+      sigmaLoc=sigmaLocation(1)+(sigmaLocation(2)-sigmaLocation(1))*(locProbRange(3)-locProb)/probRangeWidth;
+      sigmaHead=sigmaHeading(1)+(sigmaHeading(2)-sigmaHeading(1))*(locProbRange(3)-locProb)/probRangeWidth;
+      partNumber=particlesNumber(1)+(particlesNumber(2)-particlesNumber(1))*(locProbRange(3)-locProb)/probRangeWidth;
+      apRobot = setfield(apRobot,"locationProb",100); % force probability to for particles creation
+      apRobot = ApCreateLocatedParticles(apRobot,partNumber,(plotValue>=2),sigmaLoc,sigmaHead); % create particles for particle filter
+      apRobot = setfield(apRobot,"locationProb",locProb);  % restore current probability
+   endif
     pointLib=["theori:";"encoder:";"gyroTheo:";"BNOleft:";"BNORight:"];
     if (plotValue>=1)
       plotReq=true;
@@ -148,8 +163,8 @@
     lastMesurmentReliable=false; 
   while (count<maxRetry && located==false && locRetCode==0) 
       automatonState=apGet(apRobot,"automatonState");
-      automatonStateList=[apGet(apRobot,"automatonStateList");[automatonState]];
-      apRobot = setfield(apRobot,"automatonStateList",automatonStateList);                    
+  %    automatonStateList=[apGet(apRobot,"automatonStateList");[automatonState]];
+  %    apRobot = setfield(apRobot,"automatonStateList",automatonStateList);                    
       if(apGet(apRobot,"automatonRC")==0);  
         switch(automatonState)
           case([lost,notLocalized,atRest])
@@ -179,7 +194,7 @@
               printf(mfilename);
               printf(" Scan reference location :(%d,%d) NO:%d *** ",robot.simulatedHardX,robot.simulatedHardY,currentNorthOrientationReference);
               printf(ctime(time()));             
-              [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,currentNorthOrientationReference,alignParticles,(plotValue>=2)); 
+              [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,currentNorthOrientationReference,alignParticles,(plotValue>=3)); 
               if (action=="inMove" || action=="stop..")
                   printf(mfilename);
                   printf(" stop required after NorthAlign : recode %d, action (%d,%d)  *** ",retCode,action(1),action(2));
@@ -211,7 +226,7 @@
               traceLoc(size(traceLoc)(1),3:6)=[detX,detY,detH,probCum];
               traceLoc(size(traceLoc)(1),12:14)=[posX(1),posY(1),posProb(1)];
               countDet++;
-              prob=max(probCum*100,posProb(1)*100);
+              prob=max(probCum,posProb(1));
               apRobot = setfield(apRobot,"locationProb",prob);
               if (realMode)
                  [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,[detX,detY,detH],prob);
@@ -242,7 +257,7 @@
                    EchoLoc=[detX,detY,detH];
                    apRobot = setfield(apRobot,"location",EchoLoc);
   %                 [apRobot,robot,probability] = ApCompareParticlesAndLocation(apRobot,robot,apGet(apRobot,"radiusMargin"),apGet(apRobot,"headingMargin"));
-                   apRobot = setfield(apRobot,"probLocation",max(apGet(apRobot,"locationProb"),apGet(apRobot,"locProbRange")(2)*1.1));
+                   apRobot = setfield(apRobot,"locationProb",max(apGet(apRobot,"locationProb"),apGet(apRobot,"locProbRange")(2)*1.1));
                    [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,localizationFound],1);           
               %{
               if(count>2 && (mod(detH,360)<=15 || mod(detH,360)>=345) && lastMesurmentReliable && histDeltaDist(countDet)<determinedDistanceThreshold && histDeltaDist(countDet-1)<determinedDistanceThreshold*2 )
@@ -252,7 +267,7 @@
                   %}
                else
                    [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,!localizationFound],1);
-                   [apRobot,robot] = ApResampleParticles(apRobot,robot,plotReq,newFigure,checkLocationAvaibility);
+                   [apRobot,robot] = ApResampleParticles(apRobot,robot,(plotValue>=3),newFigure,checkLocationAvaibility);
                  %  probCum = ApComputeCenteredParticlesProbability(apGet(apRobot,"particles"),[detX,detY,detH],apGet(apRobot,"distanceMargin"),apGet(apRobot,"headingMargin"))
                     prevDeltaDist=deltaDist;               
                endif
@@ -278,7 +293,7 @@
                       printf(" no significative possible move:(%d,%d)",rotationToDo,lenToDo);
                       printf(ctime(time()));
                 endif        
-                [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,plotOff);
+                [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,(plotValue>=3));
                  if (action=="inMove" || action=="stop..")
                     printf(mfilename);
                     printf(" stop required after Rotate : recode %d, action (%d,%d)  *** ",retCode,action(1),action(2));
@@ -344,13 +359,13 @@
                   apRobot = setfield(apRobot,"automatonState",[lost,automatonState(2),automatonState(3)]);   
                   count=maxRetry;
           endswitch
-         else
-                 printf(mfilename);
-                 printf(" unsuported move for:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
-                 printf(ctime(time())); 
-                 automatonState=apGet(apRobot,"automatonState");
-                 apRobot = setfield(apRobot,"automatonState",[lost,automatonState(2),automatonState(3)]);        
-                 count=maxRetry;        
+      else
+             printf(mfilename);
+             printf(" automaton error for:(%d,%d,%d)  automaton retCode:%d *** ",automatonState(1),automatonState(2),automatonState(3),apGet(apRobot,"automatonRC"));
+             printf(ctime(time())); 
+             automatonState=apGet(apRobot,"automatonState");
+             apRobot = setfield(apRobot,"automatonState",[lost,automatonState(2),automatonState(3)]);        
+             count=maxRetry;        
          endif
       endwhile
                  printf(mfilename);

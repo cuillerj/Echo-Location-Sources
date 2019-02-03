@@ -48,7 +48,8 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   determine=5;
   pingFB=6;
   checkTarget=7;
-  actionList=["moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB";"checkTarget"];
+  checkLocation=8;
+  actionList=["moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB";"checkTarget";"checkLocation"];
     %{
   return code list
   %}
@@ -74,7 +75,8 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
             [scan360,normal];[scan360,timeout];[scan360,pending];  %23-25
             [pingFB,normal];[pingFB,timeout];  %26-27
             [determine,determined];[determine,0];   %28-29
-			      [checkTarget,false];[checkTarget,true]   %30-31
+			[checkTarget,false];[checkTarget,true];  %30-31
+			[checkLocation,true];[checkLocation,false] %32-33
             ];
             
 % states list and transitions for localisation phase
@@ -101,16 +103,18 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
 				[targeting,notLocalized,scanned];[lost,notLocalized,atRest]; 							% 4-5
 				[targeting,determining,scanned];  														% 6
 				[gotTarget,localized,atRest];                                 % 7
-        [locked,localized,atRest];[locked,notLocalized,atRest]        % 8-9
-        
+				[locked,localized,atRest];[locked,notLocalized,atRest];        % 8-9
+				[initial,localisationLost,atRest]  %10
 			];
   transitionsListT=[[1,1,1];[1,2,5];[1,3,8];[1,4,8];[1,5,8];[1,6,1];[1,7,2];[1,7,8];[1,8,8];  %  1-8 move straight
 					[1,9,2];[1,10,5];[1,11,8];[1,12,8];[1,13,8];[1,14,1];[1,15,8]; 			% 9-15 rotate
 					[2,1,1];[2,2,5];[2,3,8];[2,4,8];[2,5,8];[2,6,8];[2,7,1];[2,7,2];[2,8,8];  %  16-23 move straight
 					[2,9,2];[2,10,5];[2,11,8];[2,12,8];[2,13,8];[2,14,1];[2,15,8]; 			% 24-31 rotate
 					[2,26,3];[2,26,2];														% 32-33  ping
-					[3,28,6];[3,29,2];														% 34-35 determine
-					[2,30,2];[2,31,7]														% 36-37 check target
+					[1,28,1];[1,29,1];														% 34-35 determine
+					[2,30,2];[2,31,7];														% 36-37 check target
+					[1,23,3];[1,24,5];
+					[3,32,1];[3,33,1]
 					];    
 
   % states list and transitions for locked phase
@@ -141,13 +145,20 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
       statesListNumber=size(statesList,1);
       transitionsList=transitionsListT;
   endif
+  if (!exist("statesList"))
+      printf(mfilename);
+      printf(" automaton state error:(%d,%d,%d)  *** ",automatonState(1),automatonState(2),automatonState(3));
+      printf(ctime(time()));
+      retCode=-3;
+      return;
+  endif
   statesListNumber=size(statesList,1);
   alphabetNumber=size(alphabet,1);
   transitionsNumber=size(transitionsList,1);
   alphabetIdx=0; 
   if (debugOn)
      printf(mfilename);
-     printf(" previous automaton status: ( %s %s %s) action (%s,%d) *** ",(newState(1,:)),(newState(2,:)),(newState(3,:)),actionList(action(1),:),action(2))
+     printf(" entry automaton status: ( %s %s %s) action (%s,%d) *** ",(newState(1,:)),(newState(2,:)),(newState(3,:)),actionList(action(1),:),action(2))
      printf(ctime(time()));	
   endif
   letter=0;
@@ -158,8 +169,6 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
       break;
     endif
   end
-  
-
   state=0; 
   for (i=1:statesListNumber)
     if (statesList(i,:)==automatonState)
@@ -182,5 +191,10 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
         break;
       endif
     end
+ if (retCode!=0)
+        printf(mfilename);
+        printf(" automaton retCode:%d  *** ",retCode)
+        printf(ctime(time()));
+ endif		
   apRobot = setfield(apRobot,"automatonRC",retCode);    
   endfunction

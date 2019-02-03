@@ -14,6 +14,7 @@ currentL=apGet(apRobot,"location");
 targetL=apGet(apRobot,"destination");
 newTarget=apGet(apRobot,"newTarget");      % true first request for this new target
 apRobot = setfield(apRobot,"newTarget",false);  %
+pathMaxStraightLenght=apGet(apRobot,"pathMaxStraightLenght");
 stepSize=apGet(apRobot,"stepSize");
 carto=apGet(apRobot,"carto");
 nextX=targetL(1);
@@ -26,7 +27,9 @@ targetX=RoundTo(targetL(1),5);
 targetY=RoundTo(targetL(2),5);
 forward=0;
 instruction=[];
-if (newTarget==false) 
+direct=false;
+
+if (newTarget==false && (sqrt((currentL(1)-targetL(1))^2+(currentL(2)-targetL(2))^2)<=pathMaxStraightLenght))
   [apRobot,rotation,distance,possible] = ApCheckStraightMovePossibility(apRobot,currentL,targetL);
   if (possible==true)
     direct=true;
@@ -45,7 +48,6 @@ if (newTarget==false)
     next=[nextX,nextY];
     return
   else
-    direct=false;
     printf(mfilename);
     printf(" *** need to compute path . *** ");
     printf(ctime(time()))
@@ -71,7 +73,18 @@ else
   %load(AStarStepSmooth.mat);
   AStarStep=apGet(apRobot,"pathStep");
 	prevDist=Inf;
-	closest=0;
+	closest=1;
+  if (size(AStarStep,1)<=1)
+    next=target
+    direect=true;
+    printf(mfilename);
+    printf(" *** next step is target *** ");
+    printf(ctime(time()));
+    return
+  endif
+
+
+    
 	for i=1:size(AStarStep,1)
 		dist=sqrt((AStarStep(i,1)-currentX)^2+(AStarStep(i,2)-currentY)^2);
 		if (dist<=prevDist)
@@ -91,6 +104,13 @@ else
 	printf(" *** closest step is:%d . *** ",closest);
 	printf(ctime(time()));
 	if (closest!=0)
+    if (sqrt((AStarStep(closest,1)-currentX)^2+(AStarStep(closest,2)-currentY)^2) < apGet(apRobot,"minDistToBeDone"))
+     % AStarStep=AStarStep(2:size(AStarStep,1),:); % suppress first step too close
+      closest++;
+      printf(mfilename);
+      printf(" *** first step too close *** ");
+      printf(ctime(time()));
+    endif
     if (newTarget==false)
 		  nextX=AStarStep(min(size(AStarStep,1),closest),1);
 		  nextY=AStarStep(min(size(AStarStep,1),closest),2);

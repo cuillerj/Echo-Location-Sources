@@ -105,7 +105,7 @@
                   probExpectedMoveOk=1;
                 endif
                apRobot = setfield(apRobot,"waitFor",robot.robotInfoUpdated);
-               robot.requestBNOData();
+               robot.GetSubsystemLocation();
                [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot   
-               robot.ValidHardPosition(); 
+               robot.ValidHardPosition();
 endfunction

@@ -14,6 +14,6 @@ function [probability] = ApComputeCenteredParticlesProbability(particles,locatio
     endif
  endfor
  printf(mfilename);
- printf(" Probalibity:%d%% . *** ",100*probability)
+ printf(" Probalibity:%.1f%%. *** ",100*probability)
  printf(ctime(time()));
 endfunction

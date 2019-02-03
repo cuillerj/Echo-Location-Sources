@@ -20,7 +20,7 @@ function [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,
  targetX=targetL(1);
  targetY=targetL(2);
  targetHeading=targetL(3);
- currentHeading=mod(currentL(3)+360,360);
+ currentHeading=mod(currentL(3),360);
  direction=[targetX-currentL(1),targetY-currentL(2)];
  currentHeadingGrad=currentHeading*pi()/180;
  vectHeading=[cos(currentHeadingGrad),sin(currentHeadingGrad)];
@@ -32,10 +32,10 @@ function [apRobot,robot,AStarPath,AStarStep,cost] = ApAStarSearch(apRobot,robot,
   AStarPath=[];
   AStarStep=[];
   stepSize=apGet(apRobot,"stepSize");
-  currentX=stepSize*(floor(currentL(1)/stepSize))+floor(stepSize/2); % adjust position to center of square carto
-  currentY=stepSize*(floor(currentL(2)/stepSize))+floor(stepSize/2);
-  targetX=stepSize*(floor(targetX/stepSize))+floor(stepSize/2);
-  targetY=stepSize*(floor(targetY/stepSize))+floor(stepSize/2);
+  currentX=stepSize*(round(currentL(1)/stepSize))+floor(stepSize/2); % adjust position to center of square carto
+  currentY=stepSize*(round(currentL(2)/stepSize))+floor(stepSize/2);
+  targetX=stepSize*(round(targetX/stepSize))+floor(stepSize/2);
+  targetY=stepSize*(round(targetY/stepSize))+floor(stepSize/2);
   angleOneHole=apGet(apRobot,"angleOneHole");
   distanceOneHole=apGet(apRobot,"distanceOneHole");
 
@@ -76,10 +76,12 @@ fScore=ones(nbX,nbY,mailleRotation).*Inf;
 fScore(pos(1),pos(2),currentHeadingMaille+1)=AStarHeuristic(pos(1),pos(2),targetX,targetY);
 found=false;
 current=[pos(1),pos(2),currentHeadingMaille+1];
-while (size(openSet,1)!=0 || found==true)
+
+while (size(openSet,1)!=0 && found!=true)
+  size(openSet,1);
 	[valueMin,idxMin]=min(fScore(:));
 	[currentX,currentY,currentH]=ind2sub(size(fScore),idxMin);
-	if ([currentX,currentY]==[targetX,targetY])
+	if (((currentX-targetX)^2+currentY-targetY)<stepSize^2)
 		found=true;
 %		save  ("cameFrom.mat","cameFrom")
 		cost=fScore(currentX,currentY,currentH);
@@ -91,20 +93,24 @@ while (size(openSet,1)!=0 || found==true)
 
 		while (backEnd!=true)
 			actionBack=cameFrom(currentX,currentY,currentH);
-			backX=currentX-actions(actionBack,1);
-			backY=currentY-actions(actionBack,2);
+      if (actionBack>0)
+          backX=currentX-actions(actionBack,1)
+          backY=currentY-actions(actionBack,2);
 
-			AStarStep=[AStarStep;[backX,backY]];         
-			AStarPath=[AStarPath;[actionBack]];
-			if (backX == pos(1) && backY == pos(2))
-				backEnd=true;
-			else
-				currentH=cameWith(currentX,currentY,currentH);
-				currentX=backX;
-				currentY=backY;
-%				currentH=backHeadingMaille+1;
-%				backHeadingMaille=floor((backH-1)*180/pi()/deltaMailleRotation)+1
-			endif
+          AStarStep=[AStarStep;[backX,backY]];         
+          AStarPath=[AStarPath;[actionBack]];
+          if (backX == pos(1) && backY == pos(2))
+            backEnd=true;
+          else
+            currentH=cameWith(currentX,currentY,currentH);
+            currentX=backX;
+            currentY=backY;
+    %				currentH=backHeadingMaille+1;
+    %				backHeadingMaille=floor((backH-1)*180/pi()/deltaMailleRotation)+1
+          endif
+       else
+        break;
+       endif
 		end
 		AStarPath=flipud(AStarPath);
 		AStarStep=flipud(AStarStep);

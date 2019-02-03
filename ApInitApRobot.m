@@ -32,7 +32,7 @@ if (exist("apRobot"))
     robot=robotJava();            % create the java robot object  
  endif
  printf(ctime(time()))
-setupPath;					% define paths
+%setupPath;					% define paths
 %cd C:\Users\jean\Documents\Donnees\octave
 %apRobotPath
 robot.SetTraceFileOn(1);    % route console to trace file
@@ -50,7 +50,7 @@ load 'scanResult.txt';
 %shiftNorthXOrientation=value;
 %printf("shift between X axis and north is %d degres *** ",shiftNorthXOrientation)
 %printf(ctime(time()));
-apRobot = setfield(apRobot,"location",[0,0,0]);                        % defined / determined location 
+apRobot = setfield(apRobot,"location",[-1,-1,-1]);                        % defined / determined location 
 apRobot = setfield(apRobot,"destination",[0,0,0]);                     % target to be reached
 apRobot = setfield(apRobot,"newTarget",true);                          % flag to defined a new target that need to compute a new path
 apRobot = setfield(apRobot,"locationProb",0);                          % location proalility
@@ -83,22 +83,23 @@ apRobot = setfield(apRobot,"shitfCartoX",0);
 apRobot = setfield(apRobot,"shitfCartoY",50);
 apRobot = setfield(apRobot,"plotRatio",4);                              % 1/potRatio to be printed
 apRobot = setfield(apRobot,"headingMargin",25);                         % 
-apRobot = setfield(apRobot,"radiusMargin",20);                        %
+apRobot = setfield(apRobot,"radiusMargin",35);                        %
 apRobot = setfield(apRobot,"nbMesurementByTrain",getNbStepsRotation());                 % nb of pings (fron and back) during 360° scan
+apRobot = setfield(apRobot,"pathMaxStraightLenght",150); 
  %   radiusMargin=30; % cm
  %   headingMargin=13; % °
 apRobot = setfield(apRobot,"northOrientationReferencePoint",[184,184]); 
 
 % used during localization phase
-%  (DetTheoDistanceMaxi,DetTfDistanceRef,DetTfDistanceMaxi,ParticlesProbMin,ParticlesProbRef,TfHighLevel,TfHighestLevel,ParticlesProbMini,TfLowLevel)
+%  (DetTheoDistanceMaxi,DetTfDistanceRef,DetTfDistanceMaxi,ParticlesProbMin,ParticlesProbRef,TfHighLevel,TfHighestLevel,ParticlesProbMini,TfLowLevel,TfCertainty)
 %   
    
-apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.03,0.3,0.60,0.90,0.05,0.30]);     
+apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.03,0.3,0.60,0.90,0.05,0.30,0.95]);     
   
 % use during targeting phase
 %    probability location range in wich robot is considered as located (under first value = not located, between first and second location to be checked
 %
-apRobot = setfield(apRobot,"locProbRange",[25,50,100]); 
+apRobot = setfield(apRobot,"locProbRange",[.25,.45,1]); 
 
 RobotWidth=apGet(apRobot,"iRobotWidth");
 
@@ -112,5 +113,5 @@ apRobot = setfield(apRobot,"simulationMode",!realMode);
 %loc=apGet(apRobot,"location")
 %locprob=apGet(apRobot,"locationProb")
 pkg load geometry
- robot.StartTensorFlowPrediction();
+robot.DeleteTensorFlowFiles(); % clear working files
 endfunction

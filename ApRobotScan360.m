@@ -19,7 +19,7 @@ function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn,scan
         action="stop..";
         return;                 
    endif
-   if (retCode==0)
+   if (retCode==0 && apGet(apRobot,"realMode"))
      if(robot.scanReceiveCount!=apGet(apRobot,"nbPulse"))
       retCode=robot.scanReceiveCount;
       [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
@@ -34,7 +34,7 @@ function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn,scan
                 action="stop..";
                 return;                 
            endif
-           if (retCode==0)
+           if (retCode==0 )
              if(robot.scanReceiveCount!=apGet(apRobot,"nbPulse"))
                 retCode=-1;
                 action="stop..";

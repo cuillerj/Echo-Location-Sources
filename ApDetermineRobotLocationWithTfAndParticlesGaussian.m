@@ -59,7 +59,14 @@ function [apRobot,robot,detX,detY,detH,prob,figureNumber] = ApDetermineRobotLoca
   endif
   apRobot = setfield(apRobot,"particles",particles);
   determine=5;
-  [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[determine,0],1);
+  checkLocation=8;
+  targeting=3;
+  if (apGet(apRobot,("automatonState"))(1)==targeting)
+    action=checkLocation;
+  else
+    action=determine;
+  endif
+  [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,[action,0],1);
  if (plotOn)
   figure(1);
   hold on;
@@ -107,5 +114,7 @@ function [apRobot,robot,detX,detY,detH,prob,figureNumber] = ApDetermineRobotLoca
 	%	hold off;
   %}
 	endif
-
+   printf(mfilename);
+   printf(" Determined location:(%d,%d,%d) probability:%.1f%% ***  ",detX,detY,detH,100*prob);
+   printf(ctime(time()));
 endfunction
