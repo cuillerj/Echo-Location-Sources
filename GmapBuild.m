@@ -37,12 +37,21 @@ function [apRobot,robot,GridMap] = GmapBuild(apRobot,robot,scan)
     if (mod(count,100)==0)    
       printf("\n",count);
     endif
-    % empty front
-    [GridMap] = GmapEmptyGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distF,beamHeading,angle,BeamWidth);
-    [GridMap] = GmapEmptyGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distB,mod(beamHeading+pi(),2*pi()),angle,BeamWidth);
-    % empty back
-    [GridMap] = GmapOccupiedGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distF,mod(beamHeading,2*pi()),BeamWidth);
-    [GridMap] = GmapOccupiedGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distB,mod(beamHeading+pi(),2*pi()),BeamWidth);
+    %
+    [widthDeg,BeamWidthF] = ToolSRF05BeamWidth(distF);
+    [widthDeg,BeamWidthB] = ToolSRF05BeamWidth(distB);
+    if (distF!=0)     
+      [GridMap] = GmapEmptyGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distF,beamHeading,angle,BeamWidthF);
+    endif
+    if (distB!=0)
+      [GridMap] = GmapEmptyGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distB,mod(beamHeading+pi(),2*pi()),angle,BeamWidthB);
+    endif
+    if (distF!=0)     
+      [GridMap] = GmapOccupiedGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distF,mod(beamHeading,2*pi()),BeamWidthF);
+    endif
+    if (distB!=0)
+      [GridMap] = GmapOccupiedGrid(apRobot,GridMap,posX+shitfCartoX,posY+shitfCartoY,distB,mod(beamHeading+pi(),2*pi()),BeamWidthB);
+    endif
   endfor
   printf("\n")
   picture=gray2ind(GridMap',256);
@@ -55,5 +64,7 @@ function [apRobot,robot,GridMap] = GmapBuild(apRobot,robot,scan)
   image(picture);
   hold off;
  % saveas (1, "carto-1.pdf");
-  saveas (2, "carto-2.pdf");
+  t=clock();
+  fname=strcat("carto-2",mat2str(t(1)),mat2str(t(2)),mat2str(t(3)),mat2str(t(4)),mat2str(t(5)),mat2str(round(t(6))),".pdf");
+  saveas (2, fname);
 endfunction

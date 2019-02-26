@@ -63,8 +63,8 @@ output:
     initialize octave data 
     %}
   %  distanceToTargetMargin=15; % cm
-    radiusMargin=30; % cm
-    headingMargin=13; % °
+    radiusMargin=apGet(apRobot,"radiusMargin"); % cm
+    headingMargin=apGet(apRobot,"headingMargin"); % °
     trajectory=[];
     traceDet=[];
     traceMove=[];
@@ -176,6 +176,7 @@ output:
      while ( apGet(apRobot,"automatonState")(2)== localized)
       % is the target reached ?
       printf(mfilename);
+      apRobot = setfield(apRobot,"location",[apGet(apRobot,"location")(1),apGet(apRobot,"location")(2),mod(apGet(apRobot,"location")(3),360)]);
       printf(" loop %d: location is (%d,%d,%d) *** ",loopCount,apGet(apRobot,"location")(1),apGet(apRobot,"location")(2),apGet(apRobot,"location")(3));
       printf(ctime(time()));
       [apRobot,robot,robotFigureNumber] = ApDrawRobot(apRobot,robot,0,robotFigureNumber); % draw the robot on the map
@@ -206,6 +207,19 @@ output:
       endif
       switch(apGet(apRobot,"automatonState"))
         case([targeting,localized,atRest])
+          if (size(apGet(apRobot,"narrowPath"),1)>1) % is there a narrow path on the way ?
+              [pathFound,pathNumber,entryPoint,pathHeading,pathDistance,farDistances] = ApLookForForNarrowPath(apRobot,robot);
+              if (pathFound)
+                  printf(mfilename);
+                  printf(" robot close to a narrow path:%d heading:%d distance:%d *** ",pathNumber,pathHeading,pathDistance);
+                  printf(ctime(time()));
+                 if (pathNumber==apGet(apRobot,"narrowPath")(2))
+                    farther=((apGet(apRobot,"destination")(1)^2+apGet(apRobot,"destination")(2)^2) > (apGet(apRobot,"location")(1)^2+apGet(apRobot,"location")(2)^2));
+                    [apRobot,robot,retCode] = ApGoThruNarrowPath(apRobot,robot,pathNumber,entryPoint,pathHeading,pathDistance,farDistances,farther,forward);
+                    break;
+                 endif
+             endif
+          endif
           [apRobot,robot,probability] = ApCompareParticlesAndLocation(apRobot,robot,radiusMargin,headingMargin);
           if (probability < locProbRange(1))
              printf(mfilename);
@@ -213,6 +227,7 @@ output:
              printf(ctime(time()))
              break;
           elseif (probability < locProbRange(2))
+
              printf(mfilename);
              printf(" probability low > need to check location:%.1f%% *** ",100*probability);
              printf(ctime(time()));
@@ -306,21 +321,41 @@ output:
         case([targeting,localized,moving])
               [apRobot,robot,retCode]=ApRobotMoveStraight(apRobot,robot,lenToDo,forward,(plotValue>=2));
               apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
-              traceRobot=[traceRobot;[time,loopCount,1,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCode]];
+              traceRobot=[traceRobot;[time,loopCount,2,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCode]];
         case([locked,localized,atRest])  
               printf(mfilename);
-              printf(" locked state:(%d,%d,%d)  *** ",apGet(apRobot,"automatonState")(1),apGet(apRobot,"automatonState")(2),apGet(apRobot,"automatonState")(3));
+              printf(" locked state:(%d,%d,%d) *** ",apGet(apRobot,"automatonState")(1),apGet(apRobot,"automatonState")(2),apGet(apRobot,"automatonState")(3));
               printf(ctime(time())); 
               randomChoice=true;
-              retCodeRetry=0;
-              if (retCode==robot.moveKoDueToNotEnoughSpace)
-                  maxLen=robot.GetRetcodeDetail();
-                  printf(mfilename);
-                  printf(" rerty with len:% d *** ",.8*maxLen);
-                  printf(ctime(time()));
-                  [apRobot,robot,retCodeRetry]=ApRobotMoveStraight(apRobot,robot,maxLen,forward,(plotValue>=2));
-                  apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
-                  traceRobot=[traceRobot;[time,loopCount,1,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCode]];
+              retCodeRetry=-1;
+              apGet(apRobot,"currentMove")
+              apGet(apRobot,"retcodeDetail")
+              [idx,j]=find(flipud(traceRobot)(:,3)==1,1)  %  loook for last rotate retCode
+              if (size(idx,1)==1)
+                  flipud(traceRobot)(idx,8)
+                 if (flipud(traceRobot)(idx,8)==robot.moveKoDueToNotEnoughSpace && apGet(apRobot,"currentMove")=="rotate" && apGet(apRobot,"retcodeDetail")>=3*apGet(apRobot,"minRotToBeDone"))
+                    rotationToDo=round(apGet(apRobot,"lastRotation")*.5);
+                    printf(mfilename);
+                    printf(" rerty rotate with rotationToDo:% d *** ",rotationToDo);
+                    printf(ctime(time()));
+                    [apRobot,robot,retCodeRetry,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,(plotValue>=3));
+                    apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
+                    traceRobot=[traceRobot;[time,loopCount,1,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCode]];
+                  endif
+              endif
+              [idx,j]=find(flipud(traceRobot)(:,3)==2,1)  %  loook for last move straight retCode
+              if (size(idx,1)==1)
+                flipud(traceRobot)(idx,8)
+
+                if (flipud(traceRobot)(idx,8)==robot.moveKoDueToNotEnoughSpace && apGet(apRobot,"currentMove")=="straig" && apGet(apRobot,"retcodeDetail")>=3*apGet(apRobot,"minDistToBeDone"))
+                    maxLen=round(robot.GetRetcodeDetail()*.7);
+                    printf(mfilename);
+                    printf(" rerty move straight with len:% d *** ",maxLen);
+                    printf(ctime(time()));
+                    [apRobot,robot,retCodeRetry]=ApRobotMoveStraight(apRobot,robot,maxLen,forward,(plotValue>=2));
+                    apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
+                    traceRobot=[traceRobot;[time,loopCount,2,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCode]];
+                endif
               endif
               if (retCodeRetry==0)
                    apRobot = setfield(apRobot,"automatonState",[targeting,localized,atRest]);  % 
@@ -346,6 +381,9 @@ output:
     save ("-mat4-binary","traceNext.mat","traceNext");
     save ("-mat4-binary","traceRobot.mat","traceRobot");
     save ("-mat4-binary","traceEcho.mat","traceEcho");
+    t=clock();
+    fname=strcat("moves",mat2str(t(1)),mat2str(t(2)),mat2str(t(3)),mat2str(t(4)),mat2str(t(5)),mat2str(round(t(6))),".jpg");
+    saveas(robotFigureNumber,fname,"jpg");
     hold off
     printf(mfilename);
     printf(" exit automaton status is (%s,%s,%s) *** ",char(mStatus(apGet(apRobot,"automatonState")(1))),char(lStatus(apGet(apRobot,"automatonState")(2))),char(aStatus(apGet(apRobot,"automatonState")(3))));

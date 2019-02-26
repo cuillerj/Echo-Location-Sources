@@ -47,6 +47,7 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                           printf( mfilename);
                           printf(" no rotation moveKoDueToNotEnoughSpace. *** ");
                           printf(ctime(time()));
+                          apRobot = setfield(apRobot,"retcodeDetail",apGet(apRobot,"lastRotation"));
                           apRobot = setfield(apRobot,"lastRotation",0);
                           apRobot = setfield(apRobot,"particles",lastParticles);  % restaure particles
                           apRobot = setfield(apRobot,"location",apGet(apRobot,"saveLocation"));

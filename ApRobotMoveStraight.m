@@ -67,6 +67,7 @@
                   probExpectedMoveOk=25;
  %                 gyroLenToDo=newLenToDo;
                 endif	
+              
                 if (retCodeMove==robot.moveKoDueToObstacle )
                   newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
                   printf(mfilename);
@@ -89,9 +90,9 @@
                   probExpectedMoveOk=1;
                 endif
                 if (retCodeMove==robot.moveKoDueToNotEnoughSpace)
-                  maxLen=robot.GetRetcodeDetail();
+                  apRobot = setfield(apRobot,"retcodeDetail",robot.GetRetcodeDetail());
                   printf(mfilename);
-                  printf(" no move moveKoDueToNotEnoughSpace Max possible len:% d *** ",maxLen);
+                  printf(" no move moveKoDueToNotEnoughSpace Max possible len:% d *** ",robot.GetRetcodeDetail());
                   printf(ctime(time()));
                   apRobot = setfield(apRobot,"particles",lastParticles);
                   apRobot = setfield(apRobot,"lastMove",0);

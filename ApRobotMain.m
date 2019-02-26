@@ -117,7 +117,7 @@
     endif
     printf(mfilename);
     if (realMode)     
-      target=[385,250,0];
+      target=[585,225,0];
       printf(mfilename);
       printf(" real mode destination (%d,%d) *** ",target(1),target(2))
       printf(ctime(time()));

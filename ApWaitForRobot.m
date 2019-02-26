@@ -62,7 +62,9 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
   if (typeWait==robot.scanEnd)
       [apRobot,robot,newState,rc] = ApAutomaton(apRobot,robot,[scan360,retCode],1);
   endif
-
+  if (retCode==-1) % timeout
+   robot.ResetRobotStatus() % reset robot
+  endif
   pause(1);
 
 endfunction
