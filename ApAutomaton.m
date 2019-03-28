@@ -49,7 +49,8 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   pingFB=6;
   checkTarget=7;
   checkLocation=8;
-  actionList=["moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB";"checkTarget";"checkLocation"];
+  acrossPath=9;
+  actionList=["moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB";"checkTarget";"checkLocation";"acrossPath"];
     %{
   return code list
   %}
@@ -62,7 +63,12 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   obstacle=robot.moveKoDueToObstacle;
   underLimitation=robot.moveUnderLimitation;
   speedInconstistency=robot.moveWheelSpeedInconsistancy;
-  
+  PathKoDueToWheelStopped=robot.moveAcrossPathKoDueToWheelStopped;
+  PathKoDueToObstacle=robot.moveAcrossPathKoDueToObstacle;
+  PathKoDueToNotEnoughSpace=robot.moveAcrossPathKoDueToNotEnoughSpace;
+  PathKoDueToNotFindingStart =robot.moveAcrossPathKoDueToNotFindingStart;
+  PathKoDueToNotFindingEntry=robot.moveAcrossPathKoDueToNotFindingEntry;
+  PathKoDueToNotFindingExit=robot.moveAcrossPathKoDueToNotFindingExit;
  
   
 %  if (action(1)==moveStraight && action(2)==speedInconstistency)
@@ -75,8 +81,9 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
             [scan360,normal];[scan360,timeout];[scan360,pending];  %23-25
             [pingFB,normal];[pingFB,timeout];  %26-27
             [determine,determined];[determine,0];   %28-29
-			[checkTarget,false];[checkTarget,true];  %30-31
-			[checkLocation,true];[checkLocation,false] %32-33
+			      [checkTarget,false];[checkTarget,true];  %30-31
+			      [checkLocation,true];[checkLocation,false]; %32-33
+            [acrossPath,normal];[acrossPath,PathKoDueToWheelStopped] ;[acrossPath,PathKoDueToObstacle];[acrossPath,PathKoDueToNotEnoughSpace];[acrossPath,PathKoDueToNotFindingStart];[acrossPath,PathKoDueToNotFindingEntry] ;[acrossPath,PathKoDueToNotFindingExit] %34-40
             ];
             
 % states list and transitions for localisation phase
@@ -95,7 +102,8 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
                     [5,28,9];[5,29,11];          % 33-34 determine
                     [8,4,1];
                     [11,23,5];[11,24,10];[11,28,9];[11,29,11];
-                    [6,1,10];[6,2,6];[6,3,6];[6,4,6];[6,5,6];[6,6,6]                % locked move straight
+                    [6,1,10];[6,2,6];[6,3,6];[6,4,6];[6,5,6];[6,6,6];                % locked move straight
+                    [10,16,2]
                    ];   %(stateIdx,alphabetIdx,newStateIdx)
 
  % states list and transitions for targeting phase                  
@@ -114,7 +122,8 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
 					[1,28,1];[1,29,1];														% 34-35 determine
 					[2,30,2];[2,31,7];														% 36-37 check target
 					[1,23,3];[1,24,5];
-					[3,32,1];[3,33,1]
+					[3,32,1];[3,33,1];
+          [1,34,1];[1,35,8];[1,36,8];[1,37,8];[1,38,1];[1,39,1];[1,40,1]
 					];    
 
   % states list and transitions for locked phase

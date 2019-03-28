@@ -1,11 +1,17 @@
 function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,plotOn)
+                 action="......";
+                 apRobot = setfield(apRobot,"lastRotation",rotationToDo);
+                if (rotationToDo==0)
+                    rotate=2;
+                    retCode=0;
+                    [apRobot,robot,newState,rc] = ApAutomaton(apRobot,robot,[rotate,retCode],1);
+                    return;
+                 endif
                 aligned=false;
-                action="......";
                 lastParticles=apGet(apRobot,"particles");          % to be able to recover in case of move failure   
 %                WaitMove=robot.moveEnd;
  %               WaitNorthAlign=robot.northAlignEnd;
                 debugOn=1;
-                apRobot = setfield(apRobot,"lastRotation",rotationToDo);
                 apRobot = setfield(apRobot,"saveLocation",apGet(apRobot,"location"));
                 apRobot = setfield(apRobot,"saveGyroLocation",apGet(apRobot,"gyroLocation"));
                 apRobot = setfield(apRobot,"currentMove","rotate");

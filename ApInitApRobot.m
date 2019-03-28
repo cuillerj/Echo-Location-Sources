@@ -83,11 +83,12 @@ apRobot = setfield(apRobot,"automatonRC",0);
 apRobot = setfield(apRobot,"shitfCartoX",0); 
 apRobot = setfield(apRobot,"shitfCartoY",50);
 apRobot = setfield(apRobot,"plotRatio",4);                              % 1/potRatio to be printed
-apRobot = setfield(apRobot,"headingMargin",25);                         % 
-apRobot = setfield(apRobot,"radiusMargin",35);                        %
+apRobot = setfield(apRobot,"headingMargin",15);                         % 
+apRobot = setfield(apRobot,"radiusMargin",30);                        %
 apRobot = setfield(apRobot,"nbMesurementByTrain",getNbStepsRotation());                 % nb of pings (fron and back) during 360° scan
 apRobot = setfield(apRobot,"pathMaxStraightLenght",150); 
 apRobot = setfield(apRobot,"retcodeDetail",0);
+apRobot = setfield(apRobot,"autoLocalization",true);
  %   radiusMargin=30; % cm
  %   headingMargin=13; % °
 apRobot = setfield(apRobot,"northOrientationReferencePoint",[184,184]); 
@@ -101,7 +102,7 @@ apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.03,0.3,0.60,0.90
 % use during targeting phase
 %    probability location range in wich robot is considered as located (under first value = not located, between first and second location to be checked
 %
-apRobot = setfield(apRobot,"locProbRange",[.25,.45,1]); 
+apRobot = setfield(apRobot,"locProbRange",[0.01,0.03,1]); 
 
 RobotWidth=apGet(apRobot,"iRobotWidth");
 

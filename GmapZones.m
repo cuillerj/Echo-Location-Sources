@@ -8,17 +8,15 @@ function [number,type,heading,width,length,northHeadingF,northHeadingC] = GmapZo
   nortHeadingF when going thru the pass farther from (x=0,y=0) (x^2+y^2) increasing
  nortHeadingC when going thru the pass closer from (x=0,y=0) (x^2+y^2) decreasing
   %}
-  X=location(1);
-  Y=location(2);
-  zones=[420,440,210,280,1,0,78,35,304,124;
-              1,20,31,130,1,0,78,35,160,340;
-              210,270,340,360,1,90,78,35,308,128];
+  X=location(1)
+  Y=location(2)
+  zones = GmapNarrowPath()
   number=0;
   type=0;
   heading=0;
   for i=1:size(zones,1)
     if (X>=zones(i,1)  && X<=zones(i,2) && Y>=zones(i,3)  && Y<=zones(i,4))
-      number=i;
+      number=i
       break
     endif
   endfor

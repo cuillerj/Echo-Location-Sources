@@ -58,7 +58,16 @@ output:
     apRobot = ApCreateLocatedParticles(apRobot,partNumber,(plotValue>=2),sigmaLoc,sigmaHead); % create particles for particle filter
     apRobot = setfield(apRobot,"locationProb",locProb);  % restore current probability
     %}
-    apRobot = ApCreateParticlesForGoToTarget(apRobot,(plotValue>=2));
+
+    if (!apGet(apRobot,"autoLocalization"))
+       locProb=apGet(apRobot,"locationProb"); % get the location probability of the robot (0-100)
+       apRobot = setfield(apRobot,"locationProb",100); % force probability to for particles creation
+        apRobot = ApCreateLocatedParticles(apRobot,1000,(plotValue>=2),1.5,0.5); % robot manualy located - set noise at minimum level
+        apRobot = setfield(apRobot,"locationProb",locProb);  % restore current probability
+    else
+       apRobot = ApCreateParticlesForGoToTarget(apRobot,(plotValue>=2));
+    endif
+    
     %{
     initialize octave data 
     %}
@@ -66,7 +75,6 @@ output:
     radiusMargin=apGet(apRobot,"radiusMargin"); % cm
     headingMargin=apGet(apRobot,"headingMargin"); % °
     trajectory=[];
-    traceDet=[];
     traceMove=[];
     traceNext=[];
     traceRobot=[];
@@ -207,8 +215,9 @@ output:
       endif
       switch(apGet(apRobot,"automatonState"))
         case([targeting,localized,atRest])
+#{
           if (size(apGet(apRobot,"narrowPath"),1)>1) % is there a narrow path on the way ?
-              [pathFound,pathNumber,entryPoint,pathHeading,pathDistance,farDistances] = ApLookForForNarrowPath(apRobot,robot);
+              [pathFound,pathNumber,entryPoint,pathHeading,pathDistance,farDistances] = ApLookForForNarrowPath(apRobot,robot,100);
               if (pathFound)
                   printf(mfilename);
                   printf(" robot close to a narrow path:%d heading:%d distance:%d *** ",pathNumber,pathHeading,pathDistance);
@@ -216,10 +225,11 @@ output:
                  if (pathNumber==apGet(apRobot,"narrowPath")(2))
                     farther=((apGet(apRobot,"destination")(1)^2+apGet(apRobot,"destination")(2)^2) > (apGet(apRobot,"location")(1)^2+apGet(apRobot,"location")(2)^2));
                     [apRobot,robot,retCode] = ApGoThruNarrowPath(apRobot,robot,pathNumber,entryPoint,pathHeading,pathDistance,farDistances,farther,forward);
-                    break;
+                   % break;
                  endif
              endif
           endif
+ #}
           [apRobot,robot,probability] = ApCompareParticlesAndLocation(apRobot,robot,radiusMargin,headingMargin);
           if (probability < locProbRange(1))
              printf(mfilename);
@@ -305,9 +315,9 @@ output:
           printf(ctime(time()));
           saveTargetHeading=robot.GetHeading()+rotationToDo;  % replace rotation by rotationToDo le 28/09
           saveHeading=robot.GetHeading();
-          [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,(plotValue>=3));
+          [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo,rotationType,(plotValue>=4));
           apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
-          traceRobot=[traceRobot;[time,loopCount,1,robot.GetHardPosX(),apGet(apRobot,"location")],retCode];
+          traceRobot=[traceRobot;[time,loopCount,1,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCode]];
           if (action=="stop..")
               printf(mfilename);
               printf(" stop due to pb rotation")
@@ -376,7 +386,6 @@ output:
 
  % AStarShowStep(trajectory,"determined trajectory");
     ApAStarShowStep(apRobot,trajectory,"determined trajectory"); 
-    save ("-mat4-binary","traceDet.mat","traceDet");
     save ("-mat4-binary","traceMove.mat","traceMove");
     save ("-mat4-binary","traceNext.mat","traceNext");
     save ("-mat4-binary","traceRobot.mat","traceRobot");

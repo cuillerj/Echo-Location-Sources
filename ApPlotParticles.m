@@ -14,6 +14,7 @@
       figure(figureNumber)
       hold on;
     endif
+    grid minor on;
     figureNumber=get (0, "currentfigure");
     shitfCartoX=apGet(apRobot,"shitfCartoX");
     shitfCartoY=apGet(apRobot,"shitfCartoY");

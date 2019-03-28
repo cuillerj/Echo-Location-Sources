@@ -42,7 +42,7 @@ function [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,targetL,pl
   %   endif
   endif
   lastStep=[closestStartOptimalPoint(1),closestStartOptimalPoint(2),0,0];
-
+  narrowPath=[0];
   if (abs(endIdx-startIdx)>2)
     for i=startIdx+1:endIdx-1
       if (i==endIdx-1 || optimalPath(i,4)!=0)
@@ -59,7 +59,7 @@ function [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,targetL,pl
       endif
     end
     narrow=find(pathStep(:,3));
-    narrowPath=[0];
+ 
     if (size(narrow,1)>0)
       narrowPath=[narrowPath;[pathStep(narrow,4)]];
     endif

@@ -5,8 +5,9 @@ function [apRobot,robot,retCode] = ApGoThruNarrowPath(apRobot,robot,pathNumber,e
     narrowPath=apGet(apRobot,"narrowPath");
     retCode=0;   
     location=apGet(apRobot,"location"); 
-    startToEntryDistance=80;    
-    reqMove=50;
+    startToEntryDistance=round(sqrt((location(1)-entryPoint(1))^2+(location(2)-entryPoint(2))^2)*1.5)  
+    
+    reqMove=0;
   %  [apRobot,robot,next,direct,forward] = ApComputeNextStepToTarget(apRobot,robot,0);
     if (forward==-9)
       retCode=-1;
@@ -25,10 +26,10 @@ function [apRobot,robot,retCode] = ApGoThruNarrowPath(apRobot,robot,pathNumber,e
         farther=1;
    endif
    if (forward>=0)
-        echoToGet=farDistances(1);
+        echoToGet=round(farDistances(1)*.7)
         forward=0;
      else
-         echoToGet=farDistances(2);
+         echoToGet=round(farDistances(2)*.7)
          forward=1;
    endif
    [widthDeg,widthGrad] = ToolSRF05BeamWidth(width/2);
@@ -41,11 +42,23 @@ function [apRobot,robot,retCode] = ApGoThruNarrowPath(apRobot,robot,pathNumber,e
     retCode=-1;
     return
   endif
-  robot.RequestNarrowPathMesurments;
-  pause(2);
-  robot.RequestNarrowPathEchos;
+
   if(apGet(apRobot,"realMode"))
-        robot.ValidHardPosition();
+      robot.RequestNarrowPathMesurments;
+      pause(3);
+      while (robot.pendingNarrowPathMesurments)
+          robot.RequestNarrowPathMesurments;
+          pause(3);
+      endwhile
+      pathDistances=[robot.GetPathDistances(1),robot.GetPathDistances(2),robot.GetPathDistances(3),robot.GetPathDistances(4)];
+      printf("distance to pass start:%dcm to pass entry:%dcm  path lengh:%dcm  after distance:%dcm \n",robot.GetPathDistances(1),robot.GetPathDistances(2),robot.GetPathDistances(3),robot.GetPathDistances(4));
+      robot.RequestNarrowPathEchos;
+      pause(3);
+       while (robot.pendingNarrowPathEchos)
+          robot.RequestNarrowPathEchos;
+          pause(3);
+      endwhile
+        %robot.ValidHardPosition();
     else
       pathOrientationGrad=mod((pathOrientation*pi()/180)+pi()*forward+pi()*farther,2*pi())
       posX=(apGet(apRobot,"location")(1)+(startToEntryDistance/4+length+reqMove)*cos(pathOrientationGrad));

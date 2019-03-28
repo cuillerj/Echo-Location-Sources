@@ -6,7 +6,7 @@
    load ('zonesXY.txt');
    scanId=robot.GetMaxScanID()+1;
    minDistToBeDone=apGet(apRobot,'minDistToBeDone');
-   nbScansToDo=5;
+   nbScansToDo=7;
    forward=true;
    if (robot.GetMaxScanID()==0)
      printf('error scanId:%d \n',scanId)

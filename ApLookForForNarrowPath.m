@@ -1,7 +1,10 @@
-function [pathFound,number,entryPoint,pathHeading,pathDistance,farDistances] = ApLookForForNarrowPath(apRobot,robot)
+function [pathFound,number,entryPoint,pathHeading,pathDistance,farDistances] = ApLookForForNarrowPath(apRobot,robot,searchRadius)
   %{
  
   %}
+    if(!exist("searchRadius"))
+         searchRadius=60;
+   endif
      servofrontRef=7; % front scan number 90°
      location=apGet(apRobot,"location");
      carto=apGet(apRobot,"carto");
@@ -10,7 +13,6 @@ function [pathFound,number,entryPoint,pathHeading,pathDistance,farDistances] = A
      nbPulse=apGet(apRobot,"nbPulse");
      shiftServo=180/(nbPulse-1); % shift between 2 scan in °
      servofrontRef=mod(round((mod(location(3),360)+90)/shiftServo),nbPulse-1);  % find the closest scan angle corresponding to the current orientation
-     searchRadius=60;
      narrowPathValue=20;
      points=[];
      pathFound=false;
@@ -37,7 +39,7 @@ function [pathFound,number,entryPoint,pathHeading,pathDistance,farDistances] = A
       entryPoint=points(idx2(3),1:2);
       pathDistance=points(idx2(3),3);
       pathHeading=mod(atan2(entryPoint(2)-location(2),entryPoint(1)-location(1))*180/pi(),360);
-      [number,type,pathOrientation,width,length,northHeadingF,northHeadingC] = GmapZones(apRobot,robot,entryPoint);
+      [number,type,pathOrientation,width,length,northHeadingF,northHeadingC] = GmapZones(apRobot,robot,entryPoint)
      else
       return
      endif

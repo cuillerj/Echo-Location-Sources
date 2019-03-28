@@ -42,7 +42,7 @@
 	determine possibles locations particles taking into account updated weight
 
 %}
-
+ apRobot = setfield(apRobot,"autoLocalization",true); % 
  EchoLoc=[-1,-1,-1];
  maxRetry=5;
  determinedDistanceThreshold=30;    # expressed in cm

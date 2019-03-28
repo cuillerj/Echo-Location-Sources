@@ -11,17 +11,17 @@
     case(0)
       return;
     case(1)
-      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,1,1,1,apRobot,robot);
+      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,1,true,1,apRobot,robot);
     case(2)
-      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,0,1,1,apRobot,robot);
+      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,0,true,1,apRobot,robot);
     case(3)
       [apRobot,robot] = ApInitApRobot(1,1,apRobot,robot);
     case(4)
       [apRobot,robot] = ApInitApRobot(1,0,apRobot,robot);
     case(5)
-      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,1,0,1,apRobot,robot);
+      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,1,false,1,apRobot,robot);
     case(6)
-      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,0,0,2,apRobot,robot);
+      [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(1,0,false,3,apRobot,robot);
   endswitch
   return
  endfunction

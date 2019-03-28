@@ -1,7 +1,7 @@
 function [apRobot] = ApCreateParticlesForGoToTarget(apRobot,plotOn)
   % create particles auround robot position according to location probalibity (must be over 50%) to make sens
     locProbRange=apGet(apRobot,"locProbRange");  % probability location range in wich robot is considered as located (under first value = not located between first and second location to be checked
-    sigmaLocation=[5,0.72*apGet(apRobot,"radiusMargin")];  % sigma range values of the normal distribution
+    sigmaLocation=[3,0.72*apGet(apRobot,"radiusMargin")];  % sigma range values of the normal distribution
     sigmaHeading=[1,0.72*apGet(apRobot,"headingMargin")]; % sigma range values of the normal distribution
     particlesNumber=[1000,3000]; % particles numner range
     locProb=apGet(apRobot,"locationProb"); % get the location probability of the robot (0-100)

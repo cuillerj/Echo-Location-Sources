@@ -1,4 +1,7 @@
  function [apRobot,robot,EchoLoc,traceLoc] = ApRobotMain(flatLogRegMode,realMode,autoLocalization,plotValue,apRobot,robot)
+        printf(mfilename);
+        printf("autoLocalization:",autoLocalization)
+        printf(ctime(time()))
 
      if (!exist("flatLogRegMode") && !exist("realMode") && !exist("autoLocalization") && !exist("plotValue"))  % flat logistic regression is default mode 
         printf(mfilename);
@@ -64,9 +67,6 @@
     if (!exist("plotValue"))  % real is default mode 
         plotValue=1;
     endif
-    if (!exist("autoLocalization"))  % autoLocalization is default mode 
-        autoLocalization=1;
-    endif
 
    %simulationMode=1;  % to set simulation 1 on 0 off
     simulationMode=!realMode;
@@ -75,14 +75,18 @@
    % particlesNumber=2000;
     plotOn=true;                 % if true graphics will be provided (reduces performance)
     plotOff=false;               % no graphic
-    noiseLevel=0.2;                 % coefficent (float) of noise of simualtion mode 0 no noise
+    noiseLevel=0.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
     noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
-    scanNoiseLevel=0.5;             % 0.0 0.5
+    scanNoiseLevel=0.0;             % 0.0 0.5
     noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen 
     [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode,apRobot,robot);
     apRobot = setfield(apRobot,"simulationMode",simulationMode);
     apRobot = setfield(apRobot,"realMode",realMode);
-
+    if (!exist("autoLocalization"))  % autoLocalization is default mode 
+       autoLocalization=apGet(apRobot,"autoLocalization");
+    else 
+       apRobot = setfield(apRobot,"autoLocalization",autoLocalization);
+    endif
      
     if (realMode)
         rcBatch=robot.LaunchBatch();        % call java method to start all batchs
@@ -117,7 +121,7 @@
     endif
     printf(mfilename);
     if (realMode)     
-      target=[585,225,0];
+      target=[585,255,0];
       printf(mfilename);
       printf(" real mode destination (%d,%d) *** ",target(1),target(2))
       printf(ctime(time()));

@@ -9,7 +9,7 @@ particlesNumber=size(particles,1);
 probability=0;
 radius2=radius^2;
 for i=1:particlesNumber
-  if (abs(ToolAngleDiff(location(3),particles(i,3)) <= deltaHeading))
+  if (abs(ToolAngleDiff(location(3),particles(i,3))) <= deltaHeading)
     if (((location(1)-particles(i,1))^2+(location(2)-particles(i,2))^2)<=radius2)
       probability=probability+particles(i,4);
     endif

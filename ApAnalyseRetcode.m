@@ -67,6 +67,17 @@ else
       return;
 		endif
 	endif
+
+  if (currentAction == robot.moveAcrossPassEnded)
+      testedValue=robot.moveAcrossPathKoKoDueToWheelStopped;
+      if (retCode == testedValue)
+           printf(mfilename);
+          printf(" action stop *** ");
+          printf(ctime(time()));     
+          action="stop..";
+          issue=true;
+      endif
+  endif
 	action="resume";
 endif
 return

@@ -11,7 +11,7 @@ if posX and posY <0 and heading > 0 prob will not be used
    sigmaPos=2;
  endif
   if (!exist("sigmaHeading"))
-   sigmaHeading=3;
+   sigmaHeading=2;
  endif
   degreUnit=0;
   radianUnit=1;
