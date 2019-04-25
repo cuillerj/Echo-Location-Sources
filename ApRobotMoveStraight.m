@@ -69,7 +69,10 @@
                 endif	
               
                 if (retCodeMove==robot.moveKoDueToObstacle )
-                  newLenToDo=sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*forward;
+                  newLenToDo=round(sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*sign(lenToDo));
+                   printf(mfilename);
+		                printf(" move retCode:%d %s*** ",retCodeMove,   ApRetcodeString(apRobot,robot,robot.moveEnd,retCodeMove));
+		                printf(ctime(time()));
                   printf(mfilename);
                   printf(" incompleted move due to obstacle ! Expected dist: %d actual:%d  %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
                   printf(ctime(time()))

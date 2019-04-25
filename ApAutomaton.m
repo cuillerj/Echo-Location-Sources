@@ -13,44 +13,46 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   %{
   main status
   %}
-  initial=1;
-  localizing=2;
-  targeting=3;
-  gotTarget=4;
-  locked=5;
-  lost=6;
+  [mStatus,lStatus,aStatus] = ApAutomatonStatusList(apRobot);
+  initial=apGet(apRobot,"automatonInitial");  
+  localizing=apGet(apRobot,"automatonLocalizing"); 
+  targeting=apGet(apRobot,"automatonTargeting");
+  gotTarget=apGet(apRobot,"automatonGotTarget");
+  locked=apGet(apRobot,"automatonLocked");
+  lost=apGet(apRobot,"automatonLost");
 
-  mStatus=["initial";"localizing";"targeting";"gotTarget";"locked";"lost"];
+  %mStatus={"initial";"localizing";"targeting";"gotTarget";"locked";"lost"};
    %{
   localization status
   %} 
-  notLocalized=1;
-  localized=2;
-  localisationLost=3;
-  determining=4;
-  lStatus=["notLocalized";"localized";"localisationLost";"determining"];
+  notLocalized=apGet(apRobot,"automatonNotLocalized");
+  localized=apGet(apRobot,"automatonLocalized");
+  localisationLost=apGet(apRobot,"automatonLocalisationLost");
+  determining=apGet(apRobot,"automatonDetermining");
+  %lStatus={"notLocalized";"localized";"localisationLost";"determining"};
   %{
   action status
   %}
 
-  atRest=1;
-  NOrient=2;
-  moving=3;
-  scanned=4;
-  aStatus=["atRest";"NOrient";"moving";"scanned";"scanned"];
+  atRest=apGet(apRobot,"automatonAtRest");
+  NOrient=apGet(apRobot,"automatonNOrient");
+  moving=apGet(apRobot,"automatonMoving");
+  scanned=apGet(apRobot,"automatonScanned");
+  %aStatus={"atRest";"NOrient";"moving";"scanned";"scanned"};
   %{
   actions list
   %}
-  moveStraight=1;
-  rotate=2;
-  northAlign=3;
-  scan360=4;
-  determine=5;
-  pingFB=6;
-  checkTarget=7;
-  checkLocation=8;
-  acrossPath=9;
-  actionList=["moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB";"checkTarget";"checkLocation";"acrossPath"];
+  moveStraight=apGet(apRobot,"automatonMoveStraight");
+  rotate=apGet(apRobot,"automatonRotate");
+  northAlign=apGet(apRobot,"automatonNorthAlign");
+  scan360=apGet(apRobot,"automatonScan360");
+  determine=apGet(apRobot,"automatonDetermine");
+  pingFB=apGet(apRobot,"automatonPingFB");
+  checkTarget=apGet(apRobot,"automatonCheckTarget");
+  checkLocation=apGet(apRobot,"automatonCheckLocation");
+  acrossPath=apGet(apRobot,"automatonAcrossPath");
+  actionList = apGet(apRobot,"automatonActionList");
+  %actionList={"moveStraight";"rotate";"northAlign";"scan360";"determine";"pingFB";"checkTarget";"checkLocation";"acrossPath"};
     %{
   return code list
   %}
@@ -138,7 +140,7 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
                     ];
   
   automatonState=apGet(apRobot,"automatonState");
-  newState=[mStatus(automatonState(1),:);lStatus(automatonState(2),:);aStatus(automatonState(3),:)];
+  newState=[mStatus(automatonState(1));lStatus(automatonState(2));aStatus(automatonState(3))];
   if ((automatonState(1)==localizing) || (automatonState(1)==initial && automatonState(2)==notLocalized))
       statesList=statesListL;
       statesListNumber=size(statesList,1);
@@ -167,7 +169,7 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
   alphabetIdx=0; 
   if (debugOn)
      printf(mfilename);
-     printf(" entry automaton status: ( %s %s %s) action (%s,%d) *** ",(newState(1,:)),(newState(2,:)),(newState(3,:)),actionList(action(1),:),action(2))
+     printf(" entry automaton status: ( %s %s %s) action (%s,%d) *** ",char(newState(1)),char(newState(2)),char(newState(3)),char(actionList(action(1))),action(2))
      printf(ctime(time()));	
   endif
   letter=0;
@@ -195,7 +197,7 @@ function [apRobot,robot,newState,retCode] = ApAutomaton(apRobot,robot,action,deb
         apRobot = setfield(apRobot,"automatonState",newS);        
         newState=[mStatus(newS(1),:);lStatus(newS(2),:);aStatus(newS(3),:)];
         printf(mfilename);
-        printf(" new automaton status: ( %s %s %s ) *** ",newState(1,:),newState(2,:),newState(3,:))
+        printf(" new automaton status: ( %s %s %s ) *** ",char(newState(1)),char(newState(2)),char(newState(3)))
         printf(ctime(time()));	
         break;
       endif

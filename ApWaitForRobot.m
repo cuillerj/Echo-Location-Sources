@@ -3,6 +3,7 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
          debugOn=true;
   endif
   [typeWaitString,typeWaitMapping] = ApTypeWaitData();
+   pause(1); % to avoid speedy loop
   %typeWaitString={"robotInfoUpdated";"robotUpdatedEnd";"scanning";"moving";"scanEnd";"moveEnd";"northAlignEnd";"servoAlignEnd";"pingFBEnd";"moveAcrossPassEnded";"requestBNOEnd";"robotNOUpdated";"moveAcrossPassEnded"};
  % typeWaitMapping=[[1,1];[8,2];[102,3];[104,4];[103,5];[105,6];[107,7];[108,8];[109,9];[112,10];[118,11];[123,12];[129,13]];
   idx=1;
@@ -21,10 +22,11 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
   while (retCode==99 )
     source=robot.eventOctave;
     dest=robot.GetEventArduinoDest(typeWait);
-    retCode=robot.GetRetcode(typeWait,source,dest);          % wait 
+    retCode=robot.GetRetcode(typeWait,source,dest) ;         % wait 
     if (mod(idx,10)==0 || (retCode!=0 && retCode!=99 ))
       printf(mfilename);
-      twchar=char(typeWaitString(find(typeWaitMapping(:,1)==typeWait)));
+ %     twchar=char(typeWaitString(find(typeWaitMapping(:,1)==typeWait)));
+      twchar=ApActionList(apRobot,robot,typeWait);
       printf(" typeWait:(%d:%s) source:%d  dest:%d retcode:%d realMode:%d. *** ",typeWait,twchar,source,dest,retCode,apGet(apRobot,"realMode"));
       printf(ctime(time()));
       if(typeWait==107)
@@ -47,8 +49,9 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
     printf("\n")
   endif
   printf(mfilename);
-  twchar=char(typeWaitString(find(typeWaitMapping(:,1)==typeWait)));
-  printf(" got event:(%d:%s) source:%d  dest:%d retcode:%d. *** ",typeWait,twchar,source,dest,retCode);
+ % twchar=char(typeWaitString(find(typeWaitMapping(:,1)==typeWait)));
+  twchar=ApActionList(apRobot,robot,typeWait);
+  printf(" got event:(%d:%s) source:%d  dest:%d retcode=%d:%s*** ",typeWait,twchar,source,dest,retCode,ApRetcodeString(apRobot,robot,typeWait,retCode));
   printf(ctime(time()));
   if (typeWait==robot.northAlignEnd)
       [apRobot,robot,newState,rc] = ApAutomaton(apRobot,robot,[northAlign,retCode],1);

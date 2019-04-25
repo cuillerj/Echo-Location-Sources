@@ -9,6 +9,9 @@ function [apRobot,robot,retCode,action]=ApRobotScan360(apRobot,robot,plotOn,scan
   if (!exist("scanId"))
     scanId=0;
   endif
+  if (scanId<0)
+      scanId=0;
+  endif
   printf(mfilename);
   printf(" Scan 360 requested  *** ")
   printf(ctime(time()));									

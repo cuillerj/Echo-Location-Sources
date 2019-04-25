@@ -7,14 +7,17 @@ function [apRobot,robot] = ApMoveParticles(apRobot,robot,rotation,distance,plotO
   %}
 
 rotation=mod(rotation+360,360);
+if (distance==0 && rotation==0)
+    return
+endif
 particles=apGet(apRobot,"particles");      
 apRobot = setfield(apRobot,"lastParticles",particles); 
 location=apGet(apRobot,"location");  
 img=apGet(apRobot,"img");  
 shiftEchoVsRotationCenter=apGet(apRobot,"shiftEchoVsRotationCenter")/10;           
-sigmaDist=abs(1.1*distance/100+3);
-sigmaRot=3; %1
-sigmaHeading=3; %0.5
+sigmaDist=abs(1.2*distance/100+3);
+sigmaRot=2.2; %1
+sigmaHeading=2.0; %0.5
 [x,y]=size(particles);
 CP_AB=[-shiftEchoVsRotationCenter;0;1];
 PC_AB=[shiftEchoVsRotationCenter;0;1];
@@ -43,7 +46,8 @@ for i=1:x
   P_XY=T3_XY*P_XY;
   particles(i,1)=P_XY(1);
   particles(i,2)=P_XY(2);
-	particles(i,3)=mod(newH*180/pi(),360);
+%	particles(i,3)=mod(newH*180/pi(),360);
+   particles(i,3)=newH*180/pi();
 endfor
   apRobot = setfield(apRobot,"particles",particles);
 %save ("-mat4-binary","particles.mat","particles")

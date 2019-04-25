@@ -6,10 +6,11 @@ function [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,location,p
   retCode=0;
   while(robot.GetPosX()!=robot.GetHardPosX() || robot.GetPosY()!=robot.GetHardPosY() || mod(robot.GetHeading(),360)!=mod(robot.GetHardHeading(),360))
      robot.UpdateHardRobotLocation();
-     WaitFor=robot.robotUpdatedEnd;
-     apRobot = setfield(apRobot,"waitFor",robot.robotUpdatedEnd);      
+ %    WaitFor=robot.robotUpdatedEnd;
+    % apRobot = setfield(apRobot,"waitFor",robot.robotUpdatedEnd); 
+    pause(3);     
+    %{
      [apRobot,robot,retCode]=ApWaitForRobot(apRobot,robot);
-    
      if (retCode!=0)
          [apRobot,robot,issue,action]=ApAnalyseRetcode(apRobot,robot,retCode);
          if action=="stop.."
@@ -22,6 +23,7 @@ function [apRobot,robot,retCode] = ApUpdateHardLocation(apRobot,robot,location,p
             return
          endif
      endif
+     %}
    end
    apRobot = setfield(apRobot,"location",location);
    apRobot = setfield(apRobot,"locationProb",prob);   

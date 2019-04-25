@@ -19,4 +19,5 @@ apRobot = setfield(apRobot,"locationProb",probability);
 printf(mfilename);
 printf(" Probalibity:%.1f%% . *** ",100*probability)
 printf(ctime(time()));
+save ("-mat4-binary","lastCompParticles.mat","particles")
 endfunction

@@ -76,19 +76,22 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                           reseted=true;
                         endif
                       endwhile    
-                endif
-               apRobot = setfield(apRobot,"waitFor",robot.robotUpdatedEnd);
+                endif   
+               robot.GetSubsystemLocation();
+               apRobot = setfield(apRobot,"waitFor",robot.robotUpdatedEnd);            
                [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
                 retry=0;
                 robot.ValidHardPosition(); 
                apRobot = setfield(apRobot,"gyroLocation",[apGet(apRobot,"gyroLocation")(1),apGet(apRobot,"gyroLocation")(2),robot.GetGyroHeading()]);
+              
                while (robot.BNOLocFlag!=0 && retry<=3)
+                   robot.GetSubsystemLocation();
                    pause(1);
                    retry=retry+1;
                    robot.ValidHardPosition();          % the new hard heading will be taken into account by java code
                    apRobot = setfield(apRobot,"gyroLocation",[apGet(apRobot,"gyroLocation")(1),apGet(apRobot,"gyroLocation")(2),robot.GetGyroHeading()]);
                end
-%{               
+                  
               if (rotationType==1 && aligned==true)
                 robot.SetHeading(mod(360+robot.GetHardHeading()+robot.northOrientation-saveNO,360));
               endif

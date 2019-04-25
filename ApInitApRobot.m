@@ -37,6 +37,11 @@ if (exist("apRobot"))
 %apRobotPath
 robot.SetTraceFileOn(1);    % route console to trace file
 robot.InitRobotValues();
+%apRobot = setfield(apRobot,"moveRetcodeList", robot.moveRetcodeList);
+apRobot = setfield(apRobot,"retcodeList", robot.retcodeList);  % robot return codes list
+apRobot = setfield(apRobot,"actionList", robot.actionList); % robot actions list
+apRobot = ApDefineAutomatonActionList(apRobot);
+apRobot = ApDefineAutomatonStatusList(apRobot);
 if (flat==true)
 	load all_thetaFlat;             % load the trained logistic regression matrix
 	all_theta=all_thetaFlat;
@@ -97,12 +102,12 @@ apRobot = setfield(apRobot,"northOrientationReferencePoint",[184,184]);
 %  (DetTheoDistanceMaxi,DetTfDistanceRef,DetTfDistanceMaxi,ParticlesProbMin,ParticlesProbRef,TfHighLevel,TfHighestLevel,ParticlesProbMini,TfLowLevel,TfCertainty)
 %   
    
-apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.03,0.3,0.60,0.90,0.05,0.30,0.95]);     
+apRobot = setfield(apRobot,"determinationThreshold",[40,30,60,0.01,0.3,0.60,0.90,0.05,0.30,0.95]);     
   
 % use during targeting phase
 %    probability location range in wich robot is considered as located (under first value = not located, between first and second location to be checked
 %
-apRobot = setfield(apRobot,"locProbRange",[0.01,0.03,1]); 
+apRobot = setfield(apRobot,"locProbRange",[0.01,0.005,1]); 
 
 RobotWidth=apGet(apRobot,"iRobotWidth");
 
@@ -115,6 +120,7 @@ apRobot = setfield(apRobot,"realMode",realMode);
 apRobot = setfield(apRobot,"simulationMode",!realMode);
 %loc=apGet(apRobot,"location")
 %locprob=apGet(apRobot,"locationProb")
+apRobot = GmapDefineZones(apRobot);
 pkg load geometry
 robot.DeleteTensorFlowFiles(); % clear working files
 endfunction

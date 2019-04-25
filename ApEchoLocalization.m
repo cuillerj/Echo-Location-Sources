@@ -5,13 +5,14 @@
   %{
   main status
   %}
+  [mStatus,lStatus,aStatus] = ApAutomatonStatusList(apRobot);
   initial=1;
   localizing=2;
   targeting=3;
   gotTarget=4;
   locked=5;
   lost=6;
-  mStatus=["initial";"localizing";"targeting";"gotTarget";"locked";"lost"];
+  %mStatus=["initial";"localizing";"targeting";"gotTarget";"locked";"lost"];
    %{
   localization status
   %} 
@@ -19,7 +20,7 @@
   localized=2;
   localisationLost=3;
   determining=4;
-  lStatus=["notLocalized";"localized";"localisationLost";"determining"];
+  %lStatus=["notLocalized";"localized";"localisationLost";"determining"];
   %{
   action status
   %}
@@ -27,7 +28,7 @@
   NOrient=2;
   moving=3;
   scanned=4;
-  aStatus=["atRest";"NOrient";"moving";"scanned"];
+  %aStatus=["atRest";"NOrient";"moving";"scanned"];
 
 #
 
@@ -204,7 +205,7 @@
               endif
           case([localizing,notLocalized,NOrient])  
               %[apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithRotation(apRobot,robot,nbPred,0,plotOff);
-              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,plotReqL2,0);  
+              [apRobot,robot,posX,posY,posH,posProb,retCode] = ApEchoLocalizeRobotWithTensorFlow(apRobot,robot,(plotValue>=2),0);  
               if (retCode==-1)    
                   locRetCode=-1;
                   return;

@@ -100,13 +100,52 @@ output:
     %{
     initialize automaton
     %}
+  [mStatus,lStatus,aStatus] = ApAutomatonStatusList(apRobot);
+  initial=apGet(apRobot,"automatonInitial");  
+  localizing=apGet(apRobot,"automatonLocalizing"); 
+  targeting=apGet(apRobot,"automatonTargeting");
+  gotTarget=apGet(apRobot,"automatonGotTarget");
+  locked=apGet(apRobot,"automatonLocked");
+  lost=apGet(apRobot,"automatonLost");
+
+  %mStatus={"initial";"localizing";"targeting";"gotTarget";"locked";"lost"};
+   %{
+  localization status
+  %} 
+  notLocalized=apGet(apRobot,"automatonNotLocalized");
+  localized=apGet(apRobot,"automatonLocalized");
+  localisationLost=apGet(apRobot,"automatonLocalisationLost");
+  determining=apGet(apRobot,"automatonDetermining");
+  %lStatus={"notLocalized";"localized";"localisationLost";"determining"};
+  %{
+  action status
+  %}
+  atRest=apGet(apRobot,"automatonAtRest");
+  NOrient=apGet(apRobot,"automatonNOrient");
+  moving=apGet(apRobot,"automatonMoving");
+  scanned=apGet(apRobot,"automatonScanned");
+  
+  
+  moveStraight=apGet(apRobot,"automatonMoveStraight");
+  rotate=apGet(apRobot,"automatonRotate");
+  northAlign=apGet(apRobot,"automatonNorthAlign");
+  scan360=apGet(apRobot,"automatonScan360");
+  determine=apGet(apRobot,"automatonDetermine");
+  pingFB=apGet(apRobot,"automatonPingFB");
+  checkTarget=apGet(apRobot,"automatonCheckTarget");
+  checkLocation=apGet(apRobot,"automatonCheckLocation");
+  acrossPath=apGet(apRobot,"automatonAcrossPath");
+  actionList = apGet(apRobot,"automatonActionList");
+  %{
+  
     initial=1;
     localizing=2;
     targeting=3;
     gotTarget=4;
     locked=5;
     lost=6;
-    mStatus={"initial";"localizing";"targeting";"gotTarget";"locked";"lost"};
+    [mStatus,lStatus,aStatus] = ApAutomatonStatusList(apRobot);
+    %mStatus={"initial";"localizing";"targeting";"gotTarget";"locked";"lost"};
      %{
     localization status
     %} 
@@ -114,7 +153,7 @@ output:
     localized=2;
     localisationLost=3;
     determining=4;
-    lStatus={"notLocalized";"localized";"localisationLost";"determining"};
+   % lStatus={"notLocalized";"localized";"localisationLost";"determining"};
     %{
     action status
     %}
@@ -122,11 +161,12 @@ output:
     NOrient=2;
     moving=3;
     scanned=4;
-    aStatus={"atRest";"NOrient";"moving";"scanned";"scanned"};
+    %aStatus={"atRest";"NOrient";"moving";"scanned";"scanned"};
 
     % actions
     determine=5;
     checkTarget=7;
+    %}
     %{
     initialize hard location 
     %}
@@ -250,46 +290,47 @@ output:
              apRobot = setfield(apRobot,"locationProb",probability);
              [apRobot,robot] = ApResampleParticles(apRobot,robot,(plotValue>=3),true,checkLocationAvaibility);
              [apRobot,robot,probability] = ApCompareParticlesAndLocation(apRobot,robot,radiusMargin,headingMargin);
-             TfLocation=[TfX(1),TfY(1)];
-             [located,consistant,distance,deltaHeading,bestLocation] = ApDetermineRobotLocationLostOrNot(apRobot,saveLocation,saveProb,TfLocation,TfProb(1));
-              printf(mfilename);
-              printf(" Check location entry:(%d,%d,%d - %.1f%%) determined: (%d,%d,%d - %.1f%%) Tf: (%d,%d) - %.1f%%) *** ",saveLocation(1),saveLocation(2),saveLocation(3),100*saveProb,detX,detY,detH,100*probability,TfX(1),TfY(1),100*TfProb(1));
-              printf(ctime(time()))
-             if ((located) && (consistant))
-               printf(mfilename);
-               printf(" confirmed location - distance:%d deltaHeading:%d probability:%.1f%% *** ",distance,deltaHeading,100*probability);
-               printf(ctime(time()))
-             elseif ((!located) && (!consistant))              
-               printf(mfilename);
-               printf(" Location lost - distance:%d deltaHeading:%d probability:%.1f%% *** ",distance,deltaHeading,100*probability)
-               printf(ctime(time()))
-               apRobot = setfield(apRobot,"location",bestLocation);                        % defined / determined location 
-               apRobot = setfield(apRobot,"locationProb",0);
-               apRobot = setfield(apRobot,"automatonState",[initial,notLocalized,atRest]);
-               apRobot = setfield(apRobot,"newTarget",true);
-               break;   
-             elseif ((located) && (!consistant))
-                printf(mfilename);
-                printf(" new determined location is likely right *** ")
-                printf(ctime(time()))
-                apRobot = setfield(apRobot,"location",bestLocation);                        % defined / determined location 
-                apRobot = setfield(apRobot,"locationProb",min(saveProb,probability));   
-                [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,apGet(apRobot,"location"),apGet(apRobot,"locationProb"));
-                apRobot = ApCreateParticlesForGoToTarget(apRobot,(plotValue>=1));
-                apRobot = setfield(apRobot,"newTarget",true);   
-             elseif (!located && consistant)
-                printf(mfilename);
-                printf(" new determined location close to the estimated one *** ")
-                printf(ctime(time()))
-                if (saveProb>probability)
-                  apRobot = setfield(apRobot,"location",bestLocation);                        % defined / determined location   
-                  apRobot = setfield(apRobot,"locationProb",min(saveProb,probability));
-                  [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,apGet(apRobot,"location"),apGet(apRobot,"locationProb"));  
-                  apRobot = ApCreateParticlesForGoToTarget(apRobot,(plotValue>=1));
-                  apRobot = setfield(apRobot,"newTarget",true);
-                endif   
-             endif
-            
+             if (probability<apGet(apRobot,"locProbRange")(1))
+                 TfLocation=[TfX(1),TfY(1)];
+                 [located,consistant,distance,deltaHeading,bestLocation] = ApDetermineRobotLocationLostOrNot(apRobot,saveLocation,saveProb,TfLocation,TfProb(1));
+                  printf(mfilename);
+                  printf(" Check location entry:(%d,%d,%d - %.1f%%) determined: (%d,%d,%d - %.1f%%) Tf: (%d,%d) - %.1f%%) *** ",saveLocation(1),saveLocation(2),saveLocation(3),100*saveProb,detX,detY,detH,100*probability,TfX(1),TfY(1),100*TfProb(1));
+                  printf(ctime(time()))
+                 if ((located) && (consistant))
+                   printf(mfilename);
+                   printf(" confirmed location - distance:%d deltaHeading:%d probability:%.1f%% *** ",distance,deltaHeading,100*probability);
+                   printf(ctime(time()))
+                 elseif ((!located) && (!consistant))              
+                   printf(mfilename);
+                   printf(" Location lost - distance:%d deltaHeading:%d probability:%.1f%% *** ",distance,deltaHeading,100*probability)
+                   printf(ctime(time()))
+                   apRobot = setfield(apRobot,"location",bestLocation);                        % defined / determined location 
+                   apRobot = setfield(apRobot,"locationProb",0);
+                   apRobot = setfield(apRobot,"automatonState",[initial,notLocalized,atRest]);
+                   apRobot = setfield(apRobot,"newTarget",true);
+                   break;   
+                 elseif ((located) && (!consistant))
+                    printf(mfilename);
+                    printf(" new determined location is likely right *** ")
+                    printf(ctime(time()))
+                    apRobot = setfield(apRobot,"location",bestLocation);                        % defined / determined location 
+                    apRobot = setfield(apRobot,"locationProb",min(saveProb,probability));   
+                    [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,apGet(apRobot,"location"),apGet(apRobot,"locationProb"));
+                    apRobot = ApCreateParticlesForGoToTarget(apRobot,(plotValue>=1));
+                    apRobot = setfield(apRobot,"newTarget",true);   
+                 elseif (!located && consistant)
+                    printf(mfilename);
+                    printf(" new determined location close to the estimated one *** ")
+                    printf(ctime(time()))
+                    if (saveProb>probability)
+                      apRobot = setfield(apRobot,"location",bestLocation);                        % defined / determined location   
+                      apRobot = setfield(apRobot,"locationProb",min(saveProb,probability));
+                      [apRobot,robot] = ApUpdateHardLocation(apRobot,robot,apGet(apRobot,"location"),apGet(apRobot,"locationProb"));  
+                      apRobot = ApCreateParticlesForGoToTarget(apRobot,(plotValue>=1));
+                      apRobot = setfield(apRobot,"newTarget",true);
+                    endif   
+                 endif
+             endif  
           endif  
           if(apGet(apRobot,"newTarget")); % do we need to compute new path ?
             [apRobot,robot,retCode] = ApComputeOptimalPath(apRobot,robot,target,(plotValue>=2));
@@ -374,7 +415,7 @@ output:
                 if (unlocked==true)
                  apRobot = setfield(apRobot,"automatonState",[targeting,localized,atRest]);  % 
                 else
-                  apRobot = setfield(apRobot,"automatonState",[lost,automatonState(2),automatonState(3)]);
+                  apRobot = setfield(apRobot,"automatonState",[lost,apGet(apRobot,"automatonState")(2),apGet(apRobot,"automatonState")(3)]);
                   locRetCode=-1;
                 return
              endif

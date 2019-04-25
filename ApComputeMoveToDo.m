@@ -19,67 +19,89 @@ shiftEchoVsRotationCenter=apGet(apRobot,"shiftEchoVsRotationCenter");
 shiftEchoVsRotationCenter=shiftEchoVsRotationCenter/10;
 rotationCenterX=currentX-shiftEchoVsRotationCenter*cos(currentHeadingGrad);
 rotationCenterY=currentY-shiftEchoVsRotationCenter*sin(currentHeadingGrad);
-if ((nextX-rotationCenterX)>0)
-%	if((nextY-rotationCenterY)!=0)
-		deltaAlpha=atan((nextY-rotationCenterY)/(nextX-rotationCenterX))*180/pi;
-    if ((nextX-rotationCenterX)<0)
-      forward=-forward;
+ [apRobot,robot,actionList,retCode] = ApCheckSpecificInstruction(apRobot,robot,next,0);
+ if (size(actionList)!=0)
+            printf(mfilename);
+            printf("  specfic instruction *** ");
+            printf(ctime(time()));
+      if (actionList(1)==1) % rotate and move
+            printf(mfilename);
+            printf("  action:%d rotate: %d move:%d *** ",actionList(1),actionList(2),actionList(3));
+            printf(ctime(time()));
+            rotationToDo=actionList(2);
+            lenToDo=actionList(3);
+            return
+      endif
+       if (actionList(1)==2) % goto a specific point
+            printf(mfilename);
+            printf("  action:%d goto: (%d ,%d) *** ",actionList(1),actionList(2),actionList(3));
+            printf(ctime(time()));
+            nextX=actionList(2);
+            nextY=actionList(3);
+      endif  
+endif 
+    if ((nextX-rotationCenterX)>0)
+    %	if((nextY-rotationCenterY)!=0)
+            deltaAlpha=atan((nextY-rotationCenterY)/(nextX-rotationCenterX))*180/pi;
+        if ((nextX-rotationCenterX)<0)
+          forward=-forward;
+        endif
+    %	else
+    %		deltaAlpha=0
+    %	endif
+    elseif ((nextX-rotationCenterX)<0)
+
+            deltaAlpha=180+atan((nextY-rotationCenterY)/(nextX-rotationCenterX))*180/pi;
+        if ((nextX-rotationCenterX)<0)
+
+        endif
+    else 
+        if ((nextY-rotationCenterY)>=0)
+            deltaAlpha=90;
+        else
+            deltaAlpha=270;
+        endif
     endif
-%	else
-%		deltaAlpha=0
-%	endif
-elseif ((nextX-rotationCenterX)<0)
-
-		deltaAlpha=180+atan((nextY-rotationCenterY)/(nextX-rotationCenterX))*180/pi;
-    if ((nextX-rotationCenterX)<0)
+    rotationToDo=deltaAlpha-currentHeading;
+    shiftRotationX=shiftEchoVsRotationCenter*cos(deltaAlpha*pi/180);
+    shiftRotationY=shiftEchoVsRotationCenter*sin(deltaAlpha*pi/180);
+    minRotToBeDone=apGet(apRobot,"minRotToBeDone");
+    if (abs(rotationToDo)<minRotToBeDone)
+        if (minRotToBeDone-abs(rotationToDo)<minRotToBeDone/2)
+            rotationToDo=minRotToBeDone*sign(rotationToDo);
+        else
+            rotationToDo=0;
+        endif
 
     endif
-else 
-	if ((nextY-rotationCenterY)>=0)
-		deltaAlpha=90;
-	else
-		deltaAlpha=270;
-	endif
-endif
-rotationToDo=deltaAlpha-currentHeading;
-shiftRotationX=shiftEchoVsRotationCenter*cos(deltaAlpha*pi/180);
-shiftRotationY=shiftEchoVsRotationCenter*sin(deltaAlpha*pi/180);
-minRotToBeDone=apGet(apRobot,"minRotToBeDone");
-if (abs(rotationToDo)<minRotToBeDone)
-	if (minRotToBeDone-abs(rotationToDo)<minRotToBeDone/2)
-		rotationToDo=minRotToBeDone*sign(rotationToDo);
-	else
-		rotationToDo=0;
-	endif
 
-endif
+    if (forward==-1)
+        rotationToDo=mod(rotationToDo+180,360);
+    endif
+    newX=rotationCenterX+shiftRotationX;
+    newY=rotationCenterY+shiftRotationY;
 
-if (forward==-1)
-	rotationToDo=mod(rotationToDo+180,360);
-endif
-newX=rotationCenterX+shiftRotationX;
-newY=rotationCenterY+shiftRotationY;
+    lenToDo=sqrt(((nextX-rotationCenterX)^2+(nextY-rotationCenterY)^2))-shiftEchoVsRotationCenter;
+    printf(mfilename);
+    printf(" Computed Move Robot rotCenterX:%d rotCenterY:%d rotation:%d dist:%d. *** ",rotationCenterX,rotationCenterY,rotationToDo,lenToDo);
+    printf(ctime(time()));
+    if forward==0     % no direction constraint
+      forward=1;
+      while (abs(rotationToDo)>90)
+        [rotationToDo,lenToDo,forward] = ApOptimizeMoveToDo(rotationToDo,lenToDo,forward,shiftEchoVsRotationCenter);
+      end
+     else
+      if (rotationToDo>180)
+        rotationToDo=rotationToDo-360;
+      endif
+      if (rotationToDo<-180)
+         rotationToDo=rotationToDo+360;
+      endif
+    endif
+    rotationToDo=round(rotationToDo);
+    lenToDo=round(lenToDo)*forward;
+    printf(mfilename);
+    printf(" optimized Move Robot  rotation:%d dist:%d. *** ",rotationToDo,lenToDo);
+    printf(ctime(time()));
 
-lenToDo=sqrt(((nextX-rotationCenterX)^2+(nextY-rotationCenterY)^2))-shiftEchoVsRotationCenter;
-printf(mfilename);
-printf(" Computed Move Robot rotCenterX:%d rotCenterY:%d rotation:%d dist:%d. *** ",rotationCenterX,rotationCenterY,rotationToDo,lenToDo);
-printf(ctime(time()));
-if forward==0     % no direction constraint
-  forward=1;
-  while (abs(rotationToDo)>90)
-    [rotationToDo,lenToDo,forward] = ApOptimizeMoveToDo(rotationToDo,lenToDo,forward,shiftEchoVsRotationCenter);
-  end
- else
-  if (rotationToDo>180)
-    rotationToDo=rotationToDo-360;
-  endif
-  if (rotationToDo<-180)
-     rotationToDo=rotationToDo+360;
-  endif
-endif
-rotationToDo=round(rotationToDo);
-lenToDo=round(lenToDo)*forward;
-printf(mfilename);
-printf(" optimized Move Robot  rotation:%d dist:%d. *** ",rotationToDo,lenToDo);
-printf(ctime(time()));
 endfunction

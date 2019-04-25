@@ -24,6 +24,9 @@ if retCode==-1
 else
 	testedValue=robot.moveEnd;
 	if (currentAction == testedValue)
+    printf(mfilename);
+		printf(" move retCode:%d %s*** ",retCode,   apGet(apRobot,"retcodeList")(retCode,retCode+1));
+		printf(ctime(time()));
 		testedValue=robot.moveUnderLimitation;
 		if (retCode == testedValue)
 				action="noMove";

@@ -120,8 +120,8 @@
           robot.ResetRobotStatus();
     endif
     printf(mfilename);
-    if (realMode)     
-      target=[585,255,0];
+    if (realMode || autoLocalization==2)     
+      target=[595,120,0];
       printf(mfilename);
       printf(" real mode destination (%d,%d) *** ",target(1),target(2))
       printf(ctime(time()));
@@ -136,7 +136,7 @@
     stopRequest=false;
     robot.ResetRobotStatus();
     loopId=1;
-    if (!autoLocalization)
+    if (!autoLocalization || autoLocalization==2)
       [apRobot,robot,stopRequested] = ApDetermineCurrentLocation(apRobot,robot,1);
       if(stopRequested)
         return;
