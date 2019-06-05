@@ -43,19 +43,27 @@ function [apRobot,robot,retCode,action]=ApRobotNorthAlign(apRobot,robot,NorthHea
                return;
          endif
   endif
-  NO=robot.RefreshNorthOrientation();
-  apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
-  [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
-  while(NO==-1 || NO==999)
+
+ % apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
+  %[apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
+  prevNO=robot.RefreshNorthOrientation();
+  NO=999;
+  count=0;
+  while((NO==-1 || NO==999) && count <10)
     NO=robot.RefreshNorthOrientation();
-#    apRobot = setfield(apRobot,"waitFor",robot.robotNOUpdated);
-    [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
-    pause(1)
+    printf(".%d",NO);
+    pause(2);
+    count++;
   endwhile
+  printf("\n");
   printf(mfilename);
-  printf(" New North orientation: %d  *** ",NO);
+  if (NO!=999)
+      printf(" New North orientation: %d  *** ",NO);
+  else
+       printf(" North orientation: timeout *** ");
+       retCode=-1;
+  endif
   printf(ctime(time()));	
-  
   # for debug
   #{
   validate=false;

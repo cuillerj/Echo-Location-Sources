@@ -94,6 +94,13 @@ apRobot = setfield(apRobot,"nbMesurementByTrain",getNbStepsRotation());         
 apRobot = setfield(apRobot,"pathMaxStraightLenght",150); 
 apRobot = setfield(apRobot,"retcodeDetail",0);
 apRobot = setfield(apRobot,"autoLocalization",true);
+% traces matrrix
+ apRobot = setfield(apRobot,"traceMove",[]);
+ apRobot = setfield(apRobot,"trajectory",[]);
+ apRobot = setfield(apRobot,"traceNext",[]);
+ apRobot = setfield(apRobot,"traceRobot",[]);
+ apRobot = setfield(apRobot,"traceEcho",[]);
+
  %   radiusMargin=30; % cm
  %   headingMargin=13; % °
 apRobot = setfield(apRobot,"northOrientationReferencePoint",[184,184]); 

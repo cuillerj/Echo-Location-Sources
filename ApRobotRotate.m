@@ -79,7 +79,7 @@ function [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotationToDo
                 endif   
                robot.GetSubsystemLocation();
                apRobot = setfield(apRobot,"waitFor",robot.robotUpdatedEnd);            
-               [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
+               [apRobot,robot,retCodeUpdate] = ApWaitForRobot(apRobot,robot,debugOn);       % wait for updated information from robot
                 retry=0;
                 robot.ValidHardPosition(); 
                apRobot = setfield(apRobot,"gyroLocation",[apGet(apRobot,"gyroLocation")(1),apGet(apRobot,"gyroLocation")(2),robot.GetGyroHeading()]);

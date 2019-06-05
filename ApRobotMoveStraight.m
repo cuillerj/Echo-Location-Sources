@@ -10,6 +10,14 @@
                 robot.Move(0,lenToDo); 		 % len sent in cm
                 lastParticles=apGet(apRobot,"particles");          % to be able to recover in case of move failure   
                 saveLocation=apGet(apRobot,"saveLocation");
+                minDistToBeDone=apGet(apRobot,"minDistToBeDone");
+                if (abs(lenToDo)<minDistToBeDone)
+                         if (abs(lenToDo)<=minDistToBeDone/2)
+                             lenToDo=0;
+                         else
+                            lenToDO=minDistToBeDone;
+                        endif
+                endif
                 if (lenToDo>=0)
                 apRobot = setfield(apRobot,"forward",true); 
                  else
@@ -71,8 +79,8 @@
                 if (retCodeMove==robot.moveKoDueToObstacle )
                   newLenToDo=round(sqrt((robot.GetHardPosX()-robot.posX)^2+(robot.GetHardPosY()-robot.posY)^2)*sign(lenToDo));
                    printf(mfilename);
-		                printf(" move retCode:%d %s*** ",retCodeMove,   ApRetcodeString(apRobot,robot,robot.moveEnd,retCodeMove));
-		                printf(ctime(time()));
+		           printf(" move retCode:%d %s*** ",retCodeMove,   ApRetcodeString(apRobot,robot,robot.moveEnd,retCodeMove));
+		           printf(ctime(time()));
                   printf(mfilename);
                   printf(" incompleted move due to obstacle ! Expected dist: %d actual:%d  %d %d %d %d *** ",lenToDo,newLenToDo,robot.GetHardPosX(),robot.posX,robot.GetHardPosY(),robot.posY)
                   printf(ctime(time()))
@@ -91,11 +99,12 @@
                   apRobot = setfield(apRobot,"particles",lastParticles);
                   apRobot = setfield(apRobot,"location",apGet(apRobot,"saveLocation"));
                   probExpectedMoveOk=1;
+                  retCodeMove=0; % consider move ok
                 endif
                 if (retCodeMove==robot.moveKoDueToNotEnoughSpace)
-                  apRobot = setfield(apRobot,"retcodeDetail",robot.GetRetcodeDetail());
+                  apRobot = setfield(apRobot,"retcodeDetail",robot.retCodeDetail);
                   printf(mfilename);
-                  printf(" no move moveKoDueToNotEnoughSpace Max possible len:% d *** ",robot.GetRetcodeDetail());
+                  printf(" no move moveKoDueToNotEnoughSpace Max possible len:% d *** ",robot.retCodeDetail);
                   printf(ctime(time()));
                   apRobot = setfield(apRobot,"particles",lastParticles);
                   apRobot = setfield(apRobot,"lastMove",0);

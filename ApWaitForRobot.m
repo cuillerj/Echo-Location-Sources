@@ -66,7 +66,11 @@ function [apRobot,robot,retCode] = ApWaitForRobot(apRobot,robot,debugOn)
       [apRobot,robot,newState,rc] = ApAutomaton(apRobot,robot,[scan360,retCode],1);
   endif
   if (retCode==-1) % timeout
+   robot.RequestInternalFlags();
+   pause(3);
    robot.ResetRobotStatus() % reset robot
+   robot.RequestInternalFlags();
+    pause(3);
   endif
   pause(1);
 

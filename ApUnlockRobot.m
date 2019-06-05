@@ -1,8 +1,8 @@
-function [apRobot,robot,unlocked,retCode] = ApUnlockRobot(apRobot,robot)
+function [apRobot,robot,unlocked,retCode] = ApUnlockRobot(apRobot,robot,loopCount)
   %{
    This function look for a way to move straight forward and backward based on a front back ping
   %}
-  flag=bitget (robot.IRMap, 8:-1:8)
+  flag=bitget (robot.IRMap, 8:-1:8);
   rotationType=2;  % select 1="northOrientation" 2="gyroscope" 3="wheels"
   printf(mfilename); 
   printf(" starting unlock process ***");
@@ -15,23 +15,41 @@ function [apRobot,robot,unlocked,retCode] = ApUnlockRobot(apRobot,robot)
        retCode=0;
       [apRobot,robot,obstacleHeading,IRMap] = ApCheckIRRobot(apRobot,robot);
       if(sum(IRMap)==0) %  no more obstacle
+            printf(mfilename); 
+            printf(" no longer IR obstacle detected ***");
+            printf(ctime(time()));
             unlocked=true;
        endif
       if(obstacleHeading ==0)
           dist=-2*minDistToBeDone;
+          apRobot=setfield(apRobot,"traceMove",[apGet(apRobot,"traceMove");[time,loopCount,0,dist]]);
           [apRobot,robot,retCodeMove]=ApRobotMoveStraight(apRobot,robot,dist,true,1);
+           apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
+           [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
+           apRobot = setfield(apRobot,"traceRobot",[apGet(apRobot,"traceRobot");[time,loopCount,3,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCodeMove]]);
+           apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
           if (retCodeMove==0)
                 unlocked=true;
             endif
       elseif(obstacleHeading ==180)
             dist=2*minDistToBeDone;
+            apRobot=setfield(apRobot,"traceMove",[apGet(apRobot,"traceMove");[time,loopCount,0,dist]]);
            [apRobot,robot,retCodeMove]=ApRobotMoveStraight(apRobot,robot,dist,true,1);
+            apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
+           [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
+           apRobot = setfield(apRobot,"traceRobot",[apGet(apRobot,"traceRobot");[time,loopCount,3,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCodeMove]]);
+            apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
             if (retCodeMove==0)
                unlocked=true;
             endif
       else
           dist=-2*minDistToBeDone;
+          apRobot=setfield(apRobot,"traceMove",[apGet(apRobot,"traceMove");[time,loopCount,0,dist]]);
           [apRobot,robot,retCodeMove]=ApRobotMoveStraight(apRobot,robot,dist,true,1);
+          apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
+          [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
+           apRobot = setfield(apRobot,"traceRobot",[apGet(apRobot,"traceRobot");[time,loopCount,3,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCodeMove]]);
+          apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
            if (retCodeMove!=0)
                   printf(mfilename); 
                   printf(" Unclock failed ***");
@@ -41,7 +59,12 @@ function [apRobot,robot,unlocked,retCode] = ApUnlockRobot(apRobot,robot)
            endif
           [rotation,lenToDo,forward] = ApOptimizeMoveToDo(-obstacleHeading,0,0);  
           rot=rotation;
-          [apRobot,robot,retCode,action]=ApRobotRotate(apRobot,robot,rotation,rotationType,1);
+          apRobot=setfield(apRobot,"traceMove",[apGet(apRobot,"traceMove");[time,loopCount,rotation,0]]);
+          [apRobot,robot,retCodeMove,action]=ApRobotRotate(apRobot,robot,rotation,rotationType,1);
+           apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
+           [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
+           apRobot = setfield(apRobot,"traceRobot",[apGet(apRobot,"traceRobot");[time,loopCount,3,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCodeMove]]);
+           apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
            if (retCodeMove==0)
                 unlocked=true;
             endif
@@ -90,7 +113,12 @@ function [apRobot,robot,unlocked,retCode] = ApUnlockRobot(apRobot,robot)
           unlocked=false; 
           return;
       endif
+      apRobot=setfield(apRobot,"traceMove",[apGet(apRobot,"traceMove");[time,loopCount,0,moveToDo]]);
       [apRobot,robot,retCodeMove]=ApRobotMoveStraight(apRobot,robot,moveToDo,forward,plotOn);
+      apRobot = setfield(apRobot,"waitFor",robot.moveEnd);
+      [apRobot,robot,retCodeMove]=ApWaitForRobot(apRobot,robot,debugOn);
+      apRobot = setfield(apRobot,"traceRobot",[apGet(apRobot,"traceRobot");[time,loopCount,3,[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading],robot.GetGyroHeading(),retCodeMove]]);
+      apRobot = setfield(apRobot,"location",[robot.GetHardPosX,robot.GetHardPosY,robot.GetHardHeading]);
       if (retCodeMove==0)
         printf(mfilename); 
         printf(" Unlock successfull ***");

@@ -75,8 +75,8 @@
    % particlesNumber=2000;
     plotOn=true;                 % if true graphics will be provided (reduces performance)
     plotOff=false;               % no graphic
-    noiseLevel=0.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
-    noiseRetCode=0;                 % boolean (0 move 100% completed 1 move can be incompleted)
+    noiseLevel=1.0;                 % coefficent (float) of noise of simualtion mode 0 no noise
+    noiseRetCode=1;                 % boolean (0 move 100% completed 1 move can be incompleted)
     scanNoiseLevel=0.0;             % 0.0 0.5
     noiseRetValue=12;               % range of noised retcode in wich a random retcode is choosen 
     [apRobot,robot] =ApInitApRobot(flatLogRegMode,realMode,apRobot,robot);
@@ -109,15 +109,17 @@
             printf(mfilename);
             printf(" wait for robot to be ready  *** ");
             printf(ctime(time()));
+
            endif
           while (robotStatus<=0)              % wait for robot to be ready
             robotStatus=robot.runningStatus;
             pause(2);
             printf(".");
           end
-          pause(2);
+          pause(10);
           [apRobot,robot,rc] = ApInitRobotParameters(apRobot,robot);  % download parameters inside the robot
           robot.ResetRobotStatus();
+          pause(15);
     endif
     printf(mfilename);
     if (realMode || autoLocalization==2)     

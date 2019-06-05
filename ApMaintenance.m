@@ -18,7 +18,8 @@
   printf(" GetS ubsytem Registers: 16\n")
   printf(" Stop robot server:17\n")
   printf(" Init robot value:18\n")
-  printf(" Stop all: 19\n")
+  printf(" Lanch batch:19\n")
+  printf(" Stop all: 20\n")
   option=input("enter your choice ");
   switch(option)
     case(0)
@@ -59,7 +60,19 @@
       robot.StopRobotServer;
     case (18)
       robot.InitRobotValues;
-     case(19)
+     case (19)       
+       if (apGet(apRobot,"realMode"))
+        rcBatch=robot.LaunchBatch();        % call java method to start all batchs
+      else
+        rcBatch=robot.LaunchSimu();        % call java method to start only simulator
+        endif
+        if (rcBatch!=0)
+            printf(mfilename);
+            printf(" java batch launch issue:%d - Need to restart Octave *** ",rcBatch);
+            printf(ctime(time()));
+            return
+        endif
+     case(20)
       ApStopRobot(apRobot,robot);
   endswitch
   return

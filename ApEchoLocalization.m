@@ -98,7 +98,7 @@
   plotOn=true;
   checkLocationAvaibility=true;
  % traceDet=[];
-  traceMove=[];
+
   histDeltaDist=[0];
   if (!exist("traceLoc"))
     traceLoc=[];

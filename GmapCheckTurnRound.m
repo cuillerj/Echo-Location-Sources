@@ -12,6 +12,6 @@ function [apRobot,possible,rotation,step] = GmapCheckTurnRound(apRobot,expectedH
     shitfCartoX=apGet(apRobot,"shitfCartoX");
     shitfCartoY=apGet(apRobot,"shitfCartoY");
     
-    cartoValue = carto(currentL(1)+shitfCartoX,currentL(2)+shitfCartoY)
+    cartoValue = carto(currentL(1)+shitfCartoX,currentL(2)+shitfCartoY);
     
     endfunction

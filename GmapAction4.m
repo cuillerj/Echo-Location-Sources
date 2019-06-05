@@ -31,6 +31,8 @@ function [actionList,retCode] = GmapAction4(apRobot,currentLocation,nextLocation
                 printf(" goto (%d,%d) *** ",nextStep(1),nextStep(2));
                 printf(ctime(time()));
                 actionList=[2,nextStep];
+                pathStep=apGet(apRobot,"pathStep");
+                apGet(apRobot,"pathStep")=pathStep(2:size(pathStep,1),:); % skip next step from path
             endif
         endif
     
